@@ -10,8 +10,8 @@ Optional: Glättung via Ollama (glm-4.7-flash, http://localhost:11434).
 
 ## Aktueller Phasenstand
 
-**Aktive Phase**: PROJ-5 – PostProcessor-Protokoll
-**Stand**: PROJ-1–PROJ-4 abgeschlossen. PROJ-5 offen.
+**Aktive Phase**: Alle Phasen abgeschlossen
+**Stand**: PROJ-1–PROJ-7 abgeschlossen.
 
 | Phase | Status |
 |-------|--------|
@@ -19,7 +19,9 @@ Optional: Glättung via Ollama (glm-4.7-flash, http://localhost:11434).
 | PROJ-2 Fn-Hotkey + Audio | Abgeschlossen |
 | PROJ-3 WhisperKit | Abgeschlossen |
 | PROJ-4 Text-Einfügung | Abgeschlossen |
-| PROJ-5 PostProcessor-Protokoll | Offen |
+| PROJ-5 PostProcessor-Protokoll | Abgeschlossen |
+| PROJ-6 OllamaPostProcessor | Abgeschlossen |
+| PROJ-7 Einstellungen | Abgeschlossen |
 | PROJ-5 PostProcessor-Protokoll | Offen |
 | PROJ-6 OllamaPostProcessor | Offen |
 | PROJ-7 Einstellungen | Offen |
