@@ -10,14 +10,14 @@ Optional: Glättung via Ollama (glm-4.7-flash, http://localhost:11434).
 
 ## Aktueller Phasenstand
 
-**Aktive Phase**: PROJ-3 – WhisperKit-Transkription
-**Stand**: PROJ-1 + PROJ-2 abgeschlossen. PROJ-3 offen.
+**Aktive Phase**: PROJ-4 – Text-Einfügung
+**Stand**: PROJ-1 + PROJ-2 + PROJ-3 abgeschlossen. PROJ-4 offen.
 
 | Phase | Status |
 |-------|--------|
 | PROJ-1 Menübar-App-Gerüst | Abgeschlossen |
 | PROJ-2 Fn-Hotkey + Audio | Abgeschlossen |
-| PROJ-3 WhisperKit | Offen |
+| PROJ-3 WhisperKit | Abgeschlossen |
 | PROJ-4 Text-Einfügung | Offen |
 | PROJ-5 PostProcessor-Protokoll | Offen |
 | PROJ-6 OllamaPostProcessor | Offen |
@@ -42,8 +42,8 @@ Optional: Glättung via Ollama (glm-4.7-flash, http://localhost:11434).
 
 ## Offene Fragen / Blocker
 
-- Fn-Taste via CGEventTap: Genaue Erkennung muss in PROJ-2 empirisch validiert werden (nicht offiziell dokumentiert). Plan B: rechte Ctrl-Taste.
-- WhisperKit SPM-Integration: muss in project.yml als Swift Package hinzugefügt werden (PROJ-3)
+- Text-Einfügung (PROJ-4): Accessibility-Permission für CGEvent-Simulation nötig. Fallback: nur Clipboard ohne Paste.
+- NSPasteboard: alten Inhalt zwischenspeichern und nach Paste wiederherstellen.
 
 ## Stack-Versionen
 

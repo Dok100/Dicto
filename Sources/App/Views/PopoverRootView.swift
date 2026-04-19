@@ -92,13 +92,22 @@ struct PopoverRootView: View {
             }
 
         case .done(let text):
-            ScrollView {
-                Text(text)
-                    .font(.callout)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .textSelection(.enabled)
+            VStack(spacing: 6) {
+                ScrollView {
+                    Text(text)
+                        .font(.callout)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .textSelection(.enabled)
+                }
+                .frame(maxHeight: 80)
+                if !appState.isAccessibilityAuthorized {
+                    PermissionHint(
+                        message: "Eingabehilfen fehlt – Text nicht eingefügt.",
+                        settingsURL: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility",
+                        appState: appState
+                    )
+                }
             }
-            .frame(maxHeight: 80)
 
         case .error(let message):
             Text(message)
