@@ -23,6 +23,7 @@ final class AppState: ObservableObject {
     let audioService: AudioService
     let whisperService: WhisperService
     let pasteService: PasteService
+    var postProcessor: TextPostProcessor = PassthroughPostProcessor()
 
     private var targetApp: NSRunningApplication?
     private var cancellables = Set<AnyCancellable>()
@@ -90,19 +91,18 @@ final class AppState: ObservableObject {
 
     @MainActor
     private func handleTranscriptionDone(text: String) async {
+        let processed = await postProcessor.process(text: text)
+
         let app = targetApp
         targetApp = nil
 
-        // Nur in externe Apps einfügen (nicht in Dicto selbst)
         if let app, app.bundleIdentifier != Bundle.main.bundleIdentifier {
             app.activate(options: .activateIgnoringOtherApps)
-            // Kurze Pause damit die Ziel-App den Fokus bekommt
             try? await Task.sleep(nanoseconds: 100_000_000)
-            pasteService.paste(text: text)
-            // Pause damit Cmd+V verarbeitet wird, bevor der Popover den Fokus übernimmt
+            pasteService.paste(text: processed)
             try? await Task.sleep(nanoseconds: 100_000_000)
         }
 
-        transcriptionState = .done(text)
+        transcriptionState = .done(processed)
     }
 }
