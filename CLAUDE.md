@@ -52,7 +52,7 @@ Optional: Glättung via Ollama (glm-4.7-flash, http://localhost:11434).
 - macOS 14.0+ Deployment Target
 - Xcode 15+
 - WhisperKit: aktuell (main branch, SPM)
-- Ollama: lokal, glm-4.7-flash
+- Ollama: lokal, glm4 (Ollama-Modellname: glm4, 5.5 GB)
 
 ## Wichtige Dateipfade
 

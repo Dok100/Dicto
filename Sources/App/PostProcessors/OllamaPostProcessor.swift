@@ -4,7 +4,7 @@ final class OllamaPostProcessor: TextPostProcessor {
     private let url: URL
     private let model: String
 
-    init(baseURL: String = "http://localhost:11434", model: String = "glm-4.7-flash") {
+    init(baseURL: String = "http://localhost:11434", model: String = "glm4") {
         self.url = URL(string: "\(baseURL)/api/chat")!
         self.model = model
     }
