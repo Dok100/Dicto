@@ -10,10 +10,18 @@ struct PopoverRootView: View {
             statusArea
             Spacer(minLength: 0)
             Divider()
-            Button("Beenden") {
-                NSApplication.shared.terminate(nil)
+            HStack {
+                Button(action: { appState.onOpenSettings?() }) {
+                    Image(systemName: "gearshape")
+                }
+                .buttonStyle(.plain)
+                .help("Einstellungen")
+                Spacer()
+                Button("Beenden") {
+                    NSApplication.shared.terminate(nil)
+                }
+                .keyboardShortcut("q", modifiers: .command)
             }
-            .keyboardShortcut("q", modifiers: .command)
         }
         .padding()
         .frame(width: 280, height: 240)

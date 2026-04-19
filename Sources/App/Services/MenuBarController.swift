@@ -6,6 +6,7 @@ final class MenuBarController {
     private let statusItem: NSStatusItem
     private let popover: NSPopover
     private var cancellable: AnyCancellable?
+    private var settingsWindowController: SettingsWindowController?
 
     init(appState: AppState) {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
@@ -13,7 +14,12 @@ final class MenuBarController {
         setupStatusItem()
         setupPopover(appState: appState)
 
-        // Popover automatisch zeigen wenn Transkription fertig ist
+        settingsWindowController = SettingsWindowController(settings: appState.settings)
+        appState.onOpenSettings = { [weak self] in
+            self?.popover.performClose(nil)
+            self?.settingsWindowController?.show()
+        }
+
         cancellable = appState.$transcriptionState
             .receive(on: RunLoop.main)
             .sink { [weak self] state in
