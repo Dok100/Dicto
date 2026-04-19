@@ -7,7 +7,7 @@ final class WhisperService: ObservableObject {
     @Published private(set) var state: TranscriptionState = .idle
 
     private var pipe: WhisperKit?
-    private static let modelName = "openai_whisper-large-v3-turbo"
+    private static let modelName = "large-v3"
 
     func loadModelIfNeeded() async {
         guard pipe == nil else { return }

@@ -74,8 +74,11 @@ struct PopoverRootView: View {
 
         case .loadingModel(let progress):
             VStack(spacing: 4) {
-                ProgressView(value: progress > 0 ? progress : nil)
-                    .progressViewStyle(.linear)
+                if progress > 0 {
+                    ProgressView(value: progress).progressViewStyle(.linear)
+                } else {
+                    ProgressView().progressViewStyle(.circular).scaleEffect(0.7)
+                }
                 Text(progress > 0
                     ? "Modell wird geladen … \(Int(progress * 100)) %"
                     : "Modell wird geladen …")
