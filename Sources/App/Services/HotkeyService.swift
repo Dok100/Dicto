@@ -9,7 +9,10 @@ final class HotkeyService {
     private var runLoopSource: CFRunLoopSource?
     private var isFnDown = false
 
-    // NX_SECONDARYFNMASK – undokumentiertes Flag für Fn/Globe-Taste
+    // Fn/Globe-Taste: keycode 63 (kVK_Function).
+    // Das Flag 0x800000 (NX_SECONDARYFNMASK) zeigt an ob die Taste gedrückt ist.
+    // Voraussetzung: Systemeinstellungen → Tastatur → 🌐-Taste → "Als Fn-Taste verwenden"
+    private static let fnKeyCode: Int64 = 63
     private static let fnKeyFlag = CGEventFlags(rawValue: 0x800000)
 
     // true wenn Bedienungshilfen erteilt (unabhängig vom Tap)
@@ -22,8 +25,6 @@ final class HotkeyService {
         tryInstallTap()
     }
 
-    // Aufrufbar nachdem Nutzer Berechtigung in Systemeinstellungen erteilt hat –
-    // kein App-Neustart nötig.
     func retryIfNeeded() {
         guard !isAvailable else { return }
         tryInstallTap()
@@ -42,9 +43,7 @@ final class HotkeyService {
 
         guard let source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, tap, 0) else { return }
 
-        // Alten Tap abbauen falls ein Retry stattfindet
         tearDownTap()
-
         eventTap = tap
         runLoopSource = source
         CFRunLoopAddSource(CFRunLoopGetMain(), source, .commonModes)
@@ -60,6 +59,8 @@ final class HotkeyService {
     }
 
     fileprivate func handleEvent(_ event: CGEvent) {
+        // Nur auf Fn/Globe-Taste reagieren (keycode 63), andere Modifier ignorieren
+        guard event.getIntegerValueField(.keyboardEventKeycode) == Self.fnKeyCode else { return }
         let fnCurrentlyDown = event.flags.contains(Self.fnKeyFlag)
         guard fnCurrentlyDown != isFnDown else { return }
         isFnDown = fnCurrentlyDown
