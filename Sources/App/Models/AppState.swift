@@ -23,7 +23,7 @@ final class AppState: ObservableObject {
     let audioService: AudioService
     let whisperService: WhisperService
     let pasteService: PasteService
-    var postProcessor: TextPostProcessor = PassthroughPostProcessor()
+    var postProcessor: any TextPostProcessor = OllamaPostProcessor()
 
     private var targetApp: NSRunningApplication?
     private var cancellables = Set<AnyCancellable>()
