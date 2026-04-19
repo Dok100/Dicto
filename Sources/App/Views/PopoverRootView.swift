@@ -4,11 +4,11 @@ struct PopoverRootView: View {
     @EnvironmentObject var appState: AppState
 
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 10) {
             statusIcon
             Text("Dicto").font(.headline)
-            statusText
-            Spacer()
+            statusArea
+            Spacer(minLength: 0)
             Divider()
             Button("Beenden") {
                 NSApplication.shared.terminate(nil)
@@ -16,26 +16,32 @@ struct PopoverRootView: View {
             .keyboardShortcut("q", modifiers: .command)
         }
         .padding()
-        .frame(width: 280, height: 200)
+        .frame(width: 280, height: 240)
     }
+
+    // MARK: – Status-Icon
 
     @ViewBuilder
     private var statusIcon: some View {
-        Image(systemName: appState.isRecording ? "mic.fill" : "mic")
-            .font(.system(size: 36))
-            .foregroundStyle(appState.isRecording ? Color.red : Color.secondary)
+        Image(systemName: iconName)
+            .font(.system(size: 32))
+            .foregroundStyle(iconColor)
             .animation(.easeInOut(duration: 0.15), value: appState.isRecording)
     }
 
+    private var iconName: String {
+        appState.isRecording ? "mic.fill" : "mic"
+    }
+
+    private var iconColor: Color {
+        appState.isRecording ? .red : .secondary
+    }
+
+    // MARK: – Haupt-Statusbereich
+
     @ViewBuilder
-    private var statusText: some View {
+    private var statusArea: some View {
         switch appState.missingPermission {
-        case .accessibility:
-            PermissionHint(
-                message: "Bedienungshilfen-Zugriff fehlt.",
-                settingsURL: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility",
-                appState: appState
-            )
         case .inputMonitoring:
             PermissionHint(
                 message: "Eingabe-Überwachung fehlt.",
@@ -49,14 +55,58 @@ struct PopoverRootView: View {
                 appState: appState
             )
         case .none:
+            transcriptionArea
+        }
+    }
+
+    // MARK: – Transkriptions-Bereich
+
+    @ViewBuilder
+    private var transcriptionArea: some View {
+        switch appState.transcriptionState {
+        case .idle:
             if appState.isRecording {
                 Text("Aufnahme läuft …").font(.subheadline).foregroundStyle(.red)
             } else {
-                Text("Fn gedrückt halten zum Diktieren").font(.subheadline).foregroundStyle(.secondary)
+                Text("Fn gedrückt halten zum Diktieren")
+                    .font(.subheadline).foregroundStyle(.secondary)
             }
+
+        case .loadingModel(let progress):
+            VStack(spacing: 4) {
+                ProgressView(value: progress > 0 ? progress : nil)
+                    .progressViewStyle(.linear)
+                Text(progress > 0
+                    ? "Modell wird geladen … \(Int(progress * 100)) %"
+                    : "Modell wird geladen …")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+
+        case .transcribing:
+            VStack(spacing: 4) {
+                ProgressView().progressViewStyle(.circular).scaleEffect(0.7)
+                Text("Transkribiere …").font(.caption).foregroundStyle(.secondary)
+            }
+
+        case .done(let text):
+            ScrollView {
+                Text(text)
+                    .font(.callout)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .textSelection(.enabled)
+            }
+            .frame(maxHeight: 80)
+
+        case .error(let message):
+            Text(message)
+                .font(.caption)
+                .foregroundStyle(.red)
+                .multilineTextAlignment(.center)
         }
     }
 }
+
+// MARK: – Berechtigungs-Hinweis
 
 private struct PermissionHint: View {
     let message: String
@@ -68,15 +118,11 @@ private struct PermissionHint: View {
             Text(message).font(.caption).foregroundStyle(.orange)
             HStack(spacing: 8) {
                 Button("Einstellungen öffnen") {
-                    if let url = URL(string: settingsURL) {
-                        NSWorkspace.shared.open(url)
-                    }
+                    if let url = URL(string: settingsURL) { NSWorkspace.shared.open(url) }
                 }
                 .font(.caption)
-                Button("Neu prüfen") {
-                    appState.recheckPermissions()
-                }
-                .font(.caption)
+                Button("Neu prüfen") { appState.recheckPermissions() }
+                    .font(.caption)
             }
         }
     }
