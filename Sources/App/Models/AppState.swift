@@ -10,7 +10,6 @@ final class AppState: ObservableObject {
 
     // Welche Berechtigung fehlt gerade – treibt die Popover-Anzeige
     var missingPermission: MissingPermission {
-        if !hotkeyService.isAccessibilityGranted { return .accessibility }
         if !hotkeyService.isAvailable { return .inputMonitoring }
         if !audioService.isMicrophoneAuthorized { return .microphone }
         return .none

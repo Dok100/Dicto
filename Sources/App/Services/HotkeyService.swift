@@ -5,73 +5,49 @@ final class HotkeyService {
     var onKeyUp: (() -> Void)?
 
     private(set) var isAvailable = false
-    private var eventTap: CFMachPort?
-    private var runLoopSource: CFRunLoopSource?
+    private var globalMonitor: Any?
+    private var localMonitor: Any?
     private var isFnDown = false
 
-    // Fn/Globe-Taste: keycode 63 (kVK_Function).
-    // Das Flag 0x800000 (NX_SECONDARYFNMASK) zeigt an ob die Taste gedrückt ist.
-    // Voraussetzung: Systemeinstellungen → Tastatur → 🌐-Taste → "Als Fn-Taste verwenden"
-    private static let fnKeyCode: Int64 = 63
-    private static let fnKeyFlag = CGEventFlags(rawValue: 0x800000)
+    // Globe/Fn-Taste: keyCode 63, modifierFlags enthält .function wenn gedrückt.
+    // Voraussetzung: Systemeinstellungen → Tastatur → 🌐-Taste → "Keine Aktion"
+    private static let fnKeyCode: UInt16 = 63
 
-    // true wenn Bedienungshilfen erteilt (unabhängig vom Tap)
     var isAccessibilityGranted: Bool { AXIsProcessTrusted() }
 
     init() {
-        // Accessibility-Dialog zeigen falls noch nicht erteilt
-        let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
-        AXIsProcessTrustedWithOptions(options)
-        tryInstallTap()
+        tryInstallMonitor()
     }
 
     func retryIfNeeded() {
         guard !isAvailable else { return }
-        tryInstallTap()
+        tryInstallMonitor()
     }
 
-    private func tryInstallTap() {
-        let mask = CGEventMask(1 << CGEventType.flagsChanged.rawValue)
-        guard let tap = CGEvent.tapCreate(
-            tap: .cgSessionEventTap,
-            place: .headInsertEventTap,
-            options: .defaultTap,
-            eventsOfInterest: mask,
-            callback: hotkeyEventTapCallback,
-            userInfo: Unmanaged.passUnretained(self).toOpaque()
-        ) else { return }
-
-        guard let source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, tap, 0) else { return }
-
-        tearDownTap()
-        eventTap = tap
-        runLoopSource = source
-        CFRunLoopAddSource(CFRunLoopGetMain(), source, .commonModes)
-        CGEvent.tapEnable(tap: tap, enable: true)
-        isAvailable = true
+    private func tryInstallMonitor() {
+        // NSEvent.addGlobalMonitorForEvents arbeitet auf Cocoa-Ebene und
+        // empfängt Globe/Fn-Events zuverlässiger als CGEventTap
+        globalMonitor = NSEvent.addGlobalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
+            self?.handleEvent(event)
+        }
+        // Local monitor damit das Popover den Hotkey auch empfängt wenn es im Fokus ist
+        localMonitor = NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
+            self?.handleEvent(event)
+            return event
+        }
+        isAvailable = globalMonitor != nil
     }
 
-    private func tearDownTap() {
-        if let tap = eventTap { CGEvent.tapEnable(tap: tap, enable: false) }
-        if let source = runLoopSource { CFRunLoopRemoveSource(CFRunLoopGetMain(), source, .commonModes) }
-        eventTap = nil
-        runLoopSource = nil
-    }
-
-    fileprivate func handleEvent(_ event: CGEvent) {
-        // Nur auf Fn/Globe-Taste reagieren (keycode 63), andere Modifier ignorieren
-        guard event.getIntegerValueField(.keyboardEventKeycode) == Self.fnKeyCode else { return }
-        let fnCurrentlyDown = event.flags.contains(Self.fnKeyFlag)
+    private func handleEvent(_ event: NSEvent) {
+        guard event.keyCode == Self.fnKeyCode else { return }
+        let fnCurrentlyDown = event.modifierFlags.contains(.function)
         guard fnCurrentlyDown != isFnDown else { return }
         isFnDown = fnCurrentlyDown
         if fnCurrentlyDown { onKeyDown?() } else { onKeyUp?() }
     }
 
-    deinit { tearDownTap() }
-}
-
-private let hotkeyEventTapCallback: CGEventTapCallBack = { _, _, event, refcon in
-    guard let refcon else { return Unmanaged.passUnretained(event) }
-    Unmanaged<HotkeyService>.fromOpaque(refcon).takeUnretainedValue().handleEvent(event)
-    return Unmanaged.passUnretained(event)
+    deinit {
+        if let m = globalMonitor { NSEvent.removeMonitor(m) }
+        if let m = localMonitor { NSEvent.removeMonitor(m) }
+    }
 }
