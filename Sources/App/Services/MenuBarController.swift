@@ -5,11 +5,11 @@ final class MenuBarController {
     private let statusItem: NSStatusItem
     private let popover: NSPopover
 
-    init() {
+    init(appState: AppState) {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         popover = NSPopover()
         setupStatusItem()
-        setupPopover()
+        setupPopover(appState: appState)
     }
 
     private func setupStatusItem() {
@@ -19,11 +19,12 @@ final class MenuBarController {
         button.target = self
     }
 
-    private func setupPopover() {
-        popover.contentSize = NSSize(width: 280, height: 180)
-        // .transient schließt den Popover automatisch, wenn der Nutzer woanders klickt
+    private func setupPopover(appState: AppState) {
+        popover.contentSize = NSSize(width: 280, height: 200)
         popover.behavior = .transient
-        popover.contentViewController = NSHostingController(rootView: PopoverRootView())
+        popover.contentViewController = NSHostingController(
+            rootView: PopoverRootView().environmentObject(appState)
+        )
     }
 
     @objc private func togglePopover() {
@@ -32,7 +33,6 @@ final class MenuBarController {
         } else {
             guard let button = statusItem.button else { return }
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
-            // Fenster in den Vordergrund holen, damit Tastatur-Fokus funktioniert
             popover.contentViewController?.view.window?.makeKey()
         }
     }
