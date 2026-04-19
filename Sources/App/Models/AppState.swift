@@ -92,6 +92,7 @@ final class AppState: ObservableObject {
     @MainActor
     private func handleTranscriptionDone(text: String) async {
         let processed = await postProcessor.process(text: text)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
 
         let app = targetApp
         targetApp = nil
