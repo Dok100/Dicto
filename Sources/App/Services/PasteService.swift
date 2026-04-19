@@ -8,6 +8,15 @@ final class PasteService {
         AXIsProcessTrusted()
     }
 
+    // Zeigt den macOS-System-Dialog "Dicto möchte Ihren Computer steuern"
+    // und trägt die App korrekt in Eingabehilfen ein.
+    func requestAccessibilityIfNeeded() {
+        guard !isAccessibilityAuthorized else { return }
+        let key = kAXTrustedCheckOptionPrompt.takeRetainedValue() as String
+        let options = [key: true] as CFDictionary
+        _ = AXIsProcessTrustedWithOptions(options)
+    }
+
     func paste(text: String) {
         let pasteboard = NSPasteboard.general
         let savedString = pasteboard.string(forType: .string)

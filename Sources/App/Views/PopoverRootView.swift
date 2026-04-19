@@ -102,7 +102,7 @@ struct PopoverRootView: View {
                 .frame(maxHeight: 80)
                 if !appState.isAccessibilityAuthorized {
                     PermissionHint(
-                        message: "Barrierefreiheit fehlt – Text nicht eingefügt.",
+                        message: "Eingabehilfen fehlt – Text nicht eingefügt.",
                         settingsURL: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility",
                         appState: appState
                     )

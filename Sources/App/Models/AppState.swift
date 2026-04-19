@@ -72,11 +72,17 @@ final class AppState: ObservableObject {
         }
 
         Task { await whisper.loadModelIfNeeded() }
+
+        // Accessibility-Dialog beim ersten Start anzeigen
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            paste.requestAccessibilityIfNeeded()
+        }
     }
 
     func recheckPermissions() {
         hotkeyService.retryIfNeeded()
         hasMicrophonePermission = audioService.isMicrophoneAuthorized
+        pasteService.requestAccessibilityIfNeeded()
         objectWillChange.send()
     }
 
