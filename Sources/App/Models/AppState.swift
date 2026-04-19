@@ -16,12 +16,8 @@ final class AppState: ObservableObject {
         self.hasHotkeyPermission = hotkey.isAvailable
         self.hasMicrophonePermission = audio.isMicrophoneAuthorized
 
-        // Mikrofon-Permission sofort beim Start anfragen, nicht erst beim ersten Record.
-        // So ist die Permission schon erteilt, wenn der Nutzer das erste Mal Fn drückt.
         audio.requestPermissionIfNeeded { [weak self] granted in
-            DispatchQueue.main.async {
-                self?.hasMicrophonePermission = granted
-            }
+            DispatchQueue.main.async { self?.hasMicrophonePermission = granted }
         }
 
         hotkey.onKeyDown = { [weak self] in
@@ -32,5 +28,12 @@ final class AppState: ObservableObject {
             self?.isRecording = false
             audio.stopRecording()
         }
+    }
+
+    // Wird vom "Neu prüfen"-Button im Popover aufgerufen
+    func recheckPermissions() {
+        hotkeyService.retryIfNeeded()
+        hasHotkeyPermission = hotkeyService.isAvailable
+        hasMicrophonePermission = audioService.isMicrophoneAuthorized
     }
 }

@@ -9,64 +9,63 @@ final class HotkeyService {
     private var runLoopSource: CFRunLoopSource?
     private var isFnDown = false
 
-    // NX_SECONDARYFNMASK – nicht offiziell dokumentiertes Flag für die Fn/Globe-Taste.
-    // Plan B: keyCode 0x3E (rechte Ctrl) als Alternative in PROJ-7 konfigurierbar.
+    // NX_SECONDARYFNMASK – undokumentiertes Flag für Fn/Globe-Taste
     private static let fnKeyFlag = CGEventFlags(rawValue: 0x800000)
 
     init() {
-        setup()
-    }
-
-    private func setup() {
-        // Zeigt Accessibility-Berechtigungsdialog beim ersten Start
+        // Accessibility-Dialog zeigen falls noch nicht erteilt
         let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
         AXIsProcessTrustedWithOptions(options)
+        tryInstallTap()
+    }
 
+    // Aufrufbar nachdem Nutzer Berechtigung in Systemeinstellungen erteilt hat –
+    // kein App-Neustart nötig.
+    func retryIfNeeded() {
+        guard !isAvailable else { return }
+        tryInstallTap()
+    }
+
+    private func tryInstallTap() {
         let mask = CGEventMask(1 << CGEventType.flagsChanged.rawValue)
-
-        eventTap = CGEvent.tapCreate(
+        guard let tap = CGEvent.tapCreate(
             tap: .cgSessionEventTap,
             place: .headInsertEventTap,
             options: .defaultTap,
             eventsOfInterest: mask,
             callback: hotkeyEventTapCallback,
             userInfo: Unmanaged.passUnretained(self).toOpaque()
-        )
+        ) else { return }
 
-        isAvailable = eventTap != nil
-        guard let tap = eventTap else { return }
+        guard let source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, tap, 0) else { return }
 
-        runLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, tap, 0)
-        if let source = runLoopSource {
-            CFRunLoopAddSource(CFRunLoopGetMain(), source, .commonModes)
-            CGEvent.tapEnable(tap: tap, enable: true)
-        }
+        // Alten Tap abbauen falls ein Retry stattfindet
+        tearDownTap()
+
+        eventTap = tap
+        runLoopSource = source
+        CFRunLoopAddSource(CFRunLoopGetMain(), source, .commonModes)
+        CGEvent.tapEnable(tap: tap, enable: true)
+        isAvailable = true
     }
 
-    // Wird vom C-Callback aufgerufen, läuft auf dem Main Thread (Main RunLoop)
+    private func tearDownTap() {
+        if let tap = eventTap { CGEvent.tapEnable(tap: tap, enable: false) }
+        if let source = runLoopSource { CFRunLoopRemoveSource(CFRunLoopGetMain(), source, .commonModes) }
+        eventTap = nil
+        runLoopSource = nil
+    }
+
     fileprivate func handleEvent(_ event: CGEvent) {
         let fnCurrentlyDown = event.flags.contains(Self.fnKeyFlag)
         guard fnCurrentlyDown != isFnDown else { return }
         isFnDown = fnCurrentlyDown
-
-        if fnCurrentlyDown {
-            onKeyDown?()
-        } else {
-            onKeyUp?()
-        }
+        if fnCurrentlyDown { onKeyDown?() } else { onKeyUp?() }
     }
 
-    deinit {
-        if let tap = eventTap {
-            CGEvent.tapEnable(tap: tap, enable: false)
-        }
-        if let source = runLoopSource {
-            CFRunLoopRemoveSource(CFRunLoopGetMain(), source, .commonModes)
-        }
-    }
+    deinit { tearDownTap() }
 }
 
-// C-kompatibler Callback – darf keine Swift-Werte clos-over, nutzt userInfo als Brücke zu self
 private let hotkeyEventTapCallback: CGEventTapCallBack = { _, _, event, refcon in
     guard let refcon else { return Unmanaged.passUnretained(event) }
     Unmanaged<HotkeyService>.fromOpaque(refcon).takeUnretainedValue().handleEvent(event)

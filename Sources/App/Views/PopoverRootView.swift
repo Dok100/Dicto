@@ -30,13 +30,27 @@ struct PopoverRootView: View {
     @ViewBuilder
     private var statusText: some View {
         if !appState.hasHotkeyPermission {
-            PermissionHint(
-                text: "Bedienungshilfen-Zugriff fehlt.\nSystemeinstellungen → Datenschutz → Bedienungshilfen"
-            )
+            VStack(spacing: 6) {
+                Text("Bedienungshilfen-Zugriff fehlt.\nSystemeinstellungen → Datenschutz → Bedienungshilfen")
+                    .font(.caption)
+                    .foregroundStyle(.orange)
+                    .multilineTextAlignment(.center)
+                Button("Neu prüfen") {
+                    appState.recheckPermissions()
+                }
+                .font(.caption)
+            }
         } else if !appState.hasMicrophonePermission {
-            PermissionHint(
-                text: "Mikrofon-Zugriff fehlt.\nSystemeinstellungen → Datenschutz → Mikrofon"
-            )
+            VStack(spacing: 6) {
+                Text("Mikrofon-Zugriff fehlt.\nSystemeinstellungen → Datenschutz → Mikrofon")
+                    .font(.caption)
+                    .foregroundStyle(.orange)
+                    .multilineTextAlignment(.center)
+                Button("Neu prüfen") {
+                    appState.recheckPermissions()
+                }
+                .font(.caption)
+            }
         } else if appState.isRecording {
             Text("Aufnahme läuft …")
                 .font(.subheadline)
@@ -46,15 +60,5 @@ struct PopoverRootView: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
-    }
-}
-
-private struct PermissionHint: View {
-    let text: String
-    var body: some View {
-        Text(text)
-            .font(.caption)
-            .foregroundStyle(.orange)
-            .multilineTextAlignment(.center)
     }
 }
