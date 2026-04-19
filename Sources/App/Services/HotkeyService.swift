@@ -12,6 +12,9 @@ final class HotkeyService {
     // NX_SECONDARYFNMASK – undokumentiertes Flag für Fn/Globe-Taste
     private static let fnKeyFlag = CGEventFlags(rawValue: 0x800000)
 
+    // true wenn Bedienungshilfen erteilt (unabhängig vom Tap)
+    var isAccessibilityGranted: Bool { AXIsProcessTrusted() }
+
     init() {
         // Accessibility-Dialog zeigen falls noch nicht erteilt
         let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary

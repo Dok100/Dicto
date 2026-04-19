@@ -1,9 +1,20 @@
 import Foundation
 
+enum MissingPermission {
+    case none, accessibility, inputMonitoring, microphone
+}
+
 final class AppState: ObservableObject {
     @Published private(set) var isRecording = false
-    @Published private(set) var hasHotkeyPermission = false
     @Published private(set) var hasMicrophonePermission = false
+
+    // Welche Berechtigung fehlt gerade – treibt die Popover-Anzeige
+    var missingPermission: MissingPermission {
+        if !hotkeyService.isAccessibilityGranted { return .accessibility }
+        if !hotkeyService.isAvailable { return .inputMonitoring }
+        if !audioService.isMicrophoneAuthorized { return .microphone }
+        return .none
+    }
 
     let hotkeyService: HotkeyService
     let audioService: AudioService
@@ -13,7 +24,6 @@ final class AppState: ObservableObject {
         let hotkey = HotkeyService()
         self.audioService = audio
         self.hotkeyService = hotkey
-        self.hasHotkeyPermission = hotkey.isAvailable
         self.hasMicrophonePermission = audio.isMicrophoneAuthorized
 
         audio.requestPermissionIfNeeded { [weak self] granted in
@@ -30,10 +40,9 @@ final class AppState: ObservableObject {
         }
     }
 
-    // Wird vom "Neu prüfen"-Button im Popover aufgerufen
     func recheckPermissions() {
         hotkeyService.retryIfNeeded()
-        hasHotkeyPermission = hotkeyService.isAvailable
         hasMicrophonePermission = audioService.isMicrophoneAuthorized
+        objectWillChange.send()
     }
 }

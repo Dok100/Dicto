@@ -29,36 +29,55 @@ struct PopoverRootView: View {
 
     @ViewBuilder
     private var statusText: some View {
-        if !appState.hasHotkeyPermission {
-            VStack(spacing: 6) {
-                Text("Bedienungshilfen-Zugriff fehlt.\nSystemeinstellungen → Datenschutz → Bedienungshilfen")
-                    .font(.caption)
-                    .foregroundStyle(.orange)
-                    .multilineTextAlignment(.center)
+        switch appState.missingPermission {
+        case .accessibility:
+            PermissionHint(
+                message: "Bedienungshilfen-Zugriff fehlt.",
+                settingsURL: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility",
+                appState: appState
+            )
+        case .inputMonitoring:
+            PermissionHint(
+                message: "Eingabe-Überwachung fehlt.",
+                settingsURL: "x-apple.systempreferences:com.apple.preference.security?Privacy_ListenEvent",
+                appState: appState
+            )
+        case .microphone:
+            PermissionHint(
+                message: "Mikrofon-Zugriff fehlt.",
+                settingsURL: "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone",
+                appState: appState
+            )
+        case .none:
+            if appState.isRecording {
+                Text("Aufnahme läuft …").font(.subheadline).foregroundStyle(.red)
+            } else {
+                Text("Fn gedrückt halten zum Diktieren").font(.subheadline).foregroundStyle(.secondary)
+            }
+        }
+    }
+}
+
+private struct PermissionHint: View {
+    let message: String
+    let settingsURL: String
+    let appState: AppState
+
+    var body: some View {
+        VStack(spacing: 6) {
+            Text(message).font(.caption).foregroundStyle(.orange)
+            HStack(spacing: 8) {
+                Button("Einstellungen öffnen") {
+                    if let url = URL(string: settingsURL) {
+                        NSWorkspace.shared.open(url)
+                    }
+                }
+                .font(.caption)
                 Button("Neu prüfen") {
                     appState.recheckPermissions()
                 }
                 .font(.caption)
             }
-        } else if !appState.hasMicrophonePermission {
-            VStack(spacing: 6) {
-                Text("Mikrofon-Zugriff fehlt.\nSystemeinstellungen → Datenschutz → Mikrofon")
-                    .font(.caption)
-                    .foregroundStyle(.orange)
-                    .multilineTextAlignment(.center)
-                Button("Neu prüfen") {
-                    appState.recheckPermissions()
-                }
-                .font(.caption)
-            }
-        } else if appState.isRecording {
-            Text("Aufnahme läuft …")
-                .font(.subheadline)
-                .foregroundStyle(.red)
-        } else {
-            Text("Fn gedrückt halten zum Diktieren")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
         }
     }
 }
