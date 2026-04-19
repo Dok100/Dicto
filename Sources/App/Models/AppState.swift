@@ -23,7 +23,9 @@ final class AppState: ObservableObject {
     let audioService: AudioService
     let whisperService: WhisperService
     let pasteService: PasteService
-    var postProcessor: any TextPostProcessor = OllamaPostProcessor()
+    let settings = AppSettings()
+
+    var onOpenSettings: (() -> Void)?
 
     private var targetApp: NSRunningApplication?
     private var cancellables = Set<AnyCancellable>()
@@ -39,7 +41,6 @@ final class AppState: ObservableObject {
         self.pasteService = paste
         self.hasMicrophonePermission = audio.isMicrophoneAuthorized
 
-        // WhisperService.state weiterleiten – .done abfangen für Text-Einfügung
         whisper.$state
             .receive(on: RunLoop.main)
             .sink { [weak self] state in
@@ -59,7 +60,6 @@ final class AppState: ObservableObject {
         }
 
         hotkey.onKeyDown = { [weak self] in
-            // Aktive App merken, damit wir nach der Transkription dorthin einfügen
             self?.targetApp = NSWorkspace.shared.frontmostApplication
             self?.isRecording = true
             audio.startRecording()
@@ -74,7 +74,6 @@ final class AppState: ObservableObject {
 
         Task { await whisper.loadModelIfNeeded() }
 
-        // Accessibility-Dialog beim ersten Start anzeigen
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             paste.requestAccessibilityIfNeeded()
         }
@@ -91,7 +90,11 @@ final class AppState: ObservableObject {
 
     @MainActor
     private func handleTranscriptionDone(text: String) async {
-        let processed = await postProcessor.process(text: text)
+        let processor: any TextPostProcessor = settings.ollamaEnabled
+            ? OllamaPostProcessor(baseURL: settings.ollamaBaseURL, model: settings.ollamaModel, systemPrompt: settings.ollamaPrompt)
+            : PassthroughPostProcessor()
+
+        let processed = await processor.process(text: text)
             .trimmingCharacters(in: .whitespacesAndNewlines)
 
         let app = targetApp

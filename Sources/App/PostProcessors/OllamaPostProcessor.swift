@@ -3,10 +3,12 @@ import Foundation
 final class OllamaPostProcessor: TextPostProcessor {
     private let url: URL
     private let model: String
+    private let systemPrompt: String
 
-    init(baseURL: String = "http://localhost:11434", model: String = "glm4") {
+    init(baseURL: String, model: String, systemPrompt: String) {
         self.url = URL(string: "\(baseURL)/api/chat")!
         self.model = model
+        self.systemPrompt = systemPrompt
     }
 
     func process(text: String) async -> String {
@@ -28,15 +30,7 @@ final class OllamaPostProcessor: TextPostProcessor {
             "messages": [
                 [
                     "role": "system",
-                    "content": """
-                        Du bist ein Textglätter für deutsche Diktate. Deine Aufgabe:
-                        - Entferne Füllwörter: "äh", "ähm", "also", "halt", "irgendwie", "sozusagen", "quasi", "genau", doppelte Sätze, Selbstkorrekturen
-                        - Glätte den Satzbau, ohne Bedeutung oder Tonalität zu verändern
-                        - Behalte den Sprachstil des Sprechers bei (förmlich bleibt förmlich, locker bleibt locker)
-                        - Füge KEINE neuen Inhalte, Fakten oder Interpretationen hinzu
-                        - Gib ausschließlich den geglätteten Text zurück, keine Kommentare, keine Einleitung, keine Markdown-Formatierung
-                        - Wenn der Eingabetext bereits sauber ist, gib ihn unverändert zurück
-                        """
+                    "content": systemPrompt
                 ],
                 [
                     "role": "user",
