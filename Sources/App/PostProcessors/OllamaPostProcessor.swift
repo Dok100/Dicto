@@ -34,7 +34,7 @@ final class OllamaPostProcessor: TextPostProcessor {
                 ],
                 [
                     "role": "user",
-                    "content": text
+                    "content": "<diktat>\(text)</diktat>"
                 ]
             ]
         ]
