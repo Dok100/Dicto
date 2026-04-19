@@ -20,6 +20,18 @@
 
 ---
 
+## 2026-04-19 – NSEvent.addGlobalMonitorForEvents für Globe/Fn-Hotkey
+
+**Entscheidung**: `NSEvent.addGlobalMonitorForEvents(matching: .flagsChanged)` statt `CGEventTap`
+
+**Grund**: `CGEventTap` empfängt Globe/Fn-Key-Events auf Apple Silicon unter macOS Sequoia nicht – macOS verarbeitet sie auf Kernel-Ebene bevor sie den CGEvent-Layer erreichen. `NSEvent.addGlobalMonitorForEvents` ist die Cocoa-Abstraktion darüber und empfängt die Events zuverlässig.
+
+**Voraussetzung**: Systemeinstellungen → Tastatur → 🌐-Taste → "Keine Aktion". Eingabe-Überwachung (Input Monitoring) Permission wird benötigt.
+
+**Referenz**: WhisperFlow und andere Push-to-Talk-Apps auf macOS nutzen denselben Ansatz.
+
+---
+
 ## 2026-04-19 – CGEventTap für Fn-Hotkey (primär), rechte Ctrl als Plan B
 
 **Entscheidung**: Fn-Taste via `flagsChanged`-Event als primärer Hotkey
