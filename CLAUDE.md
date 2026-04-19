@@ -10,13 +10,13 @@ Optional: Glättung via Ollama (glm-4.7-flash, http://localhost:11434).
 
 ## Aktueller Phasenstand
 
-**Aktive Phase**: PROJ-1 – Menübar-App-Gerüst
-**Stand**: Phase A (Dokumentation + Gerüst) abgeschlossen. Wartet auf Review-Freigabe für Phase B (Swift-Code).
+**Aktive Phase**: PROJ-2 – Globaler Fn-Hotkey + Audio-Aufnahme
+**Stand**: PROJ-1 abgeschlossen. PROJ-2 in Arbeit (Branch: proj-2-hotkey-audio).
 
 | Phase | Status |
 |-------|--------|
-| PROJ-1 Menübar-App-Gerüst | Phase A fertig, Phase B ausstehend |
-| PROJ-2 Fn-Hotkey + Audio | Offen |
+| PROJ-1 Menübar-App-Gerüst | Abgeschlossen |
+| PROJ-2 Fn-Hotkey + Audio | In Arbeit |
 | PROJ-3 WhisperKit | Offen |
 | PROJ-4 Text-Einfügung | Offen |
 | PROJ-5 PostProcessor-Protokoll | Offen |

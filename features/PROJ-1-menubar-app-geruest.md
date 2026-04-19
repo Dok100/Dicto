@@ -60,4 +60,4 @@ Sources/App/
 
 ## Status
 
-In Arbeit – Phase A (Dokumentation + Gerüst) abgeschlossen, wartet auf Review-Freigabe für Phase B (Swift-Code).
+**Abgeschlossen** – `make build` grün, App manuell getestet (Menübar-Icon, Popover, Beenden-Button). Initialer Commit auf main, GitHub-Remote gesetzt.
