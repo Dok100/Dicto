@@ -64,4 +64,11 @@ Sources/App/
 
 ## Status
 
-In Arbeit – Feature-Dokument zur Review, wartet auf Freigabe für Swift-Code.
+**Abgeschlossen** – Fn/Globe-Taste erkannt via `NSEvent.addGlobalMonitorForEvents`, WAV-Aufnahme funktioniert, Datei abspielbar. Manuell getestet auf MacBook Pro M4, macOS Sequoia.
+
+### Erkenntnisse aus der Umsetzung
+
+- `CGEventTap` empfängt Globe-Key-Events auf M-Chip Macs unter macOS Sequoia nicht. `NSEvent.addGlobalMonitorForEvents` (Cocoa-Ebene) ist die korrekte Lösung.
+- Voraussetzung: Systemeinstellungen → Tastatur → 🌐-Taste → **"Keine Aktion"**
+- `AVAudioRecorder` muss Mikrofon-Permission **vor** dem ersten `record()`-Aufruf haben, sonst schreibt er nur einen leeren FLLR-Header (4096 Bytes, kein Audio).
+- `NSEvent.addGlobalMonitorForEvents` benötigt Input Monitoring Permission (Eingabe-Überwachung).
