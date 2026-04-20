@@ -16,14 +16,18 @@ final class AppSettings: ObservableObject {
     @Published var whisperModel: WhisperModel {
         didSet { UserDefaults.standard.set(whisperModel.rawValue, forKey: "whisperModel") }
     }
+    @Published var previewEnabled: Bool {
+        didSet { UserDefaults.standard.set(previewEnabled, forKey: "previewEnabled") }
+    }
 
     init() {
         let d = UserDefaults.standard
-        ollamaEnabled = d.object(forKey: "ollamaEnabled") as? Bool ?? true
-        ollamaBaseURL = d.string(forKey: "ollamaBaseURL") ?? "http://localhost:11434"
-        ollamaModel   = d.string(forKey: "ollamaModel")   ?? "glm4"
-        ollamaPrompt  = d.string(forKey: "ollamaPrompt")  ?? AppSettings.defaultPrompt
-        whisperModel  = WhisperModel(rawValue: d.string(forKey: "whisperModel") ?? "") ?? .largev3
+        ollamaEnabled   = d.object(forKey: "ollamaEnabled")   as? Bool ?? true
+        ollamaBaseURL   = d.string(forKey: "ollamaBaseURL")   ?? "http://localhost:11434"
+        ollamaModel     = d.string(forKey: "ollamaModel")     ?? "glm4"
+        ollamaPrompt    = d.string(forKey: "ollamaPrompt")    ?? AppSettings.defaultPrompt
+        whisperModel    = WhisperModel(rawValue: d.string(forKey: "whisperModel") ?? "") ?? .largev3
+        previewEnabled  = d.object(forKey: "previewEnabled")  as? Bool ?? false
     }
 
     static let defaultPrompt = """

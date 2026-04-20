@@ -21,6 +21,14 @@ struct SettingsView: View {
 
                 Divider()
 
+                Toggle("Vorschau vor Einfügen", isOn: $settings.previewEnabled)
+                    .toggleStyle(.switch)
+                Text("Text im Popover bearbeiten, bevor er eingefügt wird.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Divider()
+
                 Toggle("Textglättung via Ollama", isOn: $settings.ollamaEnabled)
                     .toggleStyle(.switch)
 

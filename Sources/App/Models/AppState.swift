@@ -106,6 +106,12 @@ final class AppState: ObservableObject {
         let processed = await processor.process(text: text)
             .trimmingCharacters(in: .whitespacesAndNewlines)
 
+        if settings.previewEnabled {
+            // targetApp bleibt gespeichert – Nutzer bestätigt manuell via confirmPaste
+            transcriptionState = .done(processed)
+            return
+        }
+
         let app = targetApp
         targetApp = nil
 
@@ -117,5 +123,20 @@ final class AppState: ObservableObject {
         }
 
         transcriptionState = .done(processed)
+    }
+
+    @MainActor
+    func confirmPaste(text: String) async {
+        let app = targetApp
+        targetApp = nil
+
+        if let app, app.bundleIdentifier != Bundle.main.bundleIdentifier {
+            app.activate(options: .activateIgnoringOtherApps)
+            try? await Task.sleep(nanoseconds: 100_000_000)
+            pasteService.paste(text: text)
+            try? await Task.sleep(nanoseconds: 100_000_000)
+        }
+
+        transcriptionState = .idle
     }
 }

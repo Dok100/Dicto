@@ -2,6 +2,7 @@ import SwiftUI
 
 struct PopoverRootView: View {
     @EnvironmentObject var appState: AppState
+    @State private var editableText = ""
 
     var body: some View {
         VStack(spacing: 10) {
@@ -109,13 +110,28 @@ struct PopoverRootView: View {
 
         case .done(let text):
             VStack(spacing: 6) {
-                ScrollView {
-                    Text(text)
+                if appState.settings.previewEnabled {
+                    TextEditor(text: $editableText)
                         .font(.callout)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .textSelection(.enabled)
+                        .frame(maxHeight: 80)
+                        .overlay(RoundedRectangle(cornerRadius: 4).stroke(Color.secondary.opacity(0.3)))
+                        .onAppear { editableText = text }
+                        .onChange(of: text) { editableText = $1 }
+                    Button("Einfügen") {
+                        Task { await appState.confirmPaste(text: editableText) }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.small)
+                    .disabled(!appState.isAccessibilityAuthorized)
+                } else {
+                    ScrollView {
+                        Text(text)
+                            .font(.callout)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .textSelection(.enabled)
+                    }
+                    .frame(maxHeight: 80)
                 }
-                .frame(maxHeight: 80)
                 if !appState.isAccessibilityAuthorized {
                     PermissionHint(
                         message: "Eingabehilfen fehlt – Text nicht eingefügt.",
