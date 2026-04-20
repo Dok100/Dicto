@@ -4,19 +4,19 @@ import SwiftUI
 
 final class MenuBarController {
     private let statusItem: NSStatusItem
-    private let popover: NSPopover
+    private var panel: NSPanel!
     private var cancellables = Set<AnyCancellable>()
+    private var clickOutsideMonitor: Any?
     private var settingsWindowController: SettingsWindowController?
 
     init(appState: AppState) {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        popover = NSPopover()
         setupStatusItem()
-        setupPopover(appState: appState)
+        setupPanel(appState: appState)
 
         settingsWindowController = SettingsWindowController(appState: appState)
         appState.onOpenSettings = { [weak self] in
-            self?.popover.performClose(nil)
+            self?.hidePanel()
             self?.settingsWindowController?.show()
         }
 
@@ -30,11 +30,11 @@ final class MenuBarController {
             }
             .store(in: &cancellables)
 
-        // Popover automatisch zeigen wenn Transkription fertig ist
+        // Panel automatisch zeigen wenn Transkription fertig ist
         appState.$transcriptionState
             .receive(on: RunLoop.main)
             .sink { [weak self] state in
-                if case .done = state { self?.showPopover() }
+                if case .done = state { self?.showPanel() }
             }
             .store(in: &cancellables)
 
@@ -85,33 +85,75 @@ final class MenuBarController {
         guard let button = statusItem.button else { return }
         button.image = NSImage(systemSymbolName: "mic", accessibilityDescription: "Dicto")
         button.imagePosition = .imageLeft
-        button.action = #selector(togglePopover)
+        button.action = #selector(togglePanel)
         button.target = self
     }
 
-    private func setupPopover(appState: AppState) {
-        popover.contentSize = NSSize(width: 280, height: 200)
-        popover.behavior = .transient
-        popover.contentViewController = NSHostingController(
+    private func setupPanel(appState: AppState) {
+        panel = NSPanel(
+            contentRect: NSRect(x: 0, y: 0, width: 280, height: 320),
+            styleMask: [.titled, .closable, .resizable, .fullSizeContentView],
+            backing: .buffered,
+            defer: false
+        )
+        panel.title = ""
+        panel.titleVisibility = .hidden
+        panel.titlebarAppearsTransparent = true
+        panel.isMovableByWindowBackground = true
+        panel.isReleasedWhenClosed = false
+        panel.level = .floating
+        panel.minSize = NSSize(width: 240, height: 240)
+        panel.standardWindowButton(.miniaturizeButton)?.isHidden = true
+        panel.standardWindowButton(.zoomButton)?.isHidden = true
+        panel.contentViewController = NSHostingController(
             rootView: PopoverRootView().environmentObject(appState)
         )
     }
 
-    private func showPopover() {
-        guard !popover.isShown, let button = statusItem.button else { return }
-        popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
-        if let window = popover.contentViewController?.view.window {
-            window.styleMask.insert(.resizable)
-            window.minSize = NSSize(width: 240, height: 240)
-            window.makeKey()
+    // MARK: – Panel anzeigen / verstecken
+
+    private func showPanel() {
+        positionPanel()
+        panel.orderFront(nil)
+        panel.makeKey()
+
+        guard clickOutsideMonitor == nil else { return }
+        clickOutsideMonitor = NSEvent.addGlobalMonitorForEvents(
+            matching: [.leftMouseDown, .rightMouseDown]
+        ) { [weak self] _ in
+            self?.hidePanel()
         }
     }
 
-    @objc private func togglePopover() {
-        if popover.isShown {
-            popover.performClose(nil)
+    private func hidePanel() {
+        panel.orderOut(nil)
+        if let m = clickOutsideMonitor { NSEvent.removeMonitor(m) }
+        clickOutsideMonitor = nil
+    }
+
+    private func positionPanel() {
+        guard let button = statusItem.button,
+              let buttonWindow = button.window,
+              let screen = buttonWindow.screen else { return }
+
+        let buttonFrame = button.convert(button.bounds, to: nil)
+        let screenFrame = buttonWindow.convertToScreen(buttonFrame)
+
+        var x = screenFrame.midX - panel.frame.width / 2
+        let y = screenFrame.minY - panel.frame.height - 6
+
+        // Nicht über Bildschirmränder hinaus
+        x = min(x, screen.visibleFrame.maxX - panel.frame.width)
+        x = max(x, screen.visibleFrame.minX)
+
+        panel.setFrameOrigin(NSPoint(x: x, y: y))
+    }
+
+    @objc private func togglePanel() {
+        if panel.isVisible {
+            hidePanel()
         } else {
-            showPopover()
+            showPanel()
         }
     }
 }
