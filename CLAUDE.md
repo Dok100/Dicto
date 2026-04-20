@@ -6,12 +6,11 @@ Persistenter Kontext für Claude Code über Sessions hinweg.
 
 Native macOS-Menübar-App für Push-to-Talk-Diktat, vollständig lokal auf Apple Silicon.
 Fn-Taste → Aufnahme → WhisperKit-Transkription → Text an Cursor-Position einfügen.
-Optional: Glättung via Ollama (glm-4.7-flash, http://localhost:11434).
+Optional: Glättung via Ollama (glm4, http://localhost:11434).
 
 ## Aktueller Phasenstand
 
-**Aktive Phase**: Alle Phasen abgeschlossen
-**Stand**: PROJ-1–PROJ-7 abgeschlossen.
+**Stand**: PROJ-1–PROJ-11 abgeschlossen. PROJ-12 offen.
 
 | Phase | Status |
 |-------|--------|
@@ -21,10 +20,12 @@ Optional: Glättung via Ollama (glm-4.7-flash, http://localhost:11434).
 | PROJ-4 Text-Einfügung | Abgeschlossen |
 | PROJ-5 PostProcessor-Protokoll | Abgeschlossen |
 | PROJ-6 OllamaPostProcessor | Abgeschlossen |
-| PROJ-7 Einstellungen | Abgeschlossen |
-| PROJ-5 PostProcessor-Protokoll | Offen |
-| PROJ-6 OllamaPostProcessor | Offen |
-| PROJ-7 Einstellungen | Offen |
+| PROJ-7 Einstellungsfenster | Abgeschlossen |
+| PROJ-8 Stil-Auswahl (Neutral/Formell/Locker/Empathisch) | Abgeschlossen |
+| PROJ-9 Whisper-Modellauswahl (Base / Large v3) | Abgeschlossen |
+| PROJ-10 Preview-Modus (opt-in, editierbar vor Einfügen) | Abgeschlossen |
+| PROJ-11 Wörterbuch (statisch + lernend via Preview) | Abgeschlossen |
+| PROJ-12 Transform-Modus (Fn+Alt: Selektion + Befehl) | Offen |
 
 ## Nutzer-Kontext
 
@@ -33,7 +34,7 @@ Optional: Glättung via Ollama (glm-4.7-flash, http://localhost:11434).
 - macOS-API-Fallstricke (CGEventTap, NSPasteboard, etc.) proaktiv erklären
 - Hardware: MacBook Pro M4, 48 GB RAM, macOS Sequoia
 - Xcode, XcodeGen, swiftformat sind installiert
-- Ollama läuft lokal mit glm-4.7-flash
+- Ollama läuft lokal mit glm4
 
 ## Projekt-Konventionen
 
@@ -43,10 +44,11 @@ Optional: Glättung via Ollama (glm-4.7-flash, http://localhost:11434).
 - Commit-Messages: `feat(scope): beschreibung` oder `docs: beschreibung`
 - Kein App-Store, keine Sandbox, kein GitHub Actions CI
 
-## Offene Fragen / Blocker
+## Bekannte Fallstricke
 
-- Accessibility-Permission (Eingabehilfen): Nach XcodeGen-Regenerierung ändert sich der App-Pfad → alten Eintrag löschen, App neu starten, System-Prompt bestätigen.
-- PostProcessor (PROJ-5): Protokoll so designen dass Passthrough + Ollama einfach austauschbar sind.
+- Accessibility-Permission: Nach XcodeGen-Regenerierung ändert sich der App-Pfad → alten Eintrag löschen, App neu starten.
+- WhisperKit liefert Umlaute manchmal als NFD → DictionaryService normalisiert auf NFC vor Vergleich.
+- DictationStyle.neutral → nil → verwendet editierbaren AppSettings.ollamaPrompt.
 
 ## Stack-Versionen
 

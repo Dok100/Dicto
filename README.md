@@ -9,7 +9,7 @@ Fn-Taste gedrückt halten → Aufnahme läuft → loslassen → Transkription vi
 ## Stack
 
 - Swift / SwiftUI, macOS 14+
-- [WhisperKit](https://github.com/argmaxinc/WhisperKit) – lokale Spracherkennung (Modell: `large-v3`, Sprache: Deutsch)
+- [WhisperKit](https://github.com/argmaxinc/WhisperKit) – lokale Spracherkennung (Modell wählbar: `base` oder `large-v3`, Sprache: Deutsch)
 - [Ollama](https://ollama.ai) – optionale Textglättung (`glm4`, `http://localhost:11434`)
 - XcodeGen, swiftformat
 
@@ -49,10 +49,10 @@ Beim ersten Start fordert Dicto drei Berechtigungen an:
 | PROJ-5 | TextPostProcessor-Protokoll + PassthroughPostProcessor | Abgeschlossen |
 | PROJ-6 | OllamaPostProcessor mit Fallback | Abgeschlossen |
 | PROJ-7 | Einstellungsfenster (Toggle, Prompt-Editor, Modell/Endpoint) | Abgeschlossen |
-| PROJ-8 | Stil-Auswahl im Popover (Neutral / Formell / Locker / Empathisch) | Offen |
-| PROJ-9 | Whisper-Modellauswahl | Offen |
-| PROJ-10 | Preview-Modus (Text vor Einfügen editierbar) | Offen |
-| PROJ-11 | Wörterbuch (statisch + lernend via Preview) | Offen |
+| PROJ-8 | Stil-Auswahl im Popover (Neutral / Formell / Locker / Empathisch) | Abgeschlossen |
+| PROJ-9 | Whisper-Modellauswahl (Base / Large v3) | Abgeschlossen |
+| PROJ-10 | Preview-Modus (Text vor Einfügen editierbar, opt-in) | Abgeschlossen |
+| PROJ-11 | Wörterbuch (statisch + lernend via Preview) | Abgeschlossen |
 | PROJ-12 | Transform-Modus (Fn+Alt: Selektion + Befehl) | Offen |
 
 ## Datenschutz
