@@ -85,8 +85,11 @@ struct PopoverRootView: View {
             if appState.isRecording {
                 Text("Aufnahme läuft …").font(.subheadline).foregroundStyle(.red)
             } else {
-                Text("Fn gedrückt halten zum Diktieren")
-                    .font(.subheadline).foregroundStyle(.secondary)
+                VStack(spacing: 2) {
+                    Text("Fn halten – Diktieren")
+                    Text("Alt+Fn halten – Text transformieren")
+                }
+                .font(.subheadline).foregroundStyle(.secondary)
             }
 
         case .loadingModel(let progress):

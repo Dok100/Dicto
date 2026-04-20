@@ -3,11 +3,14 @@ import AppKit
 final class HotkeyService {
     var onKeyDown: (() -> Void)?
     var onKeyUp: (() -> Void)?
+    var onTransformKeyDown: (() -> Void)?
+    var onTransformKeyUp: (() -> Void)?
 
     private(set) var isAvailable = false
     private var globalMonitor: Any?
     private var localMonitor: Any?
     private var isFnDown = false
+    private var isTransformMode = false
 
     // Globe/Fn-Taste: keyCode 63, modifierFlags enthält .function wenn gedrückt.
     // Voraussetzung: Systemeinstellungen → Tastatur → 🌐-Taste → "Keine Aktion"
@@ -25,12 +28,9 @@ final class HotkeyService {
     }
 
     private func tryInstallMonitor() {
-        // NSEvent.addGlobalMonitorForEvents arbeitet auf Cocoa-Ebene und
-        // empfängt Globe/Fn-Events zuverlässiger als CGEventTap
         globalMonitor = NSEvent.addGlobalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
             self?.handleEvent(event)
         }
-        // Local monitor damit das Popover den Hotkey auch empfängt wenn es im Fokus ist
         localMonitor = NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
             self?.handleEvent(event)
             return event
@@ -43,7 +43,23 @@ final class HotkeyService {
         let fnCurrentlyDown = event.modifierFlags.contains(.function)
         guard fnCurrentlyDown != isFnDown else { return }
         isFnDown = fnCurrentlyDown
-        if fnCurrentlyDown { onKeyDown?() } else { onKeyUp?() }
+
+        if fnCurrentlyDown {
+            // Alt (Option) bereits gehalten → Transform-Modus
+            isTransformMode = event.modifierFlags.contains(.option)
+            if isTransformMode {
+                onTransformKeyDown?()
+            } else {
+                onKeyDown?()
+            }
+        } else {
+            if isTransformMode {
+                onTransformKeyUp?()
+            } else {
+                onKeyUp?()
+            }
+            isTransformMode = false
+        }
     }
 
     deinit {

@@ -3,6 +3,7 @@ import CoreGraphics
 
 final class PasteService {
     private static let vKeyCode: CGKeyCode = 0x09  // kVK_ANSI_V
+    private static let cKeyCode: CGKeyCode = 0x08  // kVK_ANSI_C
 
     var isAccessibilityAuthorized: Bool {
         AXIsProcessTrusted()
@@ -15,6 +16,33 @@ final class PasteService {
         let key = kAXTrustedCheckOptionPrompt.takeRetainedValue() as String
         let options = [key: true] as CFDictionary
         _ = AXIsProcessTrustedWithOptions(options)
+    }
+
+    // Simuliert Cmd+C und gibt den kopierten Text zurück.
+    // Stellt den vorherigen Clipboard-Inhalt danach wieder her.
+    func captureSelectedText() async -> String {
+        guard isAccessibilityAuthorized else { return "" }
+        let pasteboard = NSPasteboard.general
+        let savedString = pasteboard.string(forType: .string)
+
+        pasteboard.clearContents()
+
+        let src = CGEventSource(stateID: .hidSystemState)
+        let keyDown = CGEvent(keyboardEventSource: src, virtualKey: Self.cKeyCode, keyDown: true)
+        keyDown?.flags = .maskCommand
+        keyDown?.post(tap: .cgAnnotatedSessionEventTap)
+        let keyUp = CGEvent(keyboardEventSource: src, virtualKey: Self.cKeyCode, keyDown: false)
+        keyUp?.flags = .maskCommand
+        keyUp?.post(tap: .cgAnnotatedSessionEventTap)
+
+        try? await Task.sleep(nanoseconds: 200_000_000)
+
+        let captured = pasteboard.string(forType: .string) ?? ""
+
+        pasteboard.clearContents()
+        if let old = savedString { pasteboard.setString(old, forType: .string) }
+
+        return captured
     }
 
     func paste(text: String) {

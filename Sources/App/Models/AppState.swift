@@ -36,6 +36,8 @@ final class AppState: ObservableObject {
     var onOpenSettings: (() -> Void)?
 
     private var targetApp: NSRunningApplication?
+    private var isTransformMode = false
+    private var selectedTextForTransform: String?
     private var cancellables = Set<AnyCancellable>()
 
     init() {
@@ -81,6 +83,25 @@ final class AppState: ObservableObject {
             }
         }
 
+        hotkey.onTransformKeyDown = { [weak self] in
+            guard let self else { return }
+            self.targetApp = NSWorkspace.shared.frontmostApplication
+            self.isTransformMode = true
+            self.isRecording = true
+            audio.startRecording()
+            Task { @MainActor [weak self] in
+                self?.selectedTextForTransform = await paste.captureSelectedText()
+            }
+        }
+        hotkey.onTransformKeyUp = { [weak self] in
+            guard let self else { return }
+            self.isRecording = false
+            let model = self.settings.whisperModel
+            if let url = audio.stopRecording() {
+                Task { await whisper.transcribe(fileURL: url, model: model) }
+            }
+        }
+
         Task { await whisper.loadModelIfNeeded(model: settings.whisperModel) }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
@@ -99,6 +120,12 @@ final class AppState: ObservableObject {
 
     @MainActor
     private func handleTranscriptionDone(text: String) async {
+        if isTransformMode {
+            isTransformMode = false
+            await handleTransformDone(command: text)
+            return
+        }
+
         let effectivePrompt = dictationStyle.systemPrompt ?? settings.ollamaPrompt
         let processor: any TextPostProcessor = settings.ollamaEnabled
             ? OllamaPostProcessor(baseURL: settings.ollamaBaseURL, model: settings.ollamaModel, systemPrompt: effectivePrompt)
@@ -110,7 +137,6 @@ final class AppState: ObservableObject {
         )
 
         if settings.previewEnabled {
-            // targetApp bleibt gespeichert – Nutzer bestätigt manuell via confirmPaste
             transcriptionState = .done(processed)
             return
         }
@@ -126,6 +152,36 @@ final class AppState: ObservableObject {
         }
 
         transcriptionState = .done(processed)
+    }
+
+    @MainActor
+    private func handleTransformDone(command: String) async {
+        let original = selectedTextForTransform ?? ""
+        selectedTextForTransform = nil
+
+        let result: String
+        if settings.ollamaEnabled, !original.isEmpty {
+            let processor = OllamaTransformProcessor(
+                baseURL: settings.ollamaBaseURL,
+                model: settings.ollamaModel
+            )
+            result = await processor.process(original: original, command: command)
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+        } else {
+            result = command
+        }
+
+        let app = targetApp
+        targetApp = nil
+
+        if let app, app.bundleIdentifier != Bundle.main.bundleIdentifier {
+            app.activate(options: .activateIgnoringOtherApps)
+            try? await Task.sleep(nanoseconds: 100_000_000)
+            pasteService.paste(text: result)
+            try? await Task.sleep(nanoseconds: 100_000_000)
+        }
+
+        transcriptionState = .done(result)
     }
 
     @MainActor
