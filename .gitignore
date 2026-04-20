@@ -38,3 +38,6 @@ build/
 .env.local
 *.swp
 *.swo
+
+# Claude Code
+.claude/
