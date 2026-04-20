@@ -1,29 +1,29 @@
 import Foundation
 
-final class AppSettings: ObservableObject {
-    @Published var ollamaEnabled: Bool {
+public final class AppSettings: ObservableObject {
+    @Published public var ollamaEnabled: Bool {
         didSet { UserDefaults.standard.set(ollamaEnabled, forKey: "ollamaEnabled") }
     }
-    @Published var ollamaBaseURL: String {
+    @Published public var ollamaBaseURL: String {
         didSet { UserDefaults.standard.set(ollamaBaseURL, forKey: "ollamaBaseURL") }
     }
-    @Published var ollamaModel: String {
+    @Published public var ollamaModel: String {
         didSet { UserDefaults.standard.set(ollamaModel, forKey: "ollamaModel") }
     }
-    @Published var ollamaPrompt: String {
+    @Published public var ollamaPrompt: String {
         didSet { UserDefaults.standard.set(ollamaPrompt, forKey: "ollamaPrompt") }
     }
-    @Published var whisperModel: WhisperModel {
+    @Published public var whisperModel: WhisperModel {
         didSet { UserDefaults.standard.set(whisperModel.rawValue, forKey: "whisperModel") }
     }
-    @Published var previewEnabled: Bool {
+    @Published public var previewEnabled: Bool {
         didSet { UserDefaults.standard.set(previewEnabled, forKey: "previewEnabled") }
     }
-    @Published var whisperLanguage: WhisperLanguage {
+    @Published public var whisperLanguage: WhisperLanguage {
         didSet { UserDefaults.standard.set(whisperLanguage.rawValue, forKey: "whisperLanguage") }
     }
 
-    init() {
+    public init() {
         let d = UserDefaults.standard
         ollamaEnabled    = d.object(forKey: "ollamaEnabled")   as? Bool ?? true
         ollamaBaseURL    = d.string(forKey: "ollamaBaseURL")   ?? "http://localhost:11434"
@@ -31,7 +31,7 @@ final class AppSettings: ObservableObject {
         ollamaPrompt     = d.string(forKey: "ollamaPrompt")    ?? AppSettings.defaultPrompt
         whisperModel     = WhisperModel(rawValue: d.string(forKey: "whisperModel") ?? "") ?? .largev3
         previewEnabled   = d.object(forKey: "previewEnabled")  as? Bool ?? false
-        whisperLanguage  = WhisperLanguage(rawValue: d.string(forKey: "whisperLanguage") ?? "") ?? .german
+        whisperLanguage  = d.string(forKey: "whisperLanguage").flatMap(WhisperLanguage.init) ?? .german
     }
 
     static let defaultPrompt = """

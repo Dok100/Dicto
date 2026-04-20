@@ -1,7 +1,7 @@
-enum DictationStyle: String, CaseIterable {
+public enum DictationStyle: String, CaseIterable {
     case neutral, formal, casual, empathic
 
-    var label: String {
+    public var label: String {
         switch self {
         case .neutral:  return "Neutral"
         case .formal:   return "Formell"
@@ -11,7 +11,7 @@ enum DictationStyle: String, CaseIterable {
     }
 
     // Neutral → nil bedeutet: editierbaren Prompt aus AppSettings verwenden
-    var systemPrompt: String? {
+    public var systemPrompt: String? {
         switch self {
         case .neutral:
             return nil

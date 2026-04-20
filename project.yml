@@ -22,6 +22,16 @@ settings:
     DEVELOPMENT_TEAM: ""
     ENABLE_APP_SANDBOX: NO
 
+schemes:
+  Dicto:
+    build:
+      targets:
+        Dicto: all
+        DictoTests: [test]
+    test:
+      targets:
+        - DictoTests
+
 targets:
   Dicto:
     type: application
@@ -51,6 +61,7 @@ targets:
     settings:
       base:
         INFOPLIST_FILE: Sources/App/Info.plist
+        ENABLE_TESTABILITY: YES
 
   DictoTests:
     type: bundle.unit-test
@@ -62,4 +73,7 @@ targets:
       - target: Dicto
     settings:
       base:
-        INFOPLIST_FILE: ""
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_MODULE_NAME: DictoTests
+        TEST_HOST: $(BUILT_PRODUCTS_DIR)/Dicto.app/Contents/MacOS/Dicto
+        BUNDLE_LOADER: $(TEST_HOST)

@@ -1,13 +1,13 @@
 import Foundation
 
-final class DictionaryService: ObservableObject {
-    @Published private(set) var entries: [WordEntry] = []
+public final class DictionaryService: ObservableObject {
+    @Published public private(set) var entries: [WordEntry] = []
 
     private let storageKey = "dictionaryEntries"
 
-    init() { load() }
+    public init() { load() }
 
-    func apply(to text: String) -> String {
+    public func apply(to text: String) -> String {
         // NFC-Normalisierung damit WhisperKit-NFD-Umlaute mit Einträgen übereinstimmen
         let normalized = text.precomposedStringWithCanonicalMapping
         return entries.reduce(normalized) { result, entry in
@@ -19,7 +19,7 @@ final class DictionaryService: ObservableObject {
         }
     }
 
-    func add(wrong: String, correct: String) {
+    public func add(wrong: String, correct: String) {
         let w = wrong.trimmingCharacters(in: .whitespacesAndNewlines)
                      .precomposedStringWithCanonicalMapping
         let c = correct.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -30,14 +30,14 @@ final class DictionaryService: ObservableObject {
         save()
     }
 
-    func remove(id: UUID) {
+    public func remove(id: UUID) {
         entries.removeAll { $0.id == id }
         save()
     }
 
     // Lernt 1:1-Wort-Korrekturen aus Vorschau-Bearbeitungen.
     // Funktioniert nur wenn Wortanzahl identisch ist (einfache Heuristik).
-    func learnFromDiff(original: String, edited: String) {
+    public func learnFromDiff(original: String, edited: String) {
         let origWords = original.components(separatedBy: .whitespaces).filter { !$0.isEmpty }
         let editWords = edited.components(separatedBy: .whitespaces).filter { !$0.isEmpty }
         guard origWords.count == editWords.count else { return }

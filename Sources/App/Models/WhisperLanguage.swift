@@ -1,9 +1,9 @@
-enum WhisperLanguage: String, CaseIterable {
+public enum WhisperLanguage: String, CaseIterable {
     case german  = "de"
     case english = "en"
     case auto    = ""
 
-    var label: String {
+    public var label: String {
         switch self {
         case .german:  return "Deutsch"
         case .english: return "Englisch"
@@ -12,7 +12,7 @@ enum WhisperLanguage: String, CaseIterable {
     }
 
     // nil → Whisper erkennt Sprache selbst
-    var code: String? {
+    public var code: String? {
         self == .auto ? nil : rawValue
     }
 }

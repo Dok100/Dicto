@@ -1,21 +1,21 @@
 import Foundation
 
-final class HistoryService: ObservableObject {
-    @Published private(set) var entries: [DictationEntry] = []
+public final class HistoryService: ObservableObject {
+    @Published public private(set) var entries: [DictationEntry] = []
 
     private let maxEntries = 20
     private let storageKey = "dictationHistory"
 
-    init() { load() }
+    public init() { load() }
 
-    func add(text: String) {
+    public func add(text: String) {
         guard !text.isEmpty else { return }
         entries.insert(DictationEntry(text: text, date: Date()), at: 0)
         if entries.count > maxEntries { entries = Array(entries.prefix(maxEntries)) }
         save()
     }
 
-    func clear() {
+    public func clear() {
         entries = []
         save()
     }

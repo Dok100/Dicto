@@ -1,7 +1,7 @@
 import Foundation
 
-struct DictationEntry: Codable, Identifiable {
-    var id = UUID()
-    var text: String
-    var date: Date
+public struct DictationEntry: Codable, Identifiable {
+    public var id = UUID()
+    public var text: String
+    public var date: Date
 }

@@ -1,7 +1,7 @@
 import Foundation
 
-struct WordEntry: Codable, Identifiable {
-    var id = UUID()
-    var wrong: String
-    var correct: String
+public struct WordEntry: Codable, Identifiable {
+    public var id = UUID()
+    public var wrong: String
+    public var correct: String
 }
