@@ -9,6 +9,14 @@ struct PopoverRootView: View {
             Text("Dicto").font(.headline)
             statusArea
             Spacer(minLength: 0)
+            Picker("Stil", selection: $appState.dictationStyle) {
+                ForEach(DictationStyle.allCases, id: \.self) { style in
+                    Text(style.label).tag(style)
+                }
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .disabled(appState.isRecording)
             Divider()
             HStack {
                 Button(action: { appState.onOpenSettings?() }) {
@@ -24,7 +32,7 @@ struct PopoverRootView: View {
             }
         }
         .padding()
-        .frame(width: 280, height: 240)
+        .frame(width: 280, height: 270)
     }
 
     // MARK: – Status-Icon
