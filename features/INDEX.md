@@ -12,5 +12,5 @@
 | [PROJ-8](PROJ-8-stil-auswahl.md) | Stil-Auswahl im Popover | Abgeschlossen |
 | [PROJ-9](PROJ-9-whisper-modellauswahl.md) | Whisper-Modellauswahl | Abgeschlossen |
 | [PROJ-10](PROJ-10-preview-modus.md) | Preview-Modus | Abgeschlossen |
-| PROJ-11 | Wörterbuch (statisch + lernend) | Offen |
+| [PROJ-11](PROJ-11-woerterbuch.md) | Wörterbuch (statisch + lernend) | Abgeschlossen |
 | PROJ-12 | Transform-Modus (Fn+Alt) | Offen |
