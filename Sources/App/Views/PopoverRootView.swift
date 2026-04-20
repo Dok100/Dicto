@@ -33,7 +33,7 @@ struct PopoverRootView: View {
             }
         }
         .padding()
-        .frame(width: 280, height: 270)
+        .frame(width: 280, height: appState.settings.previewEnabled ? 320 : 270)
     }
 
     // MARK: – Status-Icon
@@ -113,7 +113,7 @@ struct PopoverRootView: View {
                 if appState.settings.previewEnabled {
                     TextEditor(text: $editableText)
                         .font(.callout)
-                        .frame(maxHeight: 80)
+                        .frame(minHeight: 100, maxHeight: 140)
                         .overlay(RoundedRectangle(cornerRadius: 4).stroke(Color.secondary.opacity(0.3)))
                         .onAppear { editableText = text }
                         .onChange(of: text) { editableText = $1 }
