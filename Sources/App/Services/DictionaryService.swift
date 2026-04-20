@@ -8,15 +8,22 @@ final class DictionaryService: ObservableObject {
     init() { load() }
 
     func apply(to text: String) -> String {
-        entries.reduce(text) { result, entry in
+        // NFC-Normalisierung damit WhisperKit-NFD-Umlaute mit Einträgen übereinstimmen
+        let normalized = text.precomposedStringWithCanonicalMapping
+        return entries.reduce(normalized) { result, entry in
             guard !entry.wrong.isEmpty else { return result }
-            return result.replacingOccurrences(of: entry.wrong, with: entry.correct)
+            return result.replacingOccurrences(
+                of: entry.wrong.precomposedStringWithCanonicalMapping,
+                with: entry.correct
+            )
         }
     }
 
     func add(wrong: String, correct: String) {
         let w = wrong.trimmingCharacters(in: .whitespacesAndNewlines)
+                     .precomposedStringWithCanonicalMapping
         let c = correct.trimmingCharacters(in: .whitespacesAndNewlines)
+                       .precomposedStringWithCanonicalMapping
         guard !w.isEmpty, !c.isEmpty, w != c else { return }
         guard !entries.contains(where: { $0.wrong == w }) else { return }
         entries.append(WordEntry(wrong: w, correct: c))
