@@ -47,7 +47,7 @@ struct PopoverRootView: View {
     }
 
     private var iconName: String {
-        if appState.isTransformRecording { return "wand.and.stars" }
+        if appState.isTransformRecording { return "wand.and.sparkles" }
         return appState.isRecording ? "mic.fill" : "mic"
     }
 
