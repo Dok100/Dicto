@@ -9,7 +9,7 @@
 | [PROJ-5](PROJ-5-postprocessor.md) | TextPostProcessor-Protokoll + PassthroughPostProcessor | Abgeschlossen |
 | [PROJ-6](PROJ-6-ollama.md) | OllamaPostProcessor mit Fallback | Abgeschlossen |
 | [PROJ-7](PROJ-7-settings.md) | Einstellungsfenster | Abgeschlossen |
-| PROJ-8 | Stil-Auswahl im Popover | Offen |
+| [PROJ-8](PROJ-8-stil-auswahl.md) | Stil-Auswahl im Popover | Abgeschlossen |
 | [PROJ-9](PROJ-9-whisper-modellauswahl.md) | Whisper-Modellauswahl | Abgeschlossen |
 | PROJ-10 | Preview-Modus | Offen |
 | PROJ-11 | Wörterbuch (statisch + lernend) | Offen |
