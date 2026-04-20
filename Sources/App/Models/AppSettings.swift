@@ -25,8 +25,7 @@ final class AppSettings: ObservableObject {
     static let defaultPrompt = """
         Du bist ein Textglätter für deutsche Diktate. Deine Aufgabe:
         - Entferne Füllwörter: "äh", "ähm", "also", "halt", "irgendwie", "sozusagen", "quasi", "genau", doppelte Sätze, Selbstkorrekturen
-        - Glätte den Satzbau, ohne Bedeutung oder Tonalität zu verändern
-        - Behalte den Sprachstil des Sprechers bei (förmlich bleibt förmlich, locker bleibt locker)
+        - Glätte den Satzbau, ohne Bedeutung zu verändern
         - Füge KEINE neuen Inhalte, Fakten oder Interpretationen hinzu
         - Gib ausschließlich den geglätteten Text zurück, keine Kommentare, keine Einleitung, keine Markdown-Formatierung
         - Wenn der Eingabetext bereits sauber ist, gib ihn unverändert zurück
