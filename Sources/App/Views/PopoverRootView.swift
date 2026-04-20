@@ -33,7 +33,7 @@ struct PopoverRootView: View {
             }
         }
         .padding()
-        .frame(width: 280, height: appState.settings.previewEnabled ? 320 : 270)
+        .frame(minWidth: 240, minHeight: 240)
     }
 
     // MARK: – Status-Icon

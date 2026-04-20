@@ -100,7 +100,11 @@ final class MenuBarController {
     private func showPopover() {
         guard !popover.isShown, let button = statusItem.button else { return }
         popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
-        popover.contentViewController?.view.window?.makeKey()
+        if let window = popover.contentViewController?.view.window {
+            window.styleMask.insert(.resizable)
+            window.minSize = NSSize(width: 240, height: 240)
+            window.makeKey()
+        }
     }
 
     @objc private func togglePopover() {
