@@ -40,6 +40,20 @@ test: generate
 		-destination '$(DESTINATION)' \
 		| xcpretty || xcodebuild test -scheme $(SCHEME) -destination '$(DESTINATION)'
 
+# ── Install to /Applications ─────────────────────────────────────────────────
+.PHONY: install-app
+install-app: build
+	@echo "→ Installing Dicto.app to /Applications..."
+	@BUILD_DIR=$$(xcodebuild -scheme $(SCHEME) -destination '$(DESTINATION)' \
+		-showBuildSettings 2>/dev/null | grep ' BUILT_PRODUCTS_DIR' | head -1 | awk '{print $$3}'); \
+	if [ -z "$$BUILD_DIR" ]; then echo "✗ Build-Verzeichnis nicht gefunden."; exit 1; fi; \
+	if [ -d "/Applications/Dicto.app" ]; then \
+		echo "→ Alte Version wird ersetzt..."; \
+		rm -rf "/Applications/Dicto.app"; \
+	fi; \
+	cp -R "$$BUILD_DIR/Dicto.app" /Applications/; \
+	echo "✓ Dicto.app ist jetzt unter /Applications verfügbar."
+
 # ── Clean ─────────────────────────────────────────────────────────────────────
 .PHONY: clean
 clean:
