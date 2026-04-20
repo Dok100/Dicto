@@ -8,6 +8,7 @@ enum MissingPermission {
 
 final class AppState: ObservableObject {
     @Published private(set) var isRecording = false
+    @Published private(set) var isTransformRecording = false
     @Published private(set) var hasMicrophonePermission = false
     @Published private(set) var transcriptionState: TranscriptionState = .idle
 
@@ -89,6 +90,7 @@ final class AppState: ObservableObject {
             self.targetApp = NSWorkspace.shared.frontmostApplication
             self.isTransformMode = true
             self.isRecording = true
+            self.isTransformRecording = true
             audio.startRecording()
             Task { @MainActor [weak self] in
                 self?.selectedTextForTransform = await paste.captureSelectedText()
@@ -97,6 +99,7 @@ final class AppState: ObservableObject {
         hotkey.onTransformKeyUp = { [weak self] in
             guard let self else { return }
             self.isRecording = false
+            self.isTransformRecording = false
             let model = self.settings.whisperModel
             let language = self.settings.whisperLanguage
             if let url = audio.stopRecording() {

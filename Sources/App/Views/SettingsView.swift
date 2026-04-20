@@ -7,6 +7,7 @@ struct SettingsView: View {
 
     @State private var newWrong = ""
     @State private var newCorrect = ""
+    @State private var ollamaReachable: Bool? = nil
 
     private var launchAtLoginBinding: Binding<Bool> {
         Binding(
@@ -61,8 +62,17 @@ struct SettingsView: View {
 
                 Divider()
 
-                Toggle("Textglättung via Ollama", isOn: $settings.ollamaEnabled)
-                    .toggleStyle(.switch)
+                HStack(spacing: 8) {
+                    Toggle("Textglättung via Ollama", isOn: $settings.ollamaEnabled)
+                        .toggleStyle(.switch)
+                    if settings.ollamaEnabled {
+                        ollamaStatusDot
+                    }
+                }
+                .task(id: settings.ollamaEnabled) {
+                    guard settings.ollamaEnabled else { ollamaReachable = nil; return }
+                    await checkOllama()
+                }
 
                 if settings.ollamaEnabled {
                     Divider()
@@ -164,6 +174,33 @@ struct SettingsView: View {
                 .frame(width: 70, alignment: .trailing)
                 .foregroundStyle(.secondary)
             content()
+        }
+    }
+
+    @ViewBuilder
+    private var ollamaStatusDot: some View {
+        switch ollamaReachable {
+        case .none:
+            ProgressView().scaleEffect(0.5).frame(width: 14, height: 14)
+        case .some(true):
+            Image(systemName: "circle.fill").foregroundStyle(.green).font(.caption)
+                .help("Ollama erreichbar")
+        case .some(false):
+            Image(systemName: "circle.fill").foregroundStyle(.red).font(.caption)
+                .help("Ollama nicht erreichbar – läuft der Server?")
+        }
+    }
+
+    private func checkOllama() async {
+        ollamaReachable = nil
+        guard let url = URL(string: settings.ollamaBaseURL) else { ollamaReachable = false; return }
+        do {
+            let (_, response) = try await URLSession.shared.data(
+                for: URLRequest(url: url, timeoutInterval: 3)
+            )
+            ollamaReachable = (response as? HTTPURLResponse)?.statusCode == 200
+        } catch {
+            ollamaReachable = false
         }
     }
 }

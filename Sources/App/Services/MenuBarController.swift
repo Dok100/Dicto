@@ -107,6 +107,7 @@ final class MenuBarController {
         panel.becomesKeyOnlyIfNeeded = true
         panel.standardWindowButton(.miniaturizeButton)?.isHidden = true
         panel.standardWindowButton(.zoomButton)?.isHidden = true
+        panel.setFrameAutosaveName("DictoPanel")
         panel.contentViewController = NSHostingController(
             rootView: PopoverRootView().environmentObject(appState)
         )
@@ -115,7 +116,10 @@ final class MenuBarController {
     // MARK: – Panel anzeigen / verstecken
 
     private func showPanel() {
-        positionPanel()
+        // Nur beim ersten Anzeigen positionieren; danach gilt die gespeicherte Position
+        if !panel.isVisible && UserDefaults.standard.object(forKey: "NSWindow Frame DictoPanel") == nil {
+            positionPanel()
+        }
         panel.orderFront(nil)
         // makeKey auf nonactivatingPanel: Panel bekommt Tastaturfokus,
         // aber Dicto wird nicht zur frontmostApplication → targetApp bleibt korrekt

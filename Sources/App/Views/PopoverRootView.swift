@@ -47,11 +47,13 @@ struct PopoverRootView: View {
     }
 
     private var iconName: String {
-        appState.isRecording ? "mic.fill" : "mic"
+        if appState.isTransformRecording { return "wand.and.stars" }
+        return appState.isRecording ? "mic.fill" : "mic"
     }
 
     private var iconColor: Color {
-        appState.isRecording ? .red : .secondary
+        if appState.isTransformRecording { return .purple }
+        return appState.isRecording ? .red : .secondary
     }
 
     // MARK: – Haupt-Statusbereich
@@ -82,7 +84,9 @@ struct PopoverRootView: View {
     private var transcriptionArea: some View {
         switch appState.transcriptionState {
         case .idle:
-            if appState.isRecording {
+            if appState.isTransformRecording {
+                Text("Transform-Aufnahme läuft …").font(.subheadline).foregroundStyle(.purple)
+            } else if appState.isRecording {
                 Text("Aufnahme läuft …").font(.subheadline).foregroundStyle(.red)
             } else {
                 VStack(spacing: 2) {
@@ -125,6 +129,7 @@ struct PopoverRootView: View {
                     }
                     .buttonStyle(.borderedProminent)
                     .controlSize(.small)
+                    .keyboardShortcut(.return, modifiers: .command)
                     .disabled(!appState.isAccessibilityAuthorized)
                 } else {
                     ScrollView {
