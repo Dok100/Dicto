@@ -13,6 +13,9 @@ final class AppSettings: ObservableObject {
     @Published var ollamaPrompt: String {
         didSet { UserDefaults.standard.set(ollamaPrompt, forKey: "ollamaPrompt") }
     }
+    @Published var whisperModel: WhisperModel {
+        didSet { UserDefaults.standard.set(whisperModel.rawValue, forKey: "whisperModel") }
+    }
 
     init() {
         let d = UserDefaults.standard
@@ -20,6 +23,7 @@ final class AppSettings: ObservableObject {
         ollamaBaseURL = d.string(forKey: "ollamaBaseURL") ?? "http://localhost:11434"
         ollamaModel   = d.string(forKey: "ollamaModel")   ?? "glm4"
         ollamaPrompt  = d.string(forKey: "ollamaPrompt")  ?? AppSettings.defaultPrompt
+        whisperModel  = WhisperModel(rawValue: d.string(forKey: "whisperModel") ?? "") ?? .largev3
     }
 
     static let defaultPrompt = """

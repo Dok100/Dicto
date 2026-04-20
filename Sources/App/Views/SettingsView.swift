@@ -6,6 +6,21 @@ struct SettingsView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
+                Text("Whisper-Modell").font(.headline)
+                Picker("Modell", selection: $settings.whisperModel) {
+                    ForEach(WhisperModel.allCases, id: \.self) { m in
+                        Text(m.label).tag(m)
+                    }
+                }
+                .pickerStyle(.radioGroup)
+                .labelsHidden()
+
+                Text("Modellwechsel wird beim nächsten Diktat angewendet.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Divider()
+
                 Toggle("Textglättung via Ollama", isOn: $settings.ollamaEnabled)
                     .toggleStyle(.switch)
 

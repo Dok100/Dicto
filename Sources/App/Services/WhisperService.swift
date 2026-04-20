@@ -7,13 +7,16 @@ final class WhisperService: ObservableObject {
     @Published private(set) var state: TranscriptionState = .idle
 
     private var pipe: WhisperKit?
-    private static let modelName = "large-v3"
+    private var loadedModel: WhisperModel?
 
-    func loadModelIfNeeded() async {
-        guard pipe == nil else { return }
+    func loadModelIfNeeded(model: WhisperModel = .largev3) async {
+        if loadedModel == model, pipe != nil { return }
+        pipe = nil
+        loadedModel = nil
         await MainActor.run { state = .loadingModel(0.0) }
         do {
-            pipe = try await WhisperKit(model: Self.modelName, verbose: false)
+            pipe = try await WhisperKit(model: model.rawValue, verbose: false)
+            loadedModel = model
             await MainActor.run { state = .idle }
         } catch {
             let msg = error.localizedDescription
@@ -21,13 +24,12 @@ final class WhisperService: ObservableObject {
         }
     }
 
-    func transcribe(fileURL: URL) async {
-        if pipe == nil { await loadModelIfNeeded() }
+    func transcribe(fileURL: URL, model: WhisperModel = .largev3) async {
+        if pipe == nil || loadedModel != model { await loadModelIfNeeded(model: model) }
         guard let pipe else { return }
 
         await MainActor.run { state = .transcribing }
         do {
-            // Parameterreihenfolge in DecodingOptions: task vor language
             let options = DecodingOptions(task: .transcribe, language: "de")
             let results = try await pipe.transcribe(audioPath: fileURL.path, decodeOptions: options)
             let text = results

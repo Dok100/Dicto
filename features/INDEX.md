@@ -10,7 +10,7 @@
 | [PROJ-6](PROJ-6-ollama.md) | OllamaPostProcessor mit Fallback | Abgeschlossen |
 | [PROJ-7](PROJ-7-settings.md) | Einstellungsfenster | Abgeschlossen |
 | PROJ-8 | Stil-Auswahl im Popover | Offen |
-| PROJ-9 | Whisper-Modellauswahl | Offen |
+| [PROJ-9](PROJ-9-whisper-modellauswahl.md) | Whisper-Modellauswahl | Abgeschlossen |
 | PROJ-10 | Preview-Modus | Offen |
 | PROJ-11 | Wörterbuch (statisch + lernend) | Offen |
 | PROJ-12 | Transform-Modus (Fn+Alt) | Offen |

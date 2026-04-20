@@ -74,12 +74,13 @@ final class AppState: ObservableObject {
         hotkey.onKeyUp = { [weak self] in
             guard let self else { return }
             self.isRecording = false
+            let model = self.settings.whisperModel
             if let url = audio.stopRecording() {
-                Task { await whisper.transcribe(fileURL: url) }
+                Task { await whisper.transcribe(fileURL: url, model: model) }
             }
         }
 
-        Task { await whisper.loadModelIfNeeded() }
+        Task { await whisper.loadModelIfNeeded(model: settings.whisperModel) }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             paste.requestAccessibilityIfNeeded()
