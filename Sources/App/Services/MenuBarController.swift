@@ -93,7 +93,7 @@ final class MenuBarController {
         // .nonactivatingPanel: Panel zeigen ohne die Ziel-App zu deaktivieren.
         // Ohne das würde frontmostApplication auf Dicto zeigen und Diktieren wäre kaputt.
         panel = NSPanel(
-            contentRect: NSRect(x: 0, y: 0, width: 280, height: 320),
+            contentRect: NSRect(x: 0, y: 0, width: 320, height: 320),
             styleMask: [.titled, .closable, .resizable, .nonactivatingPanel],
             backing: .buffered,
             defer: false
@@ -103,12 +103,14 @@ final class MenuBarController {
         panel.isMovableByWindowBackground = true
         panel.isReleasedWhenClosed = false
         panel.level = .floating
-        panel.minSize = NSSize(width: 240, height: 240)
+        panel.minSize = NSSize(width: 280, height: 240)
         panel.becomesKeyOnlyIfNeeded = true
         panel.standardWindowButton(.miniaturizeButton)?.isHidden = true
         panel.standardWindowButton(.zoomButton)?.isHidden = true
         panel.contentViewController = NSHostingController(
-            rootView: PopoverRootView().environmentObject(appState)
+            rootView: PopoverRootView()
+                .environmentObject(appState)
+                .environment(\.controlActiveState, .key)
         )
     }
 
