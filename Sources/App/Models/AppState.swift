@@ -97,9 +97,7 @@ final class AppState: ObservableObject {
 
     @MainActor
     private func handleTranscriptionDone(text: String) async {
-        let styleNote = dictationStyle.promptSuffix
-        let effectivePrompt = settings.ollamaPrompt
-            + (styleNote.isEmpty ? "" : "\n- \(styleNote)")
+        let effectivePrompt = dictationStyle.systemPrompt ?? settings.ollamaPrompt
         let processor: any TextPostProcessor = settings.ollamaEnabled
             ? OllamaPostProcessor(baseURL: settings.ollamaBaseURL, model: settings.ollamaModel, systemPrompt: effectivePrompt)
             : PassthroughPostProcessor()
