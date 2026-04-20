@@ -19,6 +19,13 @@ final class AppState: ObservableObject {
 
     var isAccessibilityAuthorized: Bool { pasteService.isAccessibilityAuthorized }
 
+    @Published var dictationStyle: DictationStyle = {
+        let raw = UserDefaults.standard.string(forKey: "dictationStyle") ?? ""
+        return DictationStyle(rawValue: raw) ?? .neutral
+    }() {
+        didSet { UserDefaults.standard.set(dictationStyle.rawValue, forKey: "dictationStyle") }
+    }
+
     let hotkeyService: HotkeyService
     let audioService: AudioService
     let whisperService: WhisperService
@@ -90,8 +97,11 @@ final class AppState: ObservableObject {
 
     @MainActor
     private func handleTranscriptionDone(text: String) async {
+        let styleNote = dictationStyle.promptSuffix
+        let effectivePrompt = settings.ollamaPrompt
+            + (styleNote.isEmpty ? "" : "\n- \(styleNote)")
         let processor: any TextPostProcessor = settings.ollamaEnabled
-            ? OllamaPostProcessor(baseURL: settings.ollamaBaseURL, model: settings.ollamaModel, systemPrompt: settings.ollamaPrompt)
+            ? OllamaPostProcessor(baseURL: settings.ollamaBaseURL, model: settings.ollamaModel, systemPrompt: effectivePrompt)
             : PassthroughPostProcessor()
 
         let processed = await processor.process(text: text)
