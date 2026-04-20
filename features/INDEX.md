@@ -16,3 +16,5 @@
 | [PROJ-12](PROJ-12-transform-modus.md) | Transform-Modus (Alt+Fn: Selektion + Befehl) | Abgeschlossen |
 | [PROJ-13](PROJ-13-launch-at-login.md) | Launch at Login | Abgeschlossen |
 | [PROJ-14](PROJ-14-sprachauswahl.md) | Sprachauswahl (Deutsch / Englisch / Auto) | Abgeschlossen |
+| [PROJ-15](PROJ-15-diktat-verlauf.md) | Diktat-Verlauf (letzte 20 Einträge) | Abgeschlossen |
+| [PROJ-16](PROJ-16-woerterbuch-export-import.md) | Wörterbuch Export/Import | Abgeschlossen |
