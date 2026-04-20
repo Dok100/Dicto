@@ -126,7 +126,7 @@ struct SettingsView: View {
             .padding()
             .frame(maxWidth: .infinity, alignment: .topLeading)
         }
-        .frame(width: 480, height: 520)
+        .frame(minWidth: 400, minHeight: 400)
     }
 
     @ViewBuilder
