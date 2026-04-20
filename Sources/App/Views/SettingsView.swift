@@ -1,5 +1,7 @@
 import SwiftUI
 import ServiceManagement
+import AppKit
+import UniformTypeIdentifiers
 
 struct SettingsView: View {
     @ObservedObject var settings: AppSettings
@@ -159,6 +161,12 @@ struct SettingsView: View {
                               newCorrect.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
 
+                HStack(spacing: 8) {
+                    Button("Exportieren") { exportDictionary() }
+                    Button("Importieren") { importDictionary() }
+                }
+                .font(.caption)
+
                 Spacer(minLength: 0)
             }
             .padding()
@@ -188,6 +196,32 @@ struct SettingsView: View {
         case .some(false):
             Image(systemName: "circle.fill").foregroundStyle(.red).font(.caption)
                 .help("Ollama nicht erreichbar – läuft der Server?")
+        }
+    }
+
+    private func exportDictionary() {
+        let panel = NSSavePanel()
+        panel.allowedContentTypes = [.json]
+        panel.nameFieldStringValue = "dicto-woerterbuch.json"
+        panel.begin { response in
+            guard response == .OK, let url = panel.url else { return }
+            if let data = try? JSONEncoder().encode(dictionaryService.entries) {
+                try? data.write(to: url)
+            }
+        }
+    }
+
+    private func importDictionary() {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.json]
+        panel.allowsMultipleSelection = false
+        panel.begin { response in
+            guard response == .OK, let url = panel.url,
+                  let data = try? Data(contentsOf: url),
+                  let entries = try? JSONDecoder().decode([WordEntry].self, from: data) else { return }
+            for entry in entries {
+                dictionaryService.add(wrong: entry.wrong, correct: entry.correct)
+            }
         }
     }
 

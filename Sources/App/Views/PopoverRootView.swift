@@ -3,12 +3,17 @@ import SwiftUI
 struct PopoverRootView: View {
     @EnvironmentObject var appState: AppState
     @State private var editableText = ""
+    @State private var showHistory = false
 
     var body: some View {
         VStack(spacing: 10) {
             statusIcon
             Text("Dicto").font(.headline)
-            statusArea
+            if showHistory {
+                historyView
+            } else {
+                statusArea
+            }
             Spacer(minLength: 0)
             Picker("Stil", selection: $appState.dictationStyle) {
                 ForEach(DictationStyle.allCases, id: \.self) { style in
@@ -25,6 +30,11 @@ struct PopoverRootView: View {
                 }
                 .buttonStyle(.plain)
                 .help("Einstellungen")
+                Button(action: { showHistory.toggle() }) {
+                    Image(systemName: showHistory ? "clock.fill" : "clock")
+                }
+                .buttonStyle(.plain)
+                .help("Verlauf")
                 Spacer()
                 Button("Beenden") {
                     NSApplication.shared.terminate(nil)
@@ -34,6 +44,9 @@ struct PopoverRootView: View {
         }
         .padding()
         .frame(minWidth: 240, minHeight: 240)
+        .onChange(of: appState.transcriptionState) { state in
+            if case .done = state { showHistory = false }
+        }
     }
 
     // MARK: – Status-Icon
@@ -55,6 +68,48 @@ struct PopoverRootView: View {
         if appState.isTransformRecording { return .purple }
         return appState.isRecording ? .red : .secondary
     }
+
+    // MARK: – Verlauf
+
+    @ViewBuilder
+    private var historyView: some View {
+        let entries = appState.historyService.entries
+        if entries.isEmpty {
+            Text("Noch kein Verlauf.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        } else {
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 8) {
+                    ForEach(entries) { entry in
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(entry.date, formatter: Self.relativeDateFormatter)
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                            Text(entry.text)
+                                .font(.callout)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .textSelection(.enabled)
+                        }
+                        .padding(6)
+                        .background(Color.secondary.opacity(0.07))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                    }
+                }
+                .padding(.horizontal, 2)
+            }
+            .frame(minHeight: 80, maxHeight: 200)
+        }
+    }
+
+    private static let relativeDateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "de_DE")
+        f.doesRelativeDateFormatting = true
+        f.dateStyle = .short
+        f.timeStyle = .short
+        return f
+    }()
 
     // MARK: – Haupt-Statusbereich
 

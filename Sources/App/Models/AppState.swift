@@ -33,6 +33,7 @@ final class AppState: ObservableObject {
     let pasteService: PasteService
     let settings = AppSettings()
     let dictionaryService = DictionaryService()
+    let historyService = HistoryService()
 
     var onOpenSettings: (() -> Void)?
 
@@ -156,6 +157,7 @@ final class AppState: ObservableObject {
             try? await Task.sleep(nanoseconds: 100_000_000)
         }
 
+        historyService.add(text: processed)
         transcriptionState = .done(processed)
     }
 
@@ -191,6 +193,7 @@ final class AppState: ObservableObject {
             try? await Task.sleep(nanoseconds: 100_000_000)
         }
 
+        historyService.add(text: result)
         transcriptionState = .done(result)
     }
 
@@ -208,6 +211,7 @@ final class AppState: ObservableObject {
             try? await Task.sleep(nanoseconds: 100_000_000)
         }
 
+        historyService.add(text: edited)
         transcriptionState = .idle
     }
 }
