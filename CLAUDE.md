@@ -10,7 +10,7 @@ Optional: Glättung via Ollama (glm4, http://localhost:11434).
 
 ## Aktueller Phasenstand
 
-**Stand**: PROJ-1–PROJ-11 abgeschlossen. PROJ-12 offen.
+**Stand**: PROJ-1–PROJ-12 alle abgeschlossen.
 
 | Phase | Status |
 |-------|--------|
@@ -25,7 +25,7 @@ Optional: Glättung via Ollama (glm4, http://localhost:11434).
 | PROJ-9 Whisper-Modellauswahl (Base / Large v3) | Abgeschlossen |
 | PROJ-10 Preview-Modus (opt-in, editierbar vor Einfügen) | Abgeschlossen |
 | PROJ-11 Wörterbuch (statisch + lernend via Preview) | Abgeschlossen |
-| PROJ-12 Transform-Modus (Fn+Alt: Selektion + Befehl) | Offen |
+| PROJ-12 Transform-Modus (Alt+Fn: Selektion + Befehl) | Abgeschlossen |
 
 ## Nutzer-Kontext
 

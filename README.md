@@ -53,7 +53,7 @@ Beim ersten Start fordert Dicto drei Berechtigungen an:
 | PROJ-9 | Whisper-Modellauswahl (Base / Large v3) | Abgeschlossen |
 | PROJ-10 | Preview-Modus (Text vor Einfügen editierbar, opt-in) | Abgeschlossen |
 | PROJ-11 | Wörterbuch (statisch + lernend via Preview) | Abgeschlossen |
-| PROJ-12 | Transform-Modus (Fn+Alt: Selektion + Befehl) | Offen |
+| PROJ-12 | Transform-Modus (Alt+Fn: Selektion + Befehl) | Abgeschlossen |
 
 ## Datenschutz
 
