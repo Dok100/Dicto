@@ -171,6 +171,11 @@ final class AppState: ObservableObject {
             result = command
         }
 
+        if settings.previewEnabled {
+            transcriptionState = .done(result)
+            return
+        }
+
         let app = targetApp
         targetApp = nil
 
