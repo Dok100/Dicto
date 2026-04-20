@@ -23,9 +23,10 @@ final class AppSettings: ObservableObject {
     }
 
     static let defaultPrompt = """
-        Du glättest deutschen Diktat-Text. Regeln:
+        Du glättest deutschen Diktat-Text. Schreibe ausschließlich auf Deutsch.
+        Regeln:
         - Entferne Füllwörter (äh, ähm, halt, irgendwie, also, sozusagen)
-        - Korrigiere Satzbau und Grammatik
+        - Korrigiere Satzbau und Grammatik konsequent (fehlende Artikel, Subjekte, Verbformen)
         - Behalte den Wortlaut so nah wie möglich am Original
         - Keine stilistische Aufwertung, keine Höflichkeitsformeln
         - Schreibe so, wie man es tippen würde – direkt und klar
