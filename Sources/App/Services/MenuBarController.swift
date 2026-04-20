@@ -30,7 +30,14 @@ final class MenuBarController {
             }
             .store(in: &cancellables)
 
-        // Panel automatisch zeigen wenn Transkription fertig ist
+        // Panel automatisch zeigen wenn Aufnahme startet oder Transkription fertig ist
+        appState.$isRecording
+            .receive(on: RunLoop.main)
+            .sink { [weak self] isRecording in
+                if isRecording { self?.showPanel() }
+            }
+            .store(in: &cancellables)
+
         appState.$transcriptionState
             .receive(on: RunLoop.main)
             .sink { [weak self] state in
