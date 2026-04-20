@@ -90,19 +90,21 @@ final class MenuBarController {
     }
 
     private func setupPanel(appState: AppState) {
+        // .nonactivatingPanel: Panel zeigen ohne die Ziel-App zu deaktivieren.
+        // Ohne das würde frontmostApplication auf Dicto zeigen und Diktieren wäre kaputt.
         panel = NSPanel(
             contentRect: NSRect(x: 0, y: 0, width: 280, height: 320),
-            styleMask: [.titled, .closable, .resizable, .fullSizeContentView],
+            styleMask: [.titled, .closable, .resizable, .nonactivatingPanel],
             backing: .buffered,
             defer: false
         )
         panel.title = ""
         panel.titleVisibility = .hidden
-        panel.titlebarAppearsTransparent = true
         panel.isMovableByWindowBackground = true
         panel.isReleasedWhenClosed = false
         panel.level = .floating
         panel.minSize = NSSize(width: 240, height: 240)
+        panel.becomesKeyOnlyIfNeeded = true
         panel.standardWindowButton(.miniaturizeButton)?.isHidden = true
         panel.standardWindowButton(.zoomButton)?.isHidden = true
         panel.contentViewController = NSHostingController(
@@ -115,7 +117,6 @@ final class MenuBarController {
     private func showPanel() {
         positionPanel()
         panel.orderFront(nil)
-        panel.makeKey()
 
         guard clickOutsideMonitor == nil else { return }
         clickOutsideMonitor = NSEvent.addGlobalMonitorForEvents(
