@@ -10,7 +10,7 @@ Optional: Glättung via Ollama (glm4, http://localhost:11434).
 
 ## Aktueller Phasenstand
 
-**Stand**: PROJ-1–PROJ-13 alle abgeschlossen.
+**Stand**: PROJ-1–PROJ-14 alle abgeschlossen.
 
 | Phase | Status |
 |-------|--------|
@@ -27,6 +27,7 @@ Optional: Glättung via Ollama (glm4, http://localhost:11434).
 | PROJ-11 Wörterbuch (statisch + lernend via Preview) | Abgeschlossen |
 | PROJ-12 Transform-Modus (Alt+Fn: Selektion + Befehl) | Abgeschlossen |
 | PROJ-13 Launch at Login (SMAppService) | Abgeschlossen |
+| PROJ-14 Sprachauswahl (Deutsch / Englisch / Auto) | Abgeschlossen |
 
 ## Nutzer-Kontext
 

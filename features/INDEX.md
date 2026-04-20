@@ -15,3 +15,4 @@
 | [PROJ-11](PROJ-11-woerterbuch.md) | Wörterbuch (statisch + lernend) | Abgeschlossen |
 | [PROJ-12](PROJ-12-transform-modus.md) | Transform-Modus (Alt+Fn: Selektion + Befehl) | Abgeschlossen |
 | [PROJ-13](PROJ-13-launch-at-login.md) | Launch at Login | Abgeschlossen |
+| [PROJ-14](PROJ-14-sprachauswahl.md) | Sprachauswahl (Deutsch / Englisch / Auto) | Abgeschlossen |

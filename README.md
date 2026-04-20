@@ -55,6 +55,7 @@ Beim ersten Start fordert Dicto drei Berechtigungen an:
 | PROJ-11 | Wörterbuch (statisch + lernend via Preview) | Abgeschlossen |
 | PROJ-12 | Transform-Modus (Alt+Fn: Selektion + Befehl) | Abgeschlossen |
 | PROJ-13 | Launch at Login | Abgeschlossen |
+| PROJ-14 | Sprachauswahl für WhisperKit (Deutsch / Englisch / Auto) | Abgeschlossen |
 
 ## Datenschutz
 
