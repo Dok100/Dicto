@@ -108,9 +108,7 @@ final class MenuBarController {
         panel.standardWindowButton(.miniaturizeButton)?.isHidden = true
         panel.standardWindowButton(.zoomButton)?.isHidden = true
         panel.contentViewController = NSHostingController(
-            rootView: PopoverRootView()
-                .environmentObject(appState)
-                .environment(\.controlActiveState, .key)
+            rootView: PopoverRootView().environmentObject(appState)
         )
     }
 
@@ -119,6 +117,9 @@ final class MenuBarController {
     private func showPanel() {
         positionPanel()
         panel.orderFront(nil)
+        // makeKey auf nonactivatingPanel: Panel bekommt Tastaturfokus,
+        // aber Dicto wird nicht zur frontmostApplication → targetApp bleibt korrekt
+        panel.makeKey()
 
         guard clickOutsideMonitor == nil else { return }
         clickOutsideMonitor = NSEvent.addGlobalMonitorForEvents(
