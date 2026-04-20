@@ -24,13 +24,13 @@ final class WhisperService: ObservableObject {
         }
     }
 
-    func transcribe(fileURL: URL, model: WhisperModel = .largev3) async {
+    func transcribe(fileURL: URL, model: WhisperModel = .largev3, language: WhisperLanguage = .german) async {
         if pipe == nil || loadedModel != model { await loadModelIfNeeded(model: model) }
         guard let pipe else { return }
 
         await MainActor.run { state = .transcribing }
         do {
-            let options = DecodingOptions(task: .transcribe, language: "de")
+            let options = DecodingOptions(task: .transcribe, language: language.code)
             let results = try await pipe.transcribe(audioPath: fileURL.path, decodeOptions: options)
             let text = results
                 .map { $0.text }

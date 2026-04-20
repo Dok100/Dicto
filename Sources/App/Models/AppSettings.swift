@@ -19,15 +19,19 @@ final class AppSettings: ObservableObject {
     @Published var previewEnabled: Bool {
         didSet { UserDefaults.standard.set(previewEnabled, forKey: "previewEnabled") }
     }
+    @Published var whisperLanguage: WhisperLanguage {
+        didSet { UserDefaults.standard.set(whisperLanguage.rawValue, forKey: "whisperLanguage") }
+    }
 
     init() {
         let d = UserDefaults.standard
-        ollamaEnabled   = d.object(forKey: "ollamaEnabled")   as? Bool ?? true
-        ollamaBaseURL   = d.string(forKey: "ollamaBaseURL")   ?? "http://localhost:11434"
-        ollamaModel     = d.string(forKey: "ollamaModel")     ?? "glm4"
-        ollamaPrompt    = d.string(forKey: "ollamaPrompt")    ?? AppSettings.defaultPrompt
-        whisperModel    = WhisperModel(rawValue: d.string(forKey: "whisperModel") ?? "") ?? .largev3
-        previewEnabled  = d.object(forKey: "previewEnabled")  as? Bool ?? false
+        ollamaEnabled    = d.object(forKey: "ollamaEnabled")   as? Bool ?? true
+        ollamaBaseURL    = d.string(forKey: "ollamaBaseURL")   ?? "http://localhost:11434"
+        ollamaModel      = d.string(forKey: "ollamaModel")     ?? "glm4"
+        ollamaPrompt     = d.string(forKey: "ollamaPrompt")    ?? AppSettings.defaultPrompt
+        whisperModel     = WhisperModel(rawValue: d.string(forKey: "whisperModel") ?? "") ?? .largev3
+        previewEnabled   = d.object(forKey: "previewEnabled")  as? Bool ?? false
+        whisperLanguage  = WhisperLanguage(rawValue: d.string(forKey: "whisperLanguage") ?? "") ?? .german
     }
 
     static let defaultPrompt = """

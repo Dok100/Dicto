@@ -78,8 +78,9 @@ final class AppState: ObservableObject {
             guard let self else { return }
             self.isRecording = false
             let model = self.settings.whisperModel
+            let language = self.settings.whisperLanguage
             if let url = audio.stopRecording() {
-                Task { await whisper.transcribe(fileURL: url, model: model) }
+                Task { await whisper.transcribe(fileURL: url, model: model, language: language) }
             }
         }
 
@@ -97,8 +98,9 @@ final class AppState: ObservableObject {
             guard let self else { return }
             self.isRecording = false
             let model = self.settings.whisperModel
+            let language = self.settings.whisperLanguage
             if let url = audio.stopRecording() {
-                Task { await whisper.transcribe(fileURL: url, model: model) }
+                Task { await whisper.transcribe(fileURL: url, model: model, language: language) }
             }
         }
 

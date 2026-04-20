@@ -43,6 +43,14 @@ struct SettingsView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
 
+                Picker("Sprache", selection: $settings.whisperLanguage) {
+                    ForEach(WhisperLanguage.allCases, id: \.self) { l in
+                        Text(l.label).tag(l)
+                    }
+                }
+                .pickerStyle(.radioGroup)
+                .labelsHidden()
+
                 Divider()
 
                 Toggle("Vorschau vor Einfügen", isOn: $settings.previewEnabled)
