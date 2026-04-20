@@ -11,6 +11,6 @@
 | [PROJ-7](PROJ-7-settings.md) | Einstellungsfenster | Abgeschlossen |
 | [PROJ-8](PROJ-8-stil-auswahl.md) | Stil-Auswahl im Popover | Abgeschlossen |
 | [PROJ-9](PROJ-9-whisper-modellauswahl.md) | Whisper-Modellauswahl | Abgeschlossen |
-| PROJ-10 | Preview-Modus | Offen |
+| [PROJ-10](PROJ-10-preview-modus.md) | Preview-Modus | Abgeschlossen |
 | PROJ-11 | Wörterbuch (statisch + lernend) | Offen |
 | PROJ-12 | Transform-Modus (Fn+Alt) | Offen |
