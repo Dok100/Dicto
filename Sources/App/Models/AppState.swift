@@ -31,6 +31,7 @@ final class AppState: ObservableObject {
     let whisperService: WhisperService
     let pasteService: PasteService
     let settings = AppSettings()
+    let dictionaryService = DictionaryService()
 
     var onOpenSettings: (() -> Void)?
 
@@ -103,8 +104,10 @@ final class AppState: ObservableObject {
             ? OllamaPostProcessor(baseURL: settings.ollamaBaseURL, model: settings.ollamaModel, systemPrompt: effectivePrompt)
             : PassthroughPostProcessor()
 
-        let processed = await processor.process(text: text)
-            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let processed = dictionaryService.apply(
+            to: await processor.process(text: text)
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+        )
 
         if settings.previewEnabled {
             // targetApp bleibt gespeichert – Nutzer bestätigt manuell via confirmPaste
@@ -126,14 +129,16 @@ final class AppState: ObservableObject {
     }
 
     @MainActor
-    func confirmPaste(text: String) async {
+    func confirmPaste(original: String, edited: String) async {
+        dictionaryService.learnFromDiff(original: original, edited: edited)
+
         let app = targetApp
         targetApp = nil
 
         if let app, app.bundleIdentifier != Bundle.main.bundleIdentifier {
             app.activate(options: .activateIgnoringOtherApps)
             try? await Task.sleep(nanoseconds: 100_000_000)
-            pasteService.paste(text: text)
+            pasteService.paste(text: edited)
             try? await Task.sleep(nanoseconds: 100_000_000)
         }
 

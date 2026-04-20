@@ -2,6 +2,10 @@ import SwiftUI
 
 struct SettingsView: View {
     @ObservedObject var settings: AppSettings
+    @ObservedObject var dictionaryService: DictionaryService
+
+    @State private var newWrong = ""
+    @State private var newCorrect = ""
 
     var body: some View {
         ScrollView {
@@ -59,6 +63,62 @@ struct SettingsView: View {
                         settings.ollamaPrompt = AppSettings.defaultPrompt
                     }
                     .font(.caption)
+                }
+
+                Divider()
+
+                Text("Wörterbuch").font(.headline)
+                Text("Falsch erkannte Wörter automatisch ersetzen. Korrekturen im Vorschau-Modus werden automatisch gelernt.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                if dictionaryService.entries.isEmpty {
+                    Text("Noch keine Einträge.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else {
+                    VStack(spacing: 0) {
+                        ForEach(dictionaryService.entries) { entry in
+                            HStack(spacing: 8) {
+                                Text(entry.wrong)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                Image(systemName: "arrow.right")
+                                    .foregroundStyle(.secondary)
+                                    .font(.caption)
+                                Text(entry.correct)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                Button {
+                                    dictionaryService.remove(id: entry.id)
+                                } label: {
+                                    Image(systemName: "minus.circle.fill")
+                                        .foregroundStyle(.red)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                            .font(.callout)
+                            .padding(.vertical, 4)
+                            .padding(.horizontal, 8)
+                            Divider()
+                        }
+                    }
+                    .overlay(RoundedRectangle(cornerRadius: 4).stroke(Color.secondary.opacity(0.3)))
+                }
+
+                HStack(spacing: 6) {
+                    TextField("Falsch", text: $newWrong)
+                        .textFieldStyle(.roundedBorder)
+                    Image(systemName: "arrow.right")
+                        .foregroundStyle(.secondary)
+                        .font(.caption)
+                    TextField("Richtig", text: $newCorrect)
+                        .textFieldStyle(.roundedBorder)
+                    Button("Hinzufügen") {
+                        dictionaryService.add(wrong: newWrong, correct: newCorrect)
+                        newWrong = ""
+                        newCorrect = ""
+                    }
+                    .disabled(newWrong.trimmingCharacters(in: .whitespaces).isEmpty ||
+                              newCorrect.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
 
                 Spacer(minLength: 0)

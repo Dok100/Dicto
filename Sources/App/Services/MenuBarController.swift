@@ -14,7 +14,7 @@ final class MenuBarController {
         setupStatusItem()
         setupPopover(appState: appState)
 
-        settingsWindowController = SettingsWindowController(settings: appState.settings)
+        settingsWindowController = SettingsWindowController(appState: appState)
         appState.onOpenSettings = { [weak self] in
             self?.popover.performClose(nil)
             self?.settingsWindowController?.show()

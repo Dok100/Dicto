@@ -118,7 +118,7 @@ struct PopoverRootView: View {
                         .onAppear { editableText = text }
                         .onChange(of: text) { editableText = $1 }
                     Button("Einfügen") {
-                        Task { await appState.confirmPaste(text: editableText) }
+                        Task { await appState.confirmPaste(original: text, edited: editableText) }
                     }
                     .buttonStyle(.borderedProminent)
                     .controlSize(.small)
