@@ -1,4 +1,5 @@
 import SwiftUI
+import ServiceManagement
 
 struct SettingsView: View {
     @ObservedObject var settings: AppSettings
@@ -7,9 +8,28 @@ struct SettingsView: View {
     @State private var newWrong = ""
     @State private var newCorrect = ""
 
+    private var launchAtLoginBinding: Binding<Bool> {
+        Binding(
+            get: { SMAppService.mainApp.status == .enabled },
+            set: { enable in
+                try? enable ? SMAppService.mainApp.register() : SMAppService.mainApp.unregister()
+            }
+        )
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
+                Toggle("Beim Login automatisch starten", isOn: launchAtLoginBinding)
+                    .toggleStyle(.switch)
+                if SMAppService.mainApp.status == .requiresApproval {
+                    Text("Bitte in Systemeinstellungen → Allgemein → Anmeldeobjekte genehmigen.")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                }
+
+                Divider()
+
                 Text("Whisper-Modell").font(.headline)
                 Picker("Modell", selection: $settings.whisperModel) {
                     ForEach(WhisperModel.allCases, id: \.self) { m in
