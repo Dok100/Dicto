@@ -54,6 +54,7 @@ Beim ersten Start fordert Dicto drei Berechtigungen an:
 | PROJ-10 | Preview-Modus (Text vor Einfügen editierbar, opt-in) | Abgeschlossen |
 | PROJ-11 | Wörterbuch (statisch + lernend via Preview) | Abgeschlossen |
 | PROJ-12 | Transform-Modus (Alt+Fn: Selektion + Befehl) | Abgeschlossen |
+| PROJ-13 | Launch at Login | Abgeschlossen |
 
 ## Datenschutz
 
