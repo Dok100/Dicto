@@ -179,6 +179,8 @@ final class AppState: ObservableObject {
             result = command
         }
 
+        isTransformResult = true
+
         if settings.previewEnabled {
             transcriptionState = .done(result)
             return
@@ -195,7 +197,6 @@ final class AppState: ObservableObject {
         }
 
         historyService.add(text: result)
-        isTransformResult = true
         transcriptionState = .done(result)
     }
 

@@ -13,6 +13,7 @@ struct PopoverRootView: View {
                 if showHistory { historyView } else { statusArea }
             }
             .frame(maxHeight: .infinity)
+            previewActions
             Picker("Stil", selection: $appState.dictationStyle) {
                 ForEach(DictationStyle.allCases, id: \.self) { style in
                     Text(style.label).tag(style)
@@ -65,6 +66,50 @@ struct PopoverRootView: View {
     private var iconColor: Color {
         if appState.isTransformRecording { return .purple }
         return appState.isRecording ? .red : .secondary
+    }
+
+    // MARK: – Vorschau-Aktionsbuttons (außerhalb des expandierenden Bereichs)
+
+    @ViewBuilder
+    private var previewActions: some View {
+        if case .done(let text) = appState.transcriptionState, appState.settings.previewEnabled {
+            VStack(spacing: 4) {
+                if appState.isTransformResult {
+                    HStack(spacing: 8) {
+                        Button("Kopieren") {
+                            NSPasteboard.general.clearContents()
+                            NSPasteboard.general.setString(editableText, forType: .string)
+                            appState.historyService.add(text: editableText)
+                            appState.dismissResult()
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.small)
+                        .keyboardShortcut(.return, modifiers: .command)
+                        Button("Einfügen") {
+                            Task { await appState.confirmPaste(original: text, edited: editableText) }
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                        .disabled(!appState.isAccessibilityAuthorized)
+                    }
+                } else {
+                    Button("Einfügen") {
+                        Task { await appState.confirmPaste(original: text, edited: editableText) }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.small)
+                    .keyboardShortcut(.return, modifiers: .command)
+                    .disabled(!appState.isAccessibilityAuthorized)
+                }
+                if !appState.isAccessibilityAuthorized {
+                    PermissionHint(
+                        message: "Eingabehilfen fehlt – Text nicht eingefügt.",
+                        settingsURL: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility",
+                        appState: appState
+                    )
+                }
+            }
+        }
     }
 
     // MARK: – Verlauf
@@ -169,55 +214,19 @@ struct PopoverRootView: View {
             }
 
         case .done(let text):
-            VStack(spacing: 6) {
-                if appState.settings.previewEnabled {
-                    TextEditor(text: $editableText)
+            if appState.settings.previewEnabled {
+                TextEditor(text: $editableText)
+                    .font(.body)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .overlay(RoundedRectangle(cornerRadius: 4).stroke(Color.secondary.opacity(0.3)))
+                    .onAppear { editableText = text }
+                    .onChange(of: text) { editableText = $1 }
+            } else {
+                ScrollView {
+                    Text(text)
                         .font(.body)
-                        .frame(minHeight: 80, maxHeight: .infinity)
-                        .overlay(RoundedRectangle(cornerRadius: 4).stroke(Color.secondary.opacity(0.3)))
-                        .onAppear { editableText = text }
-                        .onChange(of: text) { editableText = $1 }
-                    if appState.isTransformResult {
-                        HStack(spacing: 8) {
-                            Button("Kopieren") {
-                                NSPasteboard.general.clearContents()
-                                NSPasteboard.general.setString(editableText, forType: .string)
-                                appState.dismissResult()
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .controlSize(.small)
-                            .keyboardShortcut(.return, modifiers: .command)
-                            Button("Einfügen") {
-                                Task { await appState.confirmPaste(original: text, edited: editableText) }
-                            }
-                            .buttonStyle(.bordered)
-                            .controlSize(.small)
-                            .disabled(!appState.isAccessibilityAuthorized)
-                        }
-                    } else {
-                        Button("Einfügen") {
-                            Task { await appState.confirmPaste(original: text, edited: editableText) }
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .controlSize(.small)
-                        .keyboardShortcut(.return, modifiers: .command)
-                        .disabled(!appState.isAccessibilityAuthorized)
-                    }
-                } else {
-                    ScrollView {
-                        Text(text)
-                            .font(.body)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .textSelection(.enabled)
-                    }
-                    .frame(maxHeight: .infinity)
-                }
-                if !appState.isAccessibilityAuthorized {
-                    PermissionHint(
-                        message: "Eingabehilfen fehlt – Text nicht eingefügt.",
-                        settingsURL: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility",
-                        appState: appState
-                    )
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .textSelection(.enabled)
                 }
             }
 
