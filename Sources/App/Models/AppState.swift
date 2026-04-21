@@ -39,6 +39,7 @@ final class AppState: ObservableObject {
 
     private var targetApp: NSRunningApplication?
     @Published private(set) var isTransformMode = false
+    @Published private(set) var isTransformResult = false
     private var selectedTextForTransform: String?
     private var cancellables = Set<AnyCancellable>()
 
@@ -194,7 +195,14 @@ final class AppState: ObservableObject {
         }
 
         historyService.add(text: result)
+        isTransformResult = true
         transcriptionState = .done(result)
+    }
+
+    @MainActor
+    func dismissResult() {
+        isTransformResult = false
+        transcriptionState = .idle
     }
 
     @MainActor
@@ -212,6 +220,7 @@ final class AppState: ObservableObject {
         }
 
         historyService.add(text: edited)
+        isTransformResult = false
         transcriptionState = .idle
     }
 }

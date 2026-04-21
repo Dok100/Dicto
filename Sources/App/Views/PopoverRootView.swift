@@ -9,12 +9,10 @@ struct PopoverRootView: View {
         VStack(spacing: 10) {
             statusIcon
             Text("Dicto").font(.headline)
-            if showHistory {
-                historyView
-            } else {
-                statusArea
+            Group {
+                if showHistory { historyView } else { statusArea }
             }
-            Spacer(minLength: 0)
+            .frame(maxHeight: .infinity)
             Picker("Stil", selection: $appState.dictationStyle) {
                 ForEach(DictationStyle.allCases, id: \.self) { style in
                     Text(style.label).tag(style)
@@ -174,26 +172,45 @@ struct PopoverRootView: View {
             VStack(spacing: 6) {
                 if appState.settings.previewEnabled {
                     TextEditor(text: $editableText)
-                        .font(.callout)
-                        .frame(minHeight: 100, maxHeight: 140)
+                        .font(.body)
+                        .frame(minHeight: 80, maxHeight: .infinity)
                         .overlay(RoundedRectangle(cornerRadius: 4).stroke(Color.secondary.opacity(0.3)))
                         .onAppear { editableText = text }
                         .onChange(of: text) { editableText = $1 }
-                    Button("Einfügen") {
-                        Task { await appState.confirmPaste(original: text, edited: editableText) }
+                    if appState.isTransformResult {
+                        HStack(spacing: 8) {
+                            Button("Kopieren") {
+                                NSPasteboard.general.clearContents()
+                                NSPasteboard.general.setString(editableText, forType: .string)
+                                appState.dismissResult()
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .controlSize(.small)
+                            .keyboardShortcut(.return, modifiers: .command)
+                            Button("Einfügen") {
+                                Task { await appState.confirmPaste(original: text, edited: editableText) }
+                            }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
+                            .disabled(!appState.isAccessibilityAuthorized)
+                        }
+                    } else {
+                        Button("Einfügen") {
+                            Task { await appState.confirmPaste(original: text, edited: editableText) }
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.small)
+                        .keyboardShortcut(.return, modifiers: .command)
+                        .disabled(!appState.isAccessibilityAuthorized)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.small)
-                    .keyboardShortcut(.return, modifiers: .command)
-                    .disabled(!appState.isAccessibilityAuthorized)
                 } else {
                     ScrollView {
                         Text(text)
-                            .font(.callout)
+                            .font(.body)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .textSelection(.enabled)
                     }
-                    .frame(maxHeight: 80)
+                    .frame(maxHeight: .infinity)
                 }
                 if !appState.isAccessibilityAuthorized {
                     PermissionHint(
