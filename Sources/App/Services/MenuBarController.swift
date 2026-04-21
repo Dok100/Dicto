@@ -20,6 +20,14 @@ final class MenuBarController {
             self?.settingsWindowController?.show()
         }
 
+        // Panel automatisch öffnen wenn Vorschau-Text bereit ist
+        appState.$transcriptionState
+            .receive(on: RunLoop.main)
+            .sink { [weak self] state in
+                if case .done = state { self?.showPanel() }
+            }
+            .store(in: &cancellables)
+
         // Status-Dot aktualisieren wenn sich Zustand ändert
         appState.$transcriptionState
             .combineLatest(appState.$isRecording, appState.$hasMicrophonePermission, appState.$isTransformMode)
