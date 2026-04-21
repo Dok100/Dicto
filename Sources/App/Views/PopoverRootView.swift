@@ -187,9 +187,12 @@ struct PopoverRootView: View {
             } else if appState.isRecording {
                 Text("Aufnahme läuft …").font(.subheadline).foregroundStyle(.red)
             } else {
-                VStack(spacing: 2) {
-                    Text("Fn halten – Diktieren")
-                    Text("Alt+Fn halten – Text transformieren")
+                VStack(alignment: .leading, spacing: 4) {
+                    Label("Fn halten – Diktieren", systemImage: "mic.fill")
+                    Label("Alt+Fn halten – Transformieren", systemImage: "wand.and.sparkles")
+                    Divider().padding(.vertical, 2)
+                    Label("⌘+Return – Einfügen / Kopieren", systemImage: "return")
+                    Label("⌘Q – Beenden", systemImage: "xmark.circle")
                 }
                 .font(.subheadline).foregroundStyle(.secondary)
             }

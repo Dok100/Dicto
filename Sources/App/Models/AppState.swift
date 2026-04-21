@@ -179,24 +179,8 @@ final class AppState: ObservableObject {
             result = command
         }
 
+        // Transform zeigt immer Vorschau – Auto-Einfügen ergibt im Transform-Modus keinen Sinn
         isTransformResult = true
-
-        if settings.previewEnabled {
-            transcriptionState = .done(result)
-            return
-        }
-
-        let app = targetApp
-        targetApp = nil
-
-        if let app, app.bundleIdentifier != Bundle.main.bundleIdentifier {
-            app.activate(options: .activateIgnoringOtherApps)
-            try? await Task.sleep(nanoseconds: 100_000_000)
-            pasteService.paste(text: result)
-            try? await Task.sleep(nanoseconds: 100_000_000)
-        }
-
-        historyService.add(text: result)
         transcriptionState = .done(result)
     }
 
