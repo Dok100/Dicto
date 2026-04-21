@@ -12,7 +12,10 @@ Text in einer anderen App markieren, Alt+Fn halten, Befehl diktieren → Ollama 
 1. Text in Ziel-App markieren
 2. **Alt** halten, dann **Fn** dazuhalten
 3. Befehl diktieren ("übersetze ins Englische", "mache formeller", …)
-4. Fn loslassen → WhisperKit transkribiert → Ollama verarbeitet Original + Befehl → Ergebnis ersetzt Auswahl
+4. Fn loslassen → WhisperKit transkribiert → Ollama verarbeitet Original + Befehl → Ergebnis erscheint im Vorschau-Panel
+5. **Kopieren** (⌘+Return) kopiert in Clipboard, **Einfügen** fügt an Cursor-Position ein (sofern Eingabehilfen freigegeben)
+
+> Transform zeigt **immer** eine Vorschau – unabhängig von der "Vorschau vor Einfügen"-Einstellung, da Auto-Einfügen bei Transformationen keinen Sinn ergibt.
 
 ## Umgesetzte Änderungen
 
@@ -31,13 +34,20 @@ Text in einer anderen App markieren, Alt+Fn halten, Befehl diktieren → Ollama 
 - Fallback: Originaltext bei Fehler
 
 ### AppState.swift
-- `isTransformMode: Bool` + `selectedTextForTransform: String?`
+- `@Published private(set) var isTransformMode: Bool` + `selectedTextForTransform: String?`
+- `@Published private(set) var isTransformResult: Bool` – unterscheidet Transform-Ergebnis von normalem Diktat-Ergebnis in der View
 - `onTransformKeyDown`: speichert targetApp, startet Aufnahme, erfasst Clipboard asynchron
 - `handleTranscriptionDone`: leitet bei Transform-Modus an `handleTransformDone` weiter
-- `handleTransformDone`: ruft OllamaTransformProcessor auf, fügt Ergebnis ein
+- `handleTransformDone`: ruft OllamaTransformProcessor auf, setzt `isTransformResult = true`, zeigt immer Vorschau (kein Auto-Einfügen)
+- `dismissResult()`: setzt `isTransformResult` und `transcriptionState` zurück auf Idle
+- `confirmPaste(original:edited:)`: setzt `isTransformResult = false` nach Einfügen
+
+### MenuBarController.swift
+- Status-Dot lila (`systemPurple`) während `isTransformMode == true` (überlagert roten Diktat-Dot)
 
 ### PopoverRootView.swift
-- Hinweis-Text aktualisiert: "Fn halten – Diktieren / Alt+Fn halten – Text transformieren"
+- `previewActions`: zeigt bei `isTransformResult` zwei Buttons — **Kopieren** (⌘+Return, `.borderedProminent`) + **Einfügen** (`.bordered`, deaktiviert ohne Eingabehilfen)
+- Idle-Ansicht zeigt Shortcut-Übersicht: Fn, Alt+Fn, ⌘+Return, ⌘Q
 
 ## Bekannte Eigenheit: NSPanel statt NSPopover
 

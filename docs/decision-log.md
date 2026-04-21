@@ -69,3 +69,19 @@
 **Entscheidung**: Optionaler OllamaPostProcessor via HTTP-API, Fallback auf Passthrough
 
 **Grund**: Ollama läuft bereits lokal. glm-4.7-flash ist schnell genug, um die wahrgenommene Latenz gering zu halten. Fallback auf Passthrough stellt sicher, dass die Kern-Funktion auch ohne Ollama funktioniert.
+
+---
+
+## 2026-04-21 – Status-Dot statt Panel-Auto-Open beim Aufnahmestart
+
+**Entscheidung**: Panel öffnet sich nur noch bei `.done` (Vorschau-Ergebnis), nicht mehr beim Start der Aufnahme. Statusfarbe des Menübar-Dots: grün (idle), rot (Diktat), orange (Transkription läuft), lila (Transform-Modus), rot (Fehler/fehlende Permission).
+
+**Grund**: Das automatische Öffnen des Panels beim Drücken von Fn war störend – es überlagerte die aktive App während der Aufnahme. Der farbige Dot im Menübar gibt ausreichend Feedback über den aktuellen Zustand, ohne den Workflow zu unterbrechen.
+
+---
+
+## 2026-04-21 – Transform-Modus erzwingt immer Vorschau
+
+**Entscheidung**: `handleTransformDone` zeigt das Ergebnis immer im Panel (Kopieren/Einfügen-Buttons), unabhängig von der "Vorschau vor Einfügen"-Einstellung.
+
+**Grund**: Auto-Einfügen ergibt bei Transformationen keinen Sinn – der Nutzer markiert Text, diktiert einen Befehl, und muss das Ergebnis prüfen bevor es die Auswahl ersetzt. "Einfügen" als sekundäre Aktion bleibt verfügbar; "Kopieren" (⌘+Return) ist die primäre Aktion, da sie keine Accessibility-Permission benötigt.
