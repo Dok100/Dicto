@@ -231,6 +231,8 @@ struct PopoverRootView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .textSelection(.enabled)
                 }
+                .onAppear { editableText = text }
+                .onChange(of: text) { editableText = $1 }
             }
 
         case .error(let message):
