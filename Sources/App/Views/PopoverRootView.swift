@@ -72,7 +72,7 @@ struct PopoverRootView: View {
 
     @ViewBuilder
     private var previewActions: some View {
-        if case .done(let text) = appState.transcriptionState, appState.settings.previewEnabled {
+        if case .done(let text) = appState.transcriptionState, appState.settings.previewEnabled || appState.isTransformResult {
             VStack(spacing: 4) {
                 if appState.isTransformResult {
                     HStack(spacing: 8) {
