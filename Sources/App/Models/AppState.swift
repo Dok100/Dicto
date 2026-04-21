@@ -38,7 +38,7 @@ final class AppState: ObservableObject {
     var onOpenSettings: (() -> Void)?
 
     private var targetApp: NSRunningApplication?
-    private var isTransformMode = false
+    @Published private(set) var isTransformMode = false
     private var selectedTextForTransform: String?
     private var cancellables = Set<AnyCancellable>()
 

@@ -22,26 +22,11 @@ final class MenuBarController {
 
         // Status-Dot aktualisieren wenn sich Zustand ändert
         appState.$transcriptionState
-            .combineLatest(appState.$isRecording, appState.$hasMicrophonePermission)
+            .combineLatest(appState.$isRecording, appState.$hasMicrophonePermission, appState.$isTransformMode)
             .receive(on: RunLoop.main)
-            .sink { [weak self, weak appState] _, _, _ in
+            .sink { [weak self, weak appState] _, _, _, _ in
                 guard let self, let appState else { return }
                 self.updateStatusDot(appState: appState)
-            }
-            .store(in: &cancellables)
-
-        // Panel automatisch zeigen wenn Aufnahme startet oder Transkription fertig ist
-        appState.$isRecording
-            .receive(on: RunLoop.main)
-            .sink { [weak self] isRecording in
-                if isRecording { self?.showPanel() }
-            }
-            .store(in: &cancellables)
-
-        appState.$transcriptionState
-            .receive(on: RunLoop.main)
-            .sink { [weak self] state in
-                if case .done = state { self?.showPanel() }
             }
             .store(in: &cancellables)
 
@@ -59,13 +44,20 @@ final class MenuBarController {
         if appState.missingPermission != .none {
             micName = "mic.slash"
             dotColor = .systemRed
+        } else if appState.isTransformMode {
+            // Transformation (Aufnahme + Verarbeitung): lila
+            micName = "wand.and.sparkles"
+            dotColor = .systemPurple
         } else if appState.isRecording {
+            // Diktat-Aufnahme: rot
             micName = "mic.fill"
             dotColor = .systemRed
         } else if case .loadingModel = appState.transcriptionState {
+            // Modell lädt: orange
             micName = "mic"
             dotColor = .systemOrange
         } else if case .transcribing = appState.transcriptionState {
+            // Transkription läuft: orange
             micName = "mic"
             dotColor = .systemOrange
         } else if case .error = appState.transcriptionState {
