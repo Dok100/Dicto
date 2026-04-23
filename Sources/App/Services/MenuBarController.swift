@@ -20,11 +20,15 @@ final class MenuBarController {
             self?.settingsWindowController?.show()
         }
 
-        // Panel automatisch öffnen wenn Vorschau-Text bereit ist
+        // Panel automatisch öffnen wenn Vorschau nötig ist
         appState.$transcriptionState
             .receive(on: RunLoop.main)
-            .sink { [weak self] state in
-                if case .done = state { self?.showPanel() }
+            .sink { [weak self, weak appState] state in
+                guard let self, let appState else { return }
+                if case .done = state,
+                   appState.settings.previewEnabled || appState.isTransformResult {
+                    self.showPanel()
+                }
             }
             .store(in: &cancellables)
 
