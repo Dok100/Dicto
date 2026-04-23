@@ -46,6 +46,17 @@ struct PopoverRootView: View {
         .onChange(of: appState.transcriptionState) { state in
             if case .done = state { showHistory = false }
         }
+        .onReceive(NotificationCenter.default.publisher(for: .dictoCmdReturn)) { _ in
+            guard case .done(let text) = appState.transcriptionState else { return }
+            if appState.isTransformResult {
+                NSPasteboard.general.clearContents()
+                NSPasteboard.general.setString(editableText, forType: .string)
+                appState.historyService.add(text: editableText)
+                appState.dismissResult()
+            } else {
+                Task { await appState.confirmPaste(original: text, edited: editableText) }
+            }
+        }
     }
 
     // MARK: – Status-Icon

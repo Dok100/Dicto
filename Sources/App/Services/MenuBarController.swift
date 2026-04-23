@@ -7,6 +7,7 @@ final class MenuBarController {
     private var panel: NSPanel!
     private var cancellables = Set<AnyCancellable>()
     private var clickOutsideMonitor: Any?
+    private var cmdReturnMonitor: Any?
     private var settingsWindowController: SettingsWindowController?
 
     init(appState: AppState) {
@@ -142,11 +143,20 @@ final class MenuBarController {
         ) { [weak self] _ in
             self?.hidePanel()
         }
+        // ⌘+Return: nonactivatingPanel empfängt keine Tastatur-Events solange Dicto
+        // nicht die aktive App ist – daher globaler Monitor statt .keyboardShortcut()
+        cmdReturnMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { event in
+            guard event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command,
+                  event.keyCode == 36 else { return }
+            NotificationCenter.default.post(name: .dictoCmdReturn, object: nil)
+        }
     }
 
     private func hidePanel() {
         panel.orderOut(nil)
         if let m = clickOutsideMonitor { NSEvent.removeMonitor(m) }
+        if let m = cmdReturnMonitor { NSEvent.removeMonitor(m) }
+        cmdReturnMonitor = nil
         clickOutsideMonitor = nil
     }
 
@@ -175,4 +185,8 @@ final class MenuBarController {
             showPanel()
         }
     }
+}
+
+extension Notification.Name {
+    static let dictoCmdReturn = Notification.Name("DictoCmdReturn")
 }
