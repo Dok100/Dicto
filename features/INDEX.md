@@ -25,3 +25,6 @@
 | [PROJ-21](PROJ-21-uebersetzung-en.md) | Deutsch → Englisch Übersetzung (→ EN Stil) | Abgeschlossen |
 | PROJ-22 | (reserviert) | – |
 | [PROJ-23](PROJ-23-sound-feedback.md) | Sound-Feedback bei Aufnahme Start/Stop | Abgeschlossen |
+| PROJ-24 | (reserviert) | – |
+| PROJ-25 | (reserviert) | – |
+| [PROJ-26](PROJ-26-eigene-stile.md) | Eigene Stile konfigurieren (Custom-Prompts) | Abgeschlossen |
