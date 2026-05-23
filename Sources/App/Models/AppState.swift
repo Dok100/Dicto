@@ -131,6 +131,13 @@ final class AppState: ObservableObject {
             }
         }
 
+        // Settings-Änderungen an AppState.objectWillChange weiterleiten,
+        // damit alle Views (z.B. PopoverRootView) neu rendern wenn sich
+        // customStyles, ollamaEnabled etc. ändern.
+        settings.objectWillChange
+            .sink { [weak self] _ in self?.objectWillChange.send() }
+            .store(in: &cancellables)
+
         // Shortcut-Änderungen aus Settings → HotkeyService weiterleiten
         settings.$dictationShortcut
             .dropFirst()
