@@ -154,13 +154,17 @@ final class MenuBarController {
 
         let buttonFrame = button.convert(button.bounds, to: nil)
         let screenFrame = buttonWindow.convertToScreen(buttonFrame)
+        let visible = screen.visibleFrame
 
         var x = screenFrame.midX - panel.frame.width / 2
-        let y = screenFrame.minY - panel.frame.height - 6
+        var y = screenFrame.minY - panel.frame.height - 6
 
-        // Nicht über Bildschirmränder hinaus
-        x = min(x, screen.visibleFrame.maxX - panel.frame.width)
-        x = max(x, screen.visibleFrame.minX)
+        // Horizontal: nicht über Bildschirmränder
+        x = min(x, visible.maxX - panel.frame.width)
+        x = max(x, visible.minX)
+
+        // Vertikal: Panel-Unterkante nicht unter sichtbaren Bereich (Dock etc.)
+        y = max(y, visible.minY)
 
         panel.setFrameOrigin(NSPoint(x: x, y: y))
     }

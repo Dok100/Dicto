@@ -21,26 +21,30 @@ struct SettingsView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
+        Form {
+            // ── Sektion 1: Allgemein ─────────────────────────────────────────
+            Section("Allgemein") {
                 Toggle("Beim Login automatisch starten", isOn: launchAtLoginBinding)
-                    .toggleStyle(.switch)
                 if SMAppService.mainApp.status == .requiresApproval {
-                    Text("Bitte in Systemeinstellungen → Allgemein → Anmeldeobjekte genehmigen.")
-                        .font(.caption)
-                        .foregroundStyle(.orange)
+                    Label {
+                        Text("Bitte in Systemeinstellungen → Allgemein → Anmeldeobjekte genehmigen.")
+                            .foregroundStyle(.orange)
+                    } icon: {
+                        Image(systemName: "exclamationmark.triangle")
+                            .foregroundStyle(.orange)
+                    }
+                    .font(.caption)
                 }
+            }
 
-                Divider()
-
-                Text("Whisper-Modell").font(.headline)
+            // ── Sektion 2: Sprache & Modell ──────────────────────────────────
+            Section {
                 Picker("Modell", selection: $settings.whisperModel) {
                     ForEach(WhisperModel.allCases, id: \.self) { m in
                         Text(m.label).tag(m)
                     }
                 }
                 .pickerStyle(.radioGroup)
-                .labelsHidden()
 
                 Text("Modellwechsel wird beim nächsten Diktat angewendet.")
                     .font(.caption)
@@ -52,22 +56,26 @@ struct SettingsView: View {
                     }
                 }
                 .pickerStyle(.radioGroup)
-                .labelsHidden()
+            } header: {
+                Text("Sprache & Modell")
+            }
 
-                Divider()
-
+            // ── Sektion 3: Verhalten ─────────────────────────────────────────
+            Section {
                 Toggle("Vorschau vor Einfügen", isOn: $settings.previewEnabled)
-                    .toggleStyle(.switch)
-                Text("Text im Popover bearbeiten, bevor er eingefügt wird.")
+                Text("Text im Panel bearbeiten, bevor er eingefügt wird.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+            } header: {
+                Text("Verhalten")
+            }
 
-                Divider()
-
-                HStack(spacing: 8) {
+            // ── Sektion 4: KI-Verarbeitung (Ollama) ──────────────────────────
+            Section {
+                HStack {
                     Toggle("Textglättung via Ollama", isOn: $settings.ollamaEnabled)
-                        .toggleStyle(.switch)
                     if settings.ollamaEnabled {
+                        Spacer()
                         ollamaStatusDot
                     }
                 }
@@ -77,78 +85,70 @@ struct SettingsView: View {
                 }
 
                 if settings.ollamaEnabled {
-                    Divider()
-
-                    Group {
-                        row(label: "Modell") {
-                            TextField("glm4", text: $settings.ollamaModel)
-                                .textFieldStyle(.roundedBorder)
-                        }
-                        row(label: "Endpoint") {
-                            TextField("http://localhost:11434", text: $settings.ollamaBaseURL)
-                                .textFieldStyle(.roundedBorder)
-                        }
+                    LabeledContent("Modell") {
+                        TextField("glm4", text: $settings.ollamaModel)
+                            .textFieldStyle(.roundedBorder)
+                    }
+                    LabeledContent("Endpoint") {
+                        TextField("http://localhost:11434", text: $settings.ollamaBaseURL)
+                            .textFieldStyle(.roundedBorder)
                     }
 
-                    Divider()
-
-                    Text("System-Prompt").font(.headline)
-
-                    TextEditor(text: $settings.ollamaPrompt)
-                        .font(.system(.caption, design: .monospaced))
-                        .frame(minHeight: 220)
-                        .overlay(RoundedRectangle(cornerRadius: 4).stroke(Color.secondary.opacity(0.3)))
-
-                    Button("Auf Standard zurücksetzen") {
-                        settings.ollamaPrompt = AppSettings.defaultPrompt
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("System-Prompt")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                        TextEditor(text: $settings.ollamaPrompt)
+                            .font(.system(.caption, design: .monospaced))
+                            .frame(minHeight: 160)
+                            .scrollContentBackground(.hidden)
+                            .padding(6)
+                            .background(.quinary, in: RoundedRectangle(cornerRadius: 6))
+                        Button("Auf Standard zurücksetzen") {
+                            settings.ollamaPrompt = AppSettings.defaultPrompt
+                        }
+                        .font(.caption)
                     }
-                    .font(.caption)
+                    .padding(.vertical, 2)
                 }
+            } header: {
+                Text("KI-Verarbeitung")
+            }
 
-                Divider()
-
-                Text("Wörterbuch").font(.headline)
+            // ── Sektion 5: Wörterbuch ────────────────────────────────────────
+            Section {
                 Text("Falsch erkannte Wörter automatisch ersetzen. Korrekturen im Vorschau-Modus werden automatisch gelernt.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
 
-                if dictionaryService.entries.isEmpty {
-                    Text("Noch keine Einträge.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                } else {
-                    VStack(spacing: 0) {
-                        ForEach(dictionaryService.entries) { entry in
-                            HStack(spacing: 8) {
-                                Text(entry.wrong)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                Image(systemName: "arrow.right")
-                                    .foregroundStyle(.secondary)
-                                    .font(.caption)
-                                Text(entry.correct)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                Button {
-                                    dictionaryService.remove(id: entry.id)
-                                } label: {
-                                    Image(systemName: "minus.circle.fill")
-                                        .foregroundStyle(.red)
-                                }
-                                .buttonStyle(.plain)
+                if !dictionaryService.entries.isEmpty {
+                    ForEach(dictionaryService.entries) { entry in
+                        HStack(spacing: 8) {
+                            Text(entry.wrong)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            Image(systemName: "arrow.right")
+                                .foregroundStyle(.tertiary)
+                                .font(.caption)
+                            Text(entry.correct)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            Button {
+                                dictionaryService.remove(id: entry.id)
+                            } label: {
+                                Image(systemName: "minus.circle.fill")
+                                    .foregroundStyle(.red)
                             }
-                            .font(.callout)
-                            .padding(.vertical, 4)
-                            .padding(.horizontal, 8)
-                            Divider()
+                            .buttonStyle(.plain)
                         }
+                        .font(.callout)
                     }
-                    .overlay(RoundedRectangle(cornerRadius: 4).stroke(Color.secondary.opacity(0.3)))
                 }
 
+                // Neuen Eintrag hinzufügen
                 HStack(spacing: 6) {
                     TextField("Falsch", text: $newWrong)
                         .textFieldStyle(.roundedBorder)
                     Image(systemName: "arrow.right")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.tertiary)
                         .font(.caption)
                     TextField("Richtig", text: $newCorrect)
                         .textFieldStyle(.roundedBorder)
@@ -157,8 +157,10 @@ struct SettingsView: View {
                         newWrong = ""
                         newCorrect = ""
                     }
-                    .disabled(newWrong.trimmingCharacters(in: .whitespaces).isEmpty ||
-                              newCorrect.trimmingCharacters(in: .whitespaces).isEmpty)
+                    .disabled(
+                        newWrong.trimmingCharacters(in: .whitespaces).isEmpty ||
+                        newCorrect.trimmingCharacters(in: .whitespaces).isEmpty
+                    )
                 }
 
                 HStack(spacing: 8) {
@@ -166,24 +168,15 @@ struct SettingsView: View {
                     Button("Importieren") { importDictionary() }
                 }
                 .font(.caption)
-
-                Spacer(minLength: 0)
+            } header: {
+                Text("Wörterbuch")
             }
-            .padding()
-            .frame(maxWidth: .infinity, alignment: .topLeading)
         }
-        .frame(minWidth: 400, minHeight: 400)
+        .formStyle(.grouped)
+        .frame(minWidth: 420, minHeight: 480)
     }
 
-    @ViewBuilder
-    private func row<Content: View>(label: String, @ViewBuilder content: () -> Content) -> some View {
-        HStack {
-            Text(label)
-                .frame(width: 70, alignment: .trailing)
-                .foregroundStyle(.secondary)
-            content()
-        }
-    }
+    // MARK: – Ollama-Status-Dot
 
     @ViewBuilder
     private var ollamaStatusDot: some View {
@@ -191,13 +184,19 @@ struct SettingsView: View {
         case .none:
             ProgressView().scaleEffect(0.5).frame(width: 14, height: 14)
         case .some(true):
-            Image(systemName: "circle.fill").foregroundStyle(.green).font(.caption)
+            Image(systemName: "circle.fill")
+                .foregroundStyle(.green)
+                .font(.caption)
                 .help("Ollama erreichbar")
         case .some(false):
-            Image(systemName: "circle.fill").foregroundStyle(.red).font(.caption)
+            Image(systemName: "circle.fill")
+                .foregroundStyle(.red)
+                .font(.caption)
                 .help("Ollama nicht erreichbar – läuft der Server?")
         }
     }
+
+    // MARK: – Export / Import
 
     private func exportDictionary() {
         let panel = NSSavePanel()
@@ -218,12 +217,15 @@ struct SettingsView: View {
         panel.begin { response in
             guard response == .OK, let url = panel.url,
                   let data = try? Data(contentsOf: url),
-                  let entries = try? JSONDecoder().decode([WordEntry].self, from: data) else { return }
+                  let entries = try? JSONDecoder().decode([WordEntry].self, from: data)
+            else { return }
             for entry in entries {
                 dictionaryService.add(wrong: entry.wrong, correct: entry.correct)
             }
         }
     }
+
+    // MARK: – Ollama-Verbindung prüfen
 
     private func checkOllama() async {
         ollamaReachable = nil

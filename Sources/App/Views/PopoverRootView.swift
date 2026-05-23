@@ -52,6 +52,20 @@ struct PopoverRootView: View {
 
             Divider().opacity(0.4)
 
+            // Stil-Picker in eigener Zeile – volle Breite, kein Layout-Konflikt mit Footer
+            Picker("Stil", selection: $appState.dictationStyle) {
+                ForEach(DictationStyle.allCases, id: \.self) { style in
+                    Text(style.label).tag(style)
+                }
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .disabled(appState.isRecording)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 8)
+
+            Divider().opacity(0.4)
+
             footerBar
                 .padding(.horizontal, 10)
                 .padding(.vertical, 8)
@@ -157,21 +171,7 @@ struct PopoverRootView: View {
             footerButton(icon: showHistory ? "clock.fill" : "clock", help: "Verlauf") {
                 withAnimation { showHistory.toggle() }
             }
-
             Spacer()
-
-            Picker("Stil", selection: $appState.dictationStyle) {
-                ForEach(DictationStyle.allCases, id: \.self) { style in
-                    Text(style.label).tag(style)
-                }
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
-            .frame(maxWidth: 155)
-            .disabled(appState.isRecording)
-
-            Spacer()
-
             footerButton(icon: "power", help: "Beenden ⌘Q") {
                 NSApplication.shared.terminate(nil)
             }
@@ -372,16 +372,16 @@ struct PopoverRootView: View {
 
     private var idleView: some View {
         VStack(alignment: .leading, spacing: 12) {
-            shortcutRow(key: "Fn",    description: "Diktieren",           icon: "mic.fill")
-            shortcutRow(key: "⌥+Fn", description: "Transformieren",      icon: "wand.and.sparkles")
+            shortcutRow(keys: ["Fn"],       description: "Diktieren",           icon: "mic.fill")
+            shortcutRow(keys: ["⌥", "Fn"], description: "Transformieren",      icon: "wand.and.sparkles")
             Divider().padding(.vertical, 2)
-            shortcutRow(key: "⌘↩",   description: "Einfügen / Kopieren", icon: "return")
-            shortcutRow(key: "⌘Q",   description: "Beenden",             icon: "xmark.circle")
+            shortcutRow(keys: ["⌘", "↩"],  description: "Einfügen / Kopieren", icon: "return")
+            shortcutRow(keys: ["⌘", "Q"],  description: "Beenden",             icon: "xmark.circle")
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
     }
 
-    private func shortcutRow(key: String, description: String, icon: String) -> some View {
+    private func shortcutRow(keys: [String], description: String, icon: String) -> some View {
         HStack(spacing: 10) {
             Image(systemName: icon)
                 .font(.system(size: 14, weight: .medium))
@@ -394,12 +394,22 @@ struct PopoverRootView: View {
 
             Spacer()
 
-            Text(key)
-                .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
-                .background(.quaternary, in: RoundedRectangle(cornerRadius: 5))
-                .foregroundStyle(.secondary)
+            // Jede Taste als eigenes Badge, mit + dazwischen
+            HStack(spacing: 4) {
+                ForEach(Array(keys.enumerated()), id: \.offset) { i, key in
+                    if i > 0 {
+                        Text("+")
+                            .font(.system(size: 10, weight: .light))
+                            .foregroundStyle(.tertiary)
+                    }
+                    Text(key)
+                        .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(.quaternary, in: RoundedRectangle(cornerRadius: 5))
+                        .foregroundStyle(.secondary)
+                }
+            }
         }
     }
 }

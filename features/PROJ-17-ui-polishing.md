@@ -1,6 +1,6 @@
 # PROJ-17 – UI-Polishing
 
-**Status**: In Bearbeitung
+**Status**: Abgeschlossen
 **Branch**: main
 
 ## Ziel
