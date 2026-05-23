@@ -10,7 +10,7 @@ Optional: Glättung via Ollama (glm4, http://localhost:11434).
 
 ## Aktueller Phasenstand
 
-**Stand**: PROJ-1–PROJ-16 alle abgeschlossen.
+**Stand**: PROJ-1–PROJ-16 abgeschlossen, PROJ-17 in Bearbeitung.
 
 | Phase | Status |
 |-------|--------|
@@ -30,6 +30,7 @@ Optional: Glättung via Ollama (glm4, http://localhost:11434).
 | PROJ-14 Sprachauswahl (Deutsch / Englisch / Auto) | Abgeschlossen |
 | PROJ-15 Diktat-Verlauf (letzte 20 Einträge) | Abgeschlossen |
 | PROJ-16 Wörterbuch Export/Import | Abgeschlossen |
+| PROJ-17 UI-Polishing | In Bearbeitung (Level A ✅, B+C offen) |
 
 ## Nutzer-Kontext
 

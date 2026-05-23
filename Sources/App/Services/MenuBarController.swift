@@ -101,7 +101,7 @@ final class MenuBarController {
         panel.isOpaque = false
         panel.backgroundColor = .clear
         panel.hasShadow = true
-        panel.minSize = NSSize(width: 280, height: 260)
+        panel.minSize = NSSize(width: 320, height: 400)
         panel.becomesKeyOnlyIfNeeded = true
         panel.standardWindowButton(.miniaturizeButton)?.isHidden = true
         panel.standardWindowButton(.zoomButton)?.isHidden = true
