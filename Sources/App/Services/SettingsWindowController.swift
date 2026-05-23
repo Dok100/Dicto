@@ -57,6 +57,7 @@ final class SettingsWindowController: NSWindowController, NSToolbarDelegate {
         window.title = "Dicto – Einstellungen"
         window.minSize = NSSize(width: 440, height: 400)
         window.isReleasedWhenClosed = false
+        window.setFrameAutosaveName("DictoSettings")
         window.center()
 
         super.init(window: window)
@@ -75,6 +76,13 @@ final class SettingsWindowController: NSWindowController, NSToolbarDelegate {
     required init?(coder: NSCoder) { fatalError() }
 
     func show() {
+        // Beim ersten Öffnen (kein gespeicherter Frame) Mindestgröße garantieren,
+        // damit NSHostingController-Views vollständig sichtbar sind.
+        if let w = window, !w.isVisible,
+           UserDefaults.standard.object(forKey: "NSWindow Frame DictoSettings") == nil {
+            w.setContentSize(NSSize(width: 500, height: 520))
+            w.center()
+        }
         showWindow(nil)
         NSApp.activate(ignoringOtherApps: true)
         window?.makeKeyAndOrderFront(nil)

@@ -40,6 +40,9 @@ final class OnboardingWindowController: NSWindowController {
     required init?(coder: NSCoder) { fatalError() }
 
     func show() {
+        // Größe explizit setzen – NSHostingController meldet beim ersten Rendern oft (0,0)
+        window?.setContentSize(NSSize(width: 460, height: 480))
+        window?.center()
         showWindow(nil)
         NSApp.activate(ignoringOtherApps: true)
         window?.makeKeyAndOrderFront(nil)
