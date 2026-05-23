@@ -104,21 +104,29 @@ final class MenuBarController {
     private func setupPanel(appState: AppState) {
         // .nonactivatingPanel: Panel zeigen ohne die Ziel-App zu deaktivieren.
         // Ohne das würde frontmostApplication auf Dicto zeigen und Diktieren wäre kaputt.
+        // .fullSizeContentView: Inhalt füllt die gesamte Fensterfläche (inkl. Titelleiste),
+        // nötig damit das SwiftUI-Material bis an den Rand reicht.
         panel = NSPanel(
-            contentRect: NSRect(x: 0, y: 0, width: 320, height: 320),
-            styleMask: [.titled, .closable, .resizable, .nonactivatingPanel],
+            contentRect: NSRect(x: 0, y: 0, width: 320, height: 340),
+            styleMask: [.titled, .closable, .resizable, .nonactivatingPanel, .fullSizeContentView],
             backing: .buffered,
             defer: false
         )
         panel.title = ""
         panel.titleVisibility = .hidden
+        panel.titlebarAppearsTransparent = true
         panel.isMovableByWindowBackground = true
         panel.isReleasedWhenClosed = false
         panel.level = .floating
-        panel.minSize = NSSize(width: 280, height: 240)
+        // Frosted-glass: SwiftUI .regularMaterial übernimmt die Hintergrunddarstellung
+        panel.isOpaque = false
+        panel.backgroundColor = .clear
+        panel.hasShadow = true
+        panel.minSize = NSSize(width: 280, height: 260)
         panel.becomesKeyOnlyIfNeeded = true
         panel.standardWindowButton(.miniaturizeButton)?.isHidden = true
         panel.standardWindowButton(.zoomButton)?.isHidden = true
+        panel.standardWindowButton(.closeButton)?.isHidden = true
         panel.setFrameAutosaveName("DictoPanel")
         panel.contentViewController = NSHostingController(
             rootView: PopoverRootView().environmentObject(appState)

@@ -5,44 +5,61 @@ struct PopoverRootView: View {
     @State private var editableText = ""
     @State private var showHistory = false
 
-    var body: some View {
-        VStack(spacing: 10) {
-            statusIcon
-            Text("Dicto").font(.headline)
-            Group {
-                if showHistory { historyView } else { statusArea }
-            }
-            .frame(maxHeight: .infinity)
-            previewActions
-            Picker("Stil", selection: $appState.dictationStyle) {
-                ForEach(DictationStyle.allCases, id: \.self) { style in
-                    Text(style.label).tag(style)
-                }
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
-            .disabled(appState.isRecording)
-            Divider()
-            HStack {
-                Button(action: { appState.onOpenSettings?() }) {
-                    Image(systemName: "gearshape")
-                }
-                .buttonStyle(.plain)
-                .help("Einstellungen")
-                Button(action: { showHistory.toggle() }) {
-                    Image(systemName: showHistory ? "clock.fill" : "clock")
-                }
-                .buttonStyle(.plain)
-                .help("Verlauf")
-                Spacer()
-                Button("Beenden") {
-                    NSApplication.shared.terminate(nil)
-                }
-                .keyboardShortcut("q", modifiers: .command)
-            }
+    // Treibt die State-Transition-Animation: SwiftUI erkennt durch die neue ID,
+    // dass der Inhalt neu gerendert werden soll, und wendet .transition() an.
+    private var stateTag: String {
+        if appState.isRecording { return "recording" }
+        switch appState.transcriptionState {
+        case .idle:         return "idle"
+        case .loadingModel: return "loading"
+        case .transcribing: return "transcribing"
+        case .done:         return "done"
+        case .error:        return "error"
         }
-        .padding()
-        .frame(minWidth: 240, minHeight: 240)
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            headerView
+                .padding(.horizontal, 16)
+                .padding(.top, 12)
+                .padding(.bottom, 10)
+
+            Divider().opacity(0.4)
+
+            Group {
+                if showHistory {
+                    historyView
+                        .transition(.opacity.combined(with: .move(edge: .trailing)))
+                } else {
+                    statusArea
+                        .id(stateTag)
+                        .transition(.opacity.combined(with: .scale(scale: 0.97, anchor: .center)))
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+
+            if showPreviewActions {
+                Divider().opacity(0.4)
+                previewActions
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .transition(.opacity.combined(with: .move(edge: .bottom)))
+            }
+
+            Divider().opacity(0.4)
+
+            footerBar
+                .padding(.horizontal, 10)
+                .padding(.vertical, 8)
+        }
+        .frame(minWidth: 280, minHeight: 260)
+        .background(.regularMaterial)
+        .animation(.spring(response: 0.28, dampingFraction: 0.82), value: stateTag)
+        .animation(.spring(response: 0.28, dampingFraction: 0.82), value: showHistory)
+        .animation(.spring(response: 0.28, dampingFraction: 0.82), value: showPreviewActions)
         .onChange(of: appState.transcriptionState) { state in
             if case .done = state { showHistory = false }
         }
@@ -59,14 +76,41 @@ struct PopoverRootView: View {
         }
     }
 
-    // MARK: – Status-Icon
+    // MARK: – Header
 
-    @ViewBuilder
-    private var statusIcon: some View {
-        Image(systemName: iconName)
-            .font(.system(size: 32))
-            .foregroundStyle(iconColor)
-            .animation(.easeInOut(duration: 0.15), value: appState.isRecording)
+    private var headerView: some View {
+        HStack(spacing: 10) {
+            ZStack {
+                // Pulsierender Hintergrundkreis bei Aufnahme
+                Circle()
+                    .fill(iconColor.opacity(0.12))
+                    .frame(width: 38, height: 38)
+                    .scaleEffect(appState.isRecording ? 1.18 : 1.0)
+                    .animation(
+                        appState.isRecording
+                            ? .easeInOut(duration: 0.65).repeatForever(autoreverses: true)
+                            : .spring(response: 0.3),
+                        value: appState.isRecording
+                    )
+
+                Image(systemName: iconName)
+                    .font(.system(size: 17, weight: .medium))
+                    .foregroundStyle(iconColor)
+                    .animation(.easeInOut(duration: 0.15), value: appState.isRecording)
+            }
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text("Dicto")
+                    .font(.system(size: 13, weight: .semibold))
+                Text(statusLabel)
+                    .font(.system(size: 11))
+                    .foregroundStyle(.secondary)
+                    .contentTransition(.numericText())
+                    .animation(.easeInOut(duration: 0.2), value: statusLabel)
+            }
+
+            Spacer()
+        }
     }
 
     private var iconName: String {
@@ -76,15 +120,83 @@ struct PopoverRootView: View {
 
     private var iconColor: Color {
         if appState.isTransformRecording { return .purple }
-        return appState.isRecording ? .red : .secondary
+        if appState.isRecording { return .red }
+        switch appState.transcriptionState {
+        case .error: return .red
+        default:     return .accentColor
+        }
     }
 
-    // MARK: – Vorschau-Aktionsbuttons (außerhalb des expandierenden Bereichs)
+    private var statusLabel: String {
+        if appState.isTransformRecording { return "Transform läuft …" }
+        if appState.isRecording          { return "Aufnahme läuft …" }
+        switch appState.transcriptionState {
+        case .idle:                return "Bereit"
+        case .loadingModel:        return "Modell wird geladen …"
+        case .transcribing:        return "Transkribiere …"
+        case .done:                return "Fertig"
+        case .error:               return "Fehler"
+        }
+    }
+
+    // MARK: – Preview-Aktionen sichtbar?
+
+    private var showPreviewActions: Bool {
+        guard case .done = appState.transcriptionState else { return false }
+        return appState.settings.previewEnabled || appState.isTransformResult
+    }
+
+    // MARK: – Footer
+
+    private var footerBar: some View {
+        HStack(spacing: 2) {
+            footerButton(icon: "gearshape", help: "Einstellungen") {
+                appState.onOpenSettings?()
+            }
+            footerButton(icon: showHistory ? "clock.fill" : "clock", help: "Verlauf") {
+                withAnimation { showHistory.toggle() }
+            }
+
+            Spacer()
+
+            Picker("Stil", selection: $appState.dictationStyle) {
+                ForEach(DictationStyle.allCases, id: \.self) { style in
+                    Text(style.label).tag(style)
+                }
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .frame(maxWidth: 155)
+            .disabled(appState.isRecording)
+
+            Spacer()
+
+            footerButton(icon: "power", help: "Beenden ⌘Q") {
+                NSApplication.shared.terminate(nil)
+            }
+            .keyboardShortcut("q", modifiers: .command)
+        }
+    }
+
+    private func footerButton(icon: String, help: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.system(size: 13))
+                .frame(width: 28, height: 28)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(.secondary)
+        .help(help)
+    }
+
+    // MARK: – Preview-Aktionsbuttons
 
     @ViewBuilder
     private var previewActions: some View {
-        if case .done(let text) = appState.transcriptionState, appState.settings.previewEnabled || appState.isTransformResult {
-            VStack(spacing: 4) {
+        if case .done(let text) = appState.transcriptionState,
+           appState.settings.previewEnabled || appState.isTransformResult {
+            VStack(spacing: 6) {
                 if appState.isTransformResult {
                     HStack(spacing: 8) {
                         Button("Kopieren") {
@@ -95,7 +207,6 @@ struct PopoverRootView: View {
                         }
                         .buttonStyle(.borderedProminent)
                         .controlSize(.small)
-                        .keyboardShortcut(.return, modifiers: .command)
                         Button("Einfügen") {
                             Task { await appState.confirmPaste(original: text, edited: editableText) }
                         }
@@ -104,14 +215,14 @@ struct PopoverRootView: View {
                         .disabled(!appState.isAccessibilityAuthorized)
                     }
                 } else {
-                    Button("Einfügen") {
+                    Button("⌘↩  Einfügen") {
                         Task { await appState.confirmPaste(original: text, edited: editableText) }
                     }
                     .buttonStyle(.borderedProminent)
                     .controlSize(.small)
-                    .keyboardShortcut(.return, modifiers: .command)
                     .disabled(!appState.isAccessibilityAuthorized)
                 }
+
                 if !appState.isAccessibilityAuthorized {
                     PermissionHint(
                         message: "Eingabehilfen fehlt – Text nicht eingefügt.",
@@ -129,28 +240,27 @@ struct PopoverRootView: View {
     private var historyView: some View {
         let entries = appState.historyService.entries
         if entries.isEmpty {
-            Text("Noch kein Verlauf.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+            ContentUnavailableView("Noch kein Verlauf", systemImage: "clock")
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
             ScrollView {
-                LazyVStack(alignment: .leading, spacing: 8) {
+                LazyVStack(alignment: .leading, spacing: 6) {
                     ForEach(entries) { entry in
-                        VStack(alignment: .leading, spacing: 2) {
+                        VStack(alignment: .leading, spacing: 3) {
                             Text(entry.date, formatter: Self.relativeDateFormatter)
                                 .font(.caption2)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(.tertiary)
                             Text(entry.text)
                                 .font(.callout)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .textSelection(.enabled)
                         }
-                        .padding(6)
-                        .background(Color.secondary.opacity(0.07))
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 8)
+                        .background(.quaternary.opacity(0.6), in: RoundedRectangle(cornerRadius: 8))
                     }
                 }
-                .padding(.horizontal, 2)
+                .padding(.horizontal, 1)
             }
             .frame(minHeight: 80, maxHeight: 200)
         }
@@ -165,7 +275,7 @@ struct PopoverRootView: View {
         return f
     }()
 
-    // MARK: – Haupt-Statusbereich
+    // MARK: – Status-Area (Berechtigungen)
 
     @ViewBuilder
     private var statusArea: some View {
@@ -193,46 +303,47 @@ struct PopoverRootView: View {
     private var transcriptionArea: some View {
         switch appState.transcriptionState {
         case .idle:
-            if appState.isTransformRecording {
-                Text("Transform-Aufnahme läuft …").font(.subheadline).foregroundStyle(.purple)
-            } else if appState.isRecording {
-                Text("Aufnahme läuft …").font(.subheadline).foregroundStyle(.red)
-            } else {
-                VStack(alignment: .leading, spacing: 4) {
-                    Label("Fn halten – Diktieren", systemImage: "mic.fill")
-                    Label("Alt+Fn halten – Transformieren", systemImage: "wand.and.sparkles")
-                    Divider().padding(.vertical, 2)
-                    Label("⌘+Return – Einfügen / Kopieren", systemImage: "return")
-                    Label("⌘Q – Beenden", systemImage: "xmark.circle")
-                }
-                .font(.subheadline).foregroundStyle(.secondary)
-            }
+            idleView
 
         case .loadingModel(let progress):
-            VStack(spacing: 4) {
+            VStack(spacing: 8) {
                 if progress > 0 {
-                    ProgressView(value: progress).progressViewStyle(.linear)
+                    ProgressView(value: progress)
+                        .progressViewStyle(.linear)
+                        .tint(.accentColor)
+                    Text("Modell wird geladen … \(Int(progress * 100)) %")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 } else {
-                    ProgressView().progressViewStyle(.circular).scaleEffect(0.7)
+                    ProgressView()
+                        .progressViewStyle(.circular)
+                        .scaleEffect(0.8)
+                    Text("Modell wird geladen …")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
-                Text(progress > 0
-                    ? "Modell wird geladen … \(Int(progress * 100)) %"
-                    : "Modell wird geladen …")
-                    .font(.caption).foregroundStyle(.secondary)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
 
         case .transcribing:
-            VStack(spacing: 4) {
-                ProgressView().progressViewStyle(.circular).scaleEffect(0.7)
-                Text("Transkribiere …").font(.caption).foregroundStyle(.secondary)
+            VStack(spacing: 8) {
+                ProgressView()
+                    .progressViewStyle(.circular)
+                    .scaleEffect(0.8)
+                Text("Transkribiere …")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
 
         case .done(let text):
-            if appState.settings.previewEnabled {
+            if appState.settings.previewEnabled || appState.isTransformResult {
                 TextEditor(text: $editableText)
                     .font(.body)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .overlay(RoundedRectangle(cornerRadius: 4).stroke(Color.secondary.opacity(0.3)))
+                    .scrollContentBackground(.hidden)
+                    .padding(6)
+                    .background(.quinary, in: RoundedRectangle(cornerRadius: 8))
                     .onAppear { editableText = text }
                     .onChange(of: text) { editableText = $1 }
             } else {
@@ -247,10 +358,51 @@ struct PopoverRootView: View {
             }
 
         case .error(let message):
-            Text(message)
-                .font(.caption)
-                .foregroundStyle(.red)
-                .multilineTextAlignment(.center)
+            VStack(spacing: 8) {
+                Image(systemName: "exclamationmark.triangle")
+                    .font(.system(size: 26))
+                    .foregroundStyle(.red)
+                Text(message)
+                    .font(.caption)
+                    .foregroundStyle(.red)
+                    .multilineTextAlignment(.center)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
+
+    // MARK: – Idle-Ansicht
+
+    private var idleView: some View {
+        VStack(alignment: .leading, spacing: 7) {
+            shortcutRow(key: "Fn",    description: "Diktieren",           icon: "mic.fill")
+            shortcutRow(key: "⌥+Fn", description: "Transformieren",      icon: "wand.and.sparkles")
+            Divider().padding(.vertical, 1)
+            shortcutRow(key: "⌘↩",   description: "Einfügen / Kopieren", icon: "return")
+            shortcutRow(key: "⌘Q",   description: "Beenden",             icon: "xmark.circle")
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+    }
+
+    private func shortcutRow(key: String, description: String, icon: String) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(.tertiary)
+                .frame(width: 16, alignment: .center)
+
+            Text(description)
+                .font(.system(size: 12))
+                .foregroundStyle(.secondary)
+
+            Spacer()
+
+            Text(key)
+                .font(.system(size: 10, weight: .medium, design: .monospaced))
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(.quaternary, in: RoundedRectangle(cornerRadius: 4))
+                .foregroundStyle(.secondary)
         }
     }
 }
@@ -263,8 +415,14 @@ private struct PermissionHint: View {
     let appState: AppState
 
     var body: some View {
-        VStack(spacing: 6) {
-            Text(message).font(.caption).foregroundStyle(.orange)
+        VStack(spacing: 8) {
+            Image(systemName: "lock.shield")
+                .font(.system(size: 24))
+                .foregroundStyle(.orange)
+            Text(message)
+                .font(.caption)
+                .foregroundStyle(.orange)
+                .multilineTextAlignment(.center)
             HStack(spacing: 8) {
                 Button("Einstellungen öffnen") {
                     if let url = URL(string: settingsURL) { NSWorkspace.shared.open(url) }
@@ -274,5 +432,6 @@ private struct PermissionHint: View {
                     .font(.caption)
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
