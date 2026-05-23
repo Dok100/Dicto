@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<title>Dicto — Icon Set</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --bg: #f3f1ec;
+    --paper: #fbfaf6;
+    --ink: #1a1a1c;
+    --muted: #76716a;
+    --line: #e3dfd6;
+    --rec: #d8533b;
+    --dark: #1d1d20;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.45;
+  }
+  code, kbd, .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+
+  .page { max-width: 1280px; margin: 0 auto; padding: 64px 56px 96px; }
+
+  /* ---------- header ---------- */
+  header.intro {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 48px;
+    align-items: end;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 48px;
+  }
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+    font-weight: 500;
+  }
+  h1 {
+    font-weight: 500; font-size: 42px;
+    letter-spacing: -0.02em; margin: 0 0 10px;
+  }
+  h1 em { font-style: normal; color: var(--muted); font-weight: 400; }
+  .lede { font-size: 15px; color: var(--muted); max-width: 38ch; margin: 0; }
+  .meta { font-size: 11px; color: var(--muted); line-height: 1.7; }
+  .meta dt { display: inline-block; width: 10ch; color: #a59f95; }
+  .meta dd { display: inline; margin: 0; }
+  .meta div { display: block; }
+
+  /* ---------- section ---------- */
+  section { margin-bottom: 64px; }
+  .section-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 28px;
+  }
+  .section-head h2 {
+    font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase;
+    margin: 0; font-weight: 600;
+  }
+  .section-head .hint { font-size: 11px; color: var(--muted); }
+
+  /* ---------- hero ---------- */
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 56px;
+    align-items: center;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 48px 56px;
+  }
+  .hero-icon {
+    width: 100%; max-width: 360px;
+    aspect-ratio: 1 / 1;
+    margin: 0 auto;
+    filter: drop-shadow(0 30px 50px rgba(0,0,0,0.15)) drop-shadow(0 6px 12px rgba(0,0,0,0.08));
+  }
+  .hero-icon img { width: 100%; height: 100%; display: block; }
+  .hero-copy h3 {
+    font-size: 24px; font-weight: 500; letter-spacing: -0.01em;
+    margin: 0 0 12px;
+  }
+  .hero-copy p { color: var(--muted); margin: 0 0 16px; font-size: 14.5px; }
+  .specs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 28px; margin-top: 18px; font-size: 12.5px; }
+  .specs .k { color: var(--muted); }
+  .specs .v { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; }
+  .swatch {
+    display: inline-block; width: 10px; height: 10px;
+    border-radius: 50%; margin-right: 6px; vertical-align: -1px;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08);
+  }
+
+  /* ---------- app-icon size grid ---------- */
+  .sizeGrid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 20px;
+    align-items: end;
+  }
+  .sizeCell {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+  }
+  .sizeCell .holder {
+    height: 152px;
+    display: grid; place-items: center;
+    border-bottom: 1px dashed var(--line);
+    margin-bottom: 10px;
+    background:
+      repeating-linear-gradient(135deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 14px),
+      transparent;
+  }
+  .sizeCell img { display: block; }
+  .sizeCell .lbl { font-size: 11px; color: var(--muted); font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+  .sizeCell .lbl b { color: var(--ink); font-weight: 600; }
+
+  /* ---------- menu bar showcase ---------- */
+  .menubarRow {
+    background: linear-gradient(#2c2c30, #1d1d20);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex; align-items: center; gap: 14px;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  .menubarRow .left {
+    flex: 1;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .menubarRow .apple {
+    width: 14px; height: 14px; border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+  }
+  .menubarRow .label {
+    font-size: 12.5px; color: rgba(255,255,255,0.65); font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+  .menubarRow .right {
+    display: flex; align-items: center; gap: 16px;
+  }
+  .menubarRow .right .mb {
+    width: 22px; height: 22px;
+    display: grid; place-items: center;
+  }
+  .menubarRow .right .mb img {
+    width: 18px; height: 18px;
+    /* Template tint: invert black PNG to white */
+    filter: invert(1) brightness(1.05);
+  }
+  .menubarRow.recording .mb.rec img {
+    filter: invert(35%) sepia(80%) saturate(2400%) hue-rotate(345deg) brightness(95%);
+  }
+  .menubarRow .right .text {
+    font-size: 12px; color: rgba(255,255,255,0.6);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-feature-settings: "tnum";
+  }
+  .stateLabel {
+    font-size: 11px; color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    margin-bottom: 8px; letter-spacing: 0.05em;
+  }
+  .stateGrid {
+    display: grid; grid-template-columns: 1fr; gap: 18px;
+  }
+
+  /* ---------- contact sheet ---------- */
+  .sheet {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 30px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .sheet .cell {
+    text-align: center;
+  }
+  .sheet .cell .holder {
+    background:
+      repeating-linear-gradient(135deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 12px),
+      #ffffff;
+    border-radius: 10px;
+    padding: 18px;
+    border: 1px solid var(--line);
+    margin-bottom: 12px;
+    aspect-ratio: 1.6 / 1;
+    display: grid; place-items: center;
+  }
+  .sheet .cell .holder img {
+    width: 64px; height: 64px;
+  }
+  .sheet .cell h4 {
+    font-size: 13px; font-weight: 600; margin: 0 0 4px;
+  }
+  .sheet .cell p {
+    font-size: 12px; color: var(--muted); margin: 0; line-height: 1.5;
+  }
+  .sheet .cell.idle .holder img,
+  .sheet .cell.tr .holder img { filter: none; }
+  .sheet .cell.rec .holder img {
+    filter: invert(35%) sepia(80%) saturate(2400%) hue-rotate(345deg) brightness(95%);
+  }
+
+  /* ---------- file tree ---------- */
+  .tree {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 22px 26px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 12px; line-height: 1.7;
+    color: var(--ink);
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .tree .c { color: var(--muted); }
+
+  /* ---------- callouts ---------- */
+  .callouts {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+  }
+  .callout {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 22px 24px;
+  }
+  .callout h4 {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--ink); margin: 0 0 10px; font-weight: 600;
+  }
+  .callout p { font-size: 13px; color: var(--muted); margin: 0 0 10px; line-height: 1.55; }
+  .callout pre {
+    margin: 8px 0 0;
+    background: #1d1d20; color: #f3f1ec;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 11.5px; line-height: 1.55;
+    overflow-x: auto;
+  }
+  .callout pre .k { color: #c98865; }
+  .callout pre .s { color: #8db387; }
+  .callout pre .c { color: #6c6c70; }
+
+  @media (max-width: 1100px) {
+    .sizeGrid { grid-template-columns: repeat(3, 1fr); }
+    .hero { grid-template-columns: 1fr; }
+    .sheet { grid-template-columns: 1fr; }
+    .callouts { grid-template-columns: 1fr; }
+    header.intro { grid-template-columns: 1fr; gap: 18px; }
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+
+    <header class="intro">
+      <div>
+        <div class="eyebrow">Dicto · Icon Set · Aperture D</div>
+        <h1>Das fertige Icon-Set <em>für App und Menübar.</em></h1>
+        <p class="lede">Alle macOS-Größen vom 16er-Finder-Icon bis zum 1024er-Dock-Icon, plus die drei Menübar-Zustände als Template-Images für Light- und Dark-Mode.</p>
+      </div>
+      <dl class="meta">
+        <div><dt>Quellordner</dt><dd class="mono">icon-set/</dd></div>
+        <div><dt>App-Icon</dt><dd>10 PNGs · 16 → 1024 px</dd></div>
+        <div><dt>Menübar</dt><dd>3 Zustände × 1x/2x/3x = 9 PNGs</dd></div>
+        <div><dt>Manifeste</dt><dd>4 × <span class="mono">Contents.json</span></dd></div>
+      </dl>
+    </header>
+
+    <!-- ============ HERO ============ -->
+    <section>
+      <div class="section-head">
+        <h2>Master · 1024 × 1024</h2>
+        <span class="hint">Asset für App-Store / Dock / Finder</span>
+      </div>
+      <div class="hero">
+        <div class="hero-icon"><img src="icon-set/preview-app-1024.png" alt="Dicto Icon 1024" /></div>
+        <div class="hero-copy">
+          <h3>Aperture&nbsp;D</h3>
+          <p>Der Buchstabe „D" ist als offene Apertur gezeichnet — die Innenfläche trägt den Aufnahme-Punkt. Bei Idle ist der Punkt der Marken-Akzent, bei aktiver Aufnahme wird er zum Status-Signal.</p>
+          <div class="specs">
+            <div class="k">Form</div><div class="v">Squircle · r 22,37 %</div>
+            <div class="k">Papier</div><div class="v"><span class="swatch" style="background:#fbfaf6"></span>#FBFAF6</div>
+            <div class="k">Tinte</div><div class="v"><span class="swatch" style="background:#1a1a1c"></span>#1A1A1C</div>
+            <div class="k">Aufnahme</div><div class="v"><span class="swatch" style="background:#d8533b"></span>#D8533B</div>
+            <div class="k">Strich</div><div class="v">11 / 100 vu</div>
+            <div class="k">Inset</div><div class="v">20 % allseitig</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ APP ICON SIZES ============ -->
+    <section>
+      <div class="section-head">
+        <h2>App-Icon · AppIcon.iconset</h2>
+        <span class="hint">10 PNGs · alle nativen macOS-Größen</span>
+      </div>
+      <div class="sizeGrid">
+        <div class="sizeCell">
+          <div class="holder"><img src="icon-set/AppIcon.iconset/icon_16x16.png" width="16" height="16" alt="" /></div>
+          <div class="lbl"><b>16</b>×16 · 1x</div>
+        </div>
+        <div class="sizeCell">
+          <div class="holder"><img src="icon-set/AppIcon.iconset/icon_16x16@2x.png" width="32" height="32" alt="" /></div>
+          <div class="lbl"><b>16</b>×16 · 2x</div>
+        </div>
+        <div class="sizeCell">
+          <div class="holder"><img src="icon-set/AppIcon.iconset/icon_32x32.png" width="32" height="32" alt="" /></div>
+          <div class="lbl"><b>32</b>×32 · 1x</div>
+        </div>
+        <div class="sizeCell">
+          <div class="holder"><img src="icon-set/AppIcon.iconset/icon_32x32@2x.png" width="64" height="64" alt="" /></div>
+          <div class="lbl"><b>32</b>×32 · 2x</div>
+        </div>
+        <div class="sizeCell">
+          <div class="holder"><img src="icon-set/AppIcon.iconset/icon_128x128.png" width="128" height="128" alt="" /></div>
+          <div class="lbl"><b>128</b>×128 · 1x</div>
+        </div>
+        <div class="sizeCell">
+          <div class="holder"><img src="icon-set/AppIcon.iconset/icon_128x128@2x.png" width="128" height="128" alt="" /></div>
+          <div class="lbl"><b>128</b>×128 · 2x</div>
+        </div>
+        <div class="sizeCell">
+          <div class="holder"><img src="icon-set/AppIcon.iconset/icon_256x256.png" width="128" height="128" alt="" /></div>
+          <div class="lbl"><b>256</b>×256 · 1x</div>
+        </div>
+        <div class="sizeCell">
+          <div class="holder"><img src="icon-set/AppIcon.iconset/icon_256x256@2x.png" width="128" height="128" alt="" /></div>
+          <div class="lbl"><b>256</b>×256 · 2x</div>
+        </div>
+        <div class="sizeCell">
+          <div class="holder"><img src="icon-set/AppIcon.iconset/icon_512x512.png" width="128" height="128" alt="" /></div>
+          <div class="lbl"><b>512</b>×512 · 1x</div>
+        </div>
+        <div class="sizeCell">
+          <div class="holder"><img src="icon-set/AppIcon.iconset/icon_512x512@2x.png" width="128" height="128" alt="" /></div>
+          <div class="lbl"><b>1024</b>×1024 · 2x</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ MENU BAR STATES ============ -->
+    <section>
+      <div class="section-head">
+        <h2>Menübar · Template Images</h2>
+        <span class="hint">Drei Zustände · Light- und Dark-Mode-tauglich</span>
+      </div>
+
+      <div class="stateGrid">
+
+        <div>
+          <div class="stateLabel">01 · IDLE — Bereit, kein Hotkey gedrückt</div>
+          <div class="menubarRow">
+            <div class="left">
+              <span class="apple"></span>
+              <span class="label">Dicto</span>
+              <span class="label" style="opacity:0.5">Ablage · Bearbeiten · Darstellung · Fenster · Hilfe</span>
+            </div>
+            <div class="right">
+              <div class="mb idle"><img src="icon-set/MenuBar-idle.imageset/menubar-idle@2x.png" alt="" /></div>
+              <span class="text">⌘  Mi. 23. Mai 11:24</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="stateLabel">02 · RECORDING — Fn-Taste gedrückt, Audio läuft</div>
+          <div class="menubarRow recording">
+            <div class="left">
+              <span class="apple"></span>
+              <span class="label">Dicto</span>
+              <span class="label" style="opacity:0.5">Ablage · Bearbeiten · Darstellung · Fenster · Hilfe</span>
+            </div>
+            <div class="right">
+              <div class="mb rec"><img src="icon-set/MenuBar-recording.imageset/menubar-recording@2x.png" alt="" /></div>
+              <span class="text">⌘  Mi. 23. Mai 11:24</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="stateLabel">03 · TRANSCRIBING — WhisperKit verarbeitet</div>
+          <div class="menubarRow">
+            <div class="left">
+              <span class="apple"></span>
+              <span class="label">Dicto</span>
+              <span class="label" style="opacity:0.5">Ablage · Bearbeiten · Darstellung · Fenster · Hilfe</span>
+            </div>
+            <div class="right">
+              <div class="mb tr"><img src="icon-set/MenuBar-transcribing.imageset/menubar-transcribing@2x.png" alt="" /></div>
+              <span class="text">⌘  Mi. 23. Mai 11:24</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============ CONTACT SHEET ============ -->
+    <section>
+      <div class="section-head">
+        <h2>Kontaktbogen · alle drei Zustände nebeneinander</h2>
+        <span class="hint">Glyph-Logik im Vergleich</span>
+      </div>
+      <div class="sheet">
+        <div class="cell idle">
+          <div class="holder"><img src="icon-set/MenuBar-idle.imageset/menubar-idle@3x.png" alt="" /></div>
+          <h4>Idle</h4>
+          <p>Punkt als Outline — bereit, wartet auf <kbd class="mono">fn</kbd>.</p>
+        </div>
+        <div class="cell rec">
+          <div class="holder"><img src="icon-set/MenuBar-recording.imageset/menubar-recording@3x.png" alt="" /></div>
+          <h4>Recording</h4>
+          <p>Punkt gefüllt, in System-Akzentfarbe rot getintet.</p>
+        </div>
+        <div class="cell tr">
+          <div class="holder"><img src="icon-set/MenuBar-transcribing.imageset/menubar-transcribing@3x.png" alt="" /></div>
+          <h4>Transcribing</h4>
+          <p>Drei Punkte (Ellipsis) — Verarbeitung läuft.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FILE TREE ============ -->
+    <section>
+      <div class="section-head">
+        <h2>Dateistruktur</h2>
+        <span class="hint">Direkt nach <span class="mono">Assets.xcassets/</span> kopierbar</span>
+      </div>
+      <div class="tree"><span class="c">icon-set/</span>
+├── <b>AppIcon.iconset/</b>
+│   ├── Contents.json
+│   ├── icon_16x16.png            <span class="c">16 × 16</span>
+│   ├── icon_16x16@2x.png         <span class="c">32 × 32</span>
+│   ├── icon_32x32.png            <span class="c">32 × 32</span>
+│   ├── icon_32x32@2x.png         <span class="c">64 × 64</span>
+│   ├── icon_128x128.png          <span class="c">128 × 128</span>
+│   ├── icon_128x128@2x.png       <span class="c">256 × 256</span>
+│   ├── icon_256x256.png          <span class="c">256 × 256</span>
+│   ├── icon_256x256@2x.png       <span class="c">512 × 512</span>
+│   ├── icon_512x512.png          <span class="c">512 × 512</span>
+│   └── icon_512x512@2x.png       <span class="c">1024 × 1024</span>
+│
+├── <b>MenuBar-idle.imageset/</b>
+│   ├── Contents.json             <span class="c">template-rendering-intent: template</span>
+│   ├── menubar-idle.png          <span class="c">18 × 18</span>
+│   ├── menubar-idle@2x.png       <span class="c">36 × 36</span>
+│   └── menubar-idle@3x.png       <span class="c">54 × 54</span>
+│
+├── <b>MenuBar-recording.imageset/</b>      <span class="c">… gleiche Struktur</span>
+└── <b>MenuBar-transcribing.imageset/</b>   <span class="c">… gleiche Struktur</span>
+      </div>
+    </section>
+
+    <!-- ============ INTEGRATION ============ -->
+    <section>
+      <div class="section-head">
+        <h2>Integration in Dicto</h2>
+        <span class="hint">Xcode-Asset-Catalog + SwiftUI / AppKit</span>
+      </div>
+      <div class="callouts">
+        <div class="callout">
+          <h4>1 · App-Icon einbinden</h4>
+          <p>Den Ordner <span class="mono">AppIcon.iconset</span> nach <span class="mono">Assets.xcassets/AppIcon.appiconset/</span> verschieben. Xcode liest die enthaltene <span class="mono">Contents.json</span>.</p>
+          <p>Alternativ für <span class="mono">.icns</span>-Export:</p>
+          <pre><span class="c"># Terminal, im Projektroot</span>
+<span class="k">iconutil</span> -c icns icon-set/AppIcon.iconset \
+          -o Dicto.icns</pre>
+        </div>
+        <div class="callout">
+          <h4>2 · Menübar-Image als Template</h4>
+          <p>In <span class="mono">MenuBarController.swift</span> nach Zustand wechseln. <b>Wichtig:</b> <span class="mono">isTemplate = true</span>, damit macOS automatisch tintet (weiß auf Dark-Mode-Bar, schwarz auf Light-Mode-Bar).</p>
+          <pre><span class="k">switch</span> state {
+<span class="k">case</span> .idle:         image = NSImage(named: <span class="s">"MenuBar-idle"</span>)
+<span class="k">case</span> .recording:    image = NSImage(named: <span class="s">"MenuBar-recording"</span>)
+<span class="k">case</span> .transcribing: image = NSImage(named: <span class="s">"MenuBar-transcribing"</span>)
+}
+image?.isTemplate = <span class="k">true</span>
+statusItem.button?.image = image</pre>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</body>
+</html>
