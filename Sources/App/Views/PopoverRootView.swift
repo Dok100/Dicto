@@ -374,10 +374,10 @@ struct PopoverRootView: View {
     // MARK: – Idle-Ansicht
 
     private var idleView: some View {
-        VStack(alignment: .leading, spacing: 7) {
+        VStack(alignment: .leading, spacing: 12) {
             shortcutRow(key: "Fn",    description: "Diktieren",           icon: "mic.fill")
             shortcutRow(key: "⌥+Fn", description: "Transformieren",      icon: "wand.and.sparkles")
-            Divider().padding(.vertical, 1)
+            Divider().padding(.vertical, 2)
             shortcutRow(key: "⌘↩",   description: "Einfügen / Kopieren", icon: "return")
             shortcutRow(key: "⌘Q",   description: "Beenden",             icon: "xmark.circle")
         }
@@ -385,23 +385,23 @@ struct PopoverRootView: View {
     }
 
     private func shortcutRow(key: String, description: String, icon: String) -> some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 10) {
             Image(systemName: icon)
-                .font(.system(size: 11, weight: .medium))
+                .font(.system(size: 14, weight: .medium))
                 .foregroundStyle(.tertiary)
-                .frame(width: 16, alignment: .center)
+                .frame(width: 20, alignment: .center)
 
             Text(description)
-                .font(.system(size: 12))
+                .font(.system(size: 14))
                 .foregroundStyle(.secondary)
 
             Spacer()
 
             Text(key)
-                .font(.system(size: 10, weight: .medium, design: .monospaced))
-                .padding(.horizontal, 6)
-                .padding(.vertical, 2)
-                .background(.quaternary, in: RoundedRectangle(cornerRadius: 4))
+                .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(.quaternary, in: RoundedRectangle(cornerRadius: 5))
                 .foregroundStyle(.secondary)
         }
     }

@@ -107,7 +107,7 @@ final class MenuBarController {
         // .fullSizeContentView: Inhalt füllt die gesamte Fensterfläche (inkl. Titelleiste),
         // nötig damit das SwiftUI-Material bis an den Rand reicht.
         panel = NSPanel(
-            contentRect: NSRect(x: 0, y: 0, width: 320, height: 340),
+            contentRect: NSRect(x: 0, y: 0, width: 340, height: 420),
             styleMask: [.titled, .closable, .resizable, .nonactivatingPanel, .fullSizeContentView],
             backing: .buffered,
             defer: false
