@@ -35,6 +35,7 @@ Optional: Glättung via Ollama (glm4, http://localhost:11434).
 | PROJ-19 Einstellungs-Tabs + Diktat-Statistiken | Abgeschlossen |
 | PROJ-20 Konfigurierbarer Tastatur-Shortcut | Abgeschlossen |
 | PROJ-21 Deutsch → Englisch Übersetzung (→ EN Stil) | Abgeschlossen |
+| PROJ-23 Sound-Feedback (Tink/Pop bei Start/Stop) | Abgeschlossen |
 
 ## Nutzer-Kontext
 
