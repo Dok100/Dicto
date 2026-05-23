@@ -1,6 +1,6 @@
 # PROJ-17 – UI-Polishing
 
-**Status**: Abgeschlossen
+**Status**: ✅ Abgeschlossen
 **Branch**: main
 
 ## Ziel
@@ -14,7 +14,7 @@ visuell auf Augenhöhe mit nativen macOS-Menübar-Tools (Raycast, Bartender etc.
 |-------|-------------|--------|
 | A – Foundation | Frosted-Glass-Panel + State-Animationen | ✅ Abgeschlossen |
 | B – Recording WOW | Pulsierende Aufnahme-Animation | ✅ Abgeschlossen |
-| C – Settings Overhaul | GroupBox-Sektionen, Form-Layout | Offen |
+| C – Settings Overhaul | GroupBox-Sektionen, Form-Layout | ✅ Abgeschlossen |
 
 ## Umgesetzte Änderungen (Level A)
 

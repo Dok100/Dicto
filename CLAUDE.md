@@ -30,7 +30,7 @@ Optional: Glättung via Ollama (glm4, http://localhost:11434).
 | PROJ-14 Sprachauswahl (Deutsch / Englisch / Auto) | Abgeschlossen |
 | PROJ-15 Diktat-Verlauf (letzte 20 Einträge) | Abgeschlossen |
 | PROJ-16 Wörterbuch Export/Import | Abgeschlossen |
-| PROJ-17 UI-Polishing | In Bearbeitung (Level A ✅, B+C offen) |
+| PROJ-17 UI-Polishing | Abgeschlossen (Level A+B+C ✅) |
 
 ## Nutzer-Kontext
 

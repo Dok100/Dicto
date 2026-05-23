@@ -18,4 +18,4 @@
 | [PROJ-14](PROJ-14-sprachauswahl.md) | Sprachauswahl (Deutsch / Englisch / Auto) | Abgeschlossen |
 | [PROJ-15](PROJ-15-diktat-verlauf.md) | Diktat-Verlauf (letzte 20 Einträge) | Abgeschlossen |
 | [PROJ-16](PROJ-16-woerterbuch-export-import.md) | Wörterbuch Export/Import | Abgeschlossen |
-| [PROJ-17](PROJ-17-ui-polishing.md) | UI-Polishing (Frosted Glass, Animationen, Icons) | In Bearbeitung |
+| [PROJ-17](PROJ-17-ui-polishing.md) | UI-Polishing (Frosted Glass, Animationen, Icons) | Abgeschlossen |
