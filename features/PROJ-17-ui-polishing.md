@@ -46,14 +46,31 @@ visuell auf Augenhöhe mit nativen macOS-Menübar-Tools (Raycast, Bartender etc.
 - `AppIcon.appiconset`: Aperture-D Designer-Icons (10 Größen, 16–512@2x)
   ersetzt vorheriges Mikrofon-Icon
 
-## Offene Punkte (Level B + C)
+## Umgesetzte Änderungen (Level B)
 
-### Level B – Recording WOW
-- Konzentrische Ringe die bei Aufnahme nach außen pulsieren
-- Lila Partikel-Animation bei Transform-Aufnahme
-- Elegante Punkte-Animation statt Standard-Spinner beim Transkribieren
+### PopoverRootView.swift – RecordingRingsView
+- 3 konzentrische Ringe, bei Aufnahme nach außen pulsierend
+- Rot (Diktat) / Lila (Transform) per `isTransformRecording`
+- `.easeOut(duration: 1.6).repeatForever(autoreverses: false)` + staggered `.delay(Double(i) * 0.52)`
+- `onAppear` mit 50 ms Verzögerung für sauberen Animationsstart nach `.id()`-Wechsel
 
-### Level C – Settings Overhaul
-- `Form` + `Section` für logische Gruppen (Allgemein / Modell / Verarbeitung / Wörterbuch)
-- Jede Sektion als `GroupBox` mit Header-Styling
-- Konsistente Einzüge und Abstände
+### PopoverRootView.swift – TranscribingDotsView
+- 3 Punkte mit Up/Down-Bounce beim Transkribieren
+- `.easeInOut(duration: 0.42).repeatForever(autoreverses: true)` + `.delay(Double(i) * 0.14)`
+
+## Umgesetzte Änderungen (Level C)
+
+### SettingsView.swift
+- Komplett neu mit `Form` + `.formStyle(.grouped)` (macOS 14-Style wie Systemeinstellungen)
+- 5 Sektionen: Allgemein / Sprache & Modell / Verhalten / KI-Verarbeitung / Wörterbuch
+- `LabeledContent` für Ollama-Felder (Modell, Endpoint)
+- `.task(id: settings.ollamaEnabled)` direkt auf dem Toggle-HStack
+- Ollama-Systemprompt: `TextEditor` mit `.scrollContentBackground(.hidden)` + `.quinary`-Hintergrund
+- Wörterbuch-Einträge als `ForEach` in `Section` (Form rendert als native Rows)
+- Frame: `minWidth: 420, minHeight: 480`
+
+### PopoverRootView.swift – Shortcut-Badges + Footer-Fix
+- `shortcutRow(keys: [String], ...)` – jede Taste als eigenes Badge mit `+`-Trenner
+- Stil-Picker in eigene Zeile zwischen Content und Footer verschoben (volle Breite)
+- Footer auf 3 Icon-Buttons reduziert: gear | clock | Spacer | power
+- `positionPanel`: Y-Clamping `y = max(y, visible.minY)` verhindert Panel unterhalb Dock
