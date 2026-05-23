@@ -53,16 +53,32 @@ struct PopoverRootView: View {
             Divider().opacity(0.4)
 
             // Stil-Picker in eigener Zeile – volle Breite, kein Layout-Konflikt mit Footer
-            Picker("Stil", selection: $appState.dictationStyle) {
-                ForEach(DictationStyle.allCases, id: \.self) { style in
-                    Text(style.label).tag(style)
+            VStack(spacing: 4) {
+                Picker("Stil", selection: $appState.dictationStyle) {
+                    ForEach(DictationStyle.allCases, id: \.self) { style in
+                        Text(style.label).tag(style)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .disabled(appState.isRecording)
+
+                // Hinweis wenn Übersetzung gewählt aber Ollama deaktiviert
+                if appState.dictationStyle == .translate && !appState.settings.ollamaEnabled {
+                    HStack(spacing: 4) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .font(.system(size: 10))
+                            .foregroundStyle(.orange)
+                        Text("Ollama muss aktiviert sein für die Übersetzung.")
+                            .font(.system(size: 10))
+                            .foregroundStyle(.orange)
+                    }
+                    .transition(.opacity.combined(with: .scale(scale: 0.95, anchor: .top)))
                 }
             }
-            .pickerStyle(.segmented)
-            .labelsHidden()
-            .disabled(appState.isRecording)
             .padding(.horizontal, 14)
             .padding(.vertical, 8)
+            .animation(.spring(response: 0.25), value: appState.dictationStyle == .translate && !appState.settings.ollamaEnabled)
 
             Divider().opacity(0.4)
 

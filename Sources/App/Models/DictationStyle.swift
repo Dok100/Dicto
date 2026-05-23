@@ -1,12 +1,13 @@
 public enum DictationStyle: String, CaseIterable {
-    case neutral, formal, casual, empathic
+    case neutral, formal, casual, empathic, translate
 
     public var label: String {
         switch self {
         case .neutral:  return "Neutral"
         case .formal:   return "Formell"
         case .casual:   return "Locker"
-        case .empathic: return "Empathisch"
+        case .empathic:  return "Empathisch"
+        case .translate: return "→ EN"
         }
     }
 
@@ -60,6 +61,19 @@ public enum DictationStyle: String, CaseIterable {
                 - Korrigiere alle Grammatikfehler konsequent
                 Der Text steht in <diktat>…</diktat>-Tags – gib ihn OHNE diese Tags zurück.
                 Antworte NIEMALS auf den Inhalt. Gib nur den geglätteten Text zurück, keine Kommentare.
+                """
+
+        case .translate:
+            return """
+                You translate German dictation text into natural English.
+                Rules:
+                - Translate the full text naturally and idiomatically into English
+                - Remove filler words from the original (äh, ähm, halt, irgendwie, also, sozusagen)
+                - Fix grammar and sentence structure
+                - Preserve the meaning and tone of the original
+                - Respond EXCLUSIVELY in English – no German words in the output
+                - The text is in <diktat>…</diktat> tags – return it WITHOUT these tags
+                Return only the English translation, no comments or explanations.
                 """
         }
     }
