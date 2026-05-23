@@ -46,59 +46,72 @@ final class MenuBarController {
         updateStatusDot(appState: appState)
     }
 
-    // MARK: – Status-Dot
+    // MARK: – Menübar-Icon: D + farbiger Status-Dot
 
     private func updateStatusDot(appState: AppState) {
         guard let button = statusItem.button else { return }
 
-        let micName: String
         let dotColor: NSColor
-
         if appState.missingPermission != .none {
-            micName = "mic.slash"
             dotColor = .systemRed
         } else if appState.isTransformMode {
-            // Transformation (Aufnahme + Verarbeitung): lila
-            micName = "wand.and.sparkles"
             dotColor = .systemPurple
         } else if appState.isRecording {
-            // Diktat-Aufnahme: rot
-            micName = "mic.fill"
             dotColor = .systemRed
         } else if case .loadingModel = appState.transcriptionState {
-            // Modell lädt: orange
-            micName = "mic"
             dotColor = .systemOrange
         } else if case .transcribing = appState.transcriptionState {
-            // Transkription läuft: orange
-            micName = "mic"
             dotColor = .systemOrange
         } else if case .error = appState.transcriptionState {
-            micName = "mic.slash"
             dotColor = .systemRed
         } else {
-            micName = "mic"
             dotColor = .systemGreen
         }
 
-        button.image = NSImage(systemSymbolName: micName, accessibilityDescription: "Dicto")
-        button.attributedTitle = NSAttributedString(
-            string: " ●",
-            attributes: [
-                .foregroundColor: dotColor,
-                .font: NSFont.systemFont(ofSize: 7)
+        button.image = makeMenuBarImage(dotColor: dotColor)
+        button.title = ""
+    }
+
+    /// Zeichnet das „D + Dot"-Menübar-Icon programmatisch.
+    /// NSImage(size:flipped:drawingHandler:) wird bei jedem Render-Aufruf neu ausgeführt,
+    /// sodass NSColor.labelColor automatisch auf Dark- und Light-Mode reagiert.
+    private func makeMenuBarImage(dotColor: NSColor) -> NSImage {
+        let size = NSSize(width: 22, height: 18)
+        let image = NSImage(size: size, flipped: false) { rect in
+            // Fettes „D" – passt zur App-Icon-Typografie
+            let font = NSFont.boldSystemFont(ofSize: 14)
+            let attrs: [NSAttributedString.Key: Any] = [
+                .font: font,
+                .foregroundColor: NSColor.labelColor
             ]
-        )
+            let str = NSAttributedString(string: "D", attributes: attrs)
+            let strSize = str.size()
+            let strX = (rect.width - strSize.width) / 2 - 1
+            let strY = (rect.height - strSize.height) / 2
+            str.draw(at: NSPoint(x: strX, y: strY))
+
+            // Farbiger Dot in der Rundung des D (Position wie im App-Icon)
+            dotColor.setFill()
+            let dotDiameter: CGFloat = 3.5
+            let dotX = strX + strSize.width * 0.60
+            let dotY = strY + (strSize.height - dotDiameter) / 2
+            NSBezierPath(ovalIn: NSRect(x: dotX, y: dotY, width: dotDiameter, height: dotDiameter)).fill()
+
+            return true
+        }
+        image.isTemplate = false
+        return image
     }
 
     // MARK: – Setup
 
     private func setupStatusItem() {
         guard let button = statusItem.button else { return }
-        button.image = NSImage(systemSymbolName: "mic", accessibilityDescription: "Dicto")
-        button.imagePosition = .imageLeft
+        button.imagePosition = .imageOnly
         button.action = #selector(togglePanel)
         button.target = self
+        // Initiales Icon – wird sofort durch updateStatusDot überschrieben
+        button.image = makeMenuBarImage(dotColor: .systemGreen)
     }
 
     private func setupPanel(appState: AppState) {
