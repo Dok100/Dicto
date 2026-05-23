@@ -9,6 +9,7 @@ final class MenuBarController {
     private var clickOutsideMonitor: Any?
     private var cmdReturnMonitor: Any?
     private var settingsWindowController: SettingsWindowController?
+    private var onboardingWindowController: OnboardingWindowController?
 
     init(appState: AppState) {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -19,6 +20,18 @@ final class MenuBarController {
         appState.onOpenSettings = { [weak self] in
             self?.hidePanel()
             self?.settingsWindowController?.show()
+        }
+
+        // Onboarding beim ersten Start anzeigen
+        if OnboardingWindowController.isNeeded {
+            onboardingWindowController = OnboardingWindowController { [weak self] in
+                self?.onboardingWindowController?.close()
+                self?.onboardingWindowController = nil
+            }
+            // Kurze Verzögerung damit die Menübar fertig aufgebaut ist
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+                self?.onboardingWindowController?.show()
+            }
         }
 
         // Panel automatisch öffnen wenn Vorschau nötig ist

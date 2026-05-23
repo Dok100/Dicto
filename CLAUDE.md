@@ -31,6 +31,7 @@ Optional: Glättung via Ollama (glm4, http://localhost:11434).
 | PROJ-15 Diktat-Verlauf (letzte 20 Einträge) | Abgeschlossen |
 | PROJ-16 Wörterbuch Export/Import | Abgeschlossen |
 | PROJ-17 UI-Polishing | Abgeschlossen (Level A+B+C ✅) |
+| PROJ-18 Onboarding / First-Run-Experience | Abgeschlossen |
 
 ## Nutzer-Kontext
 

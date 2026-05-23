@@ -19,3 +19,4 @@
 | [PROJ-15](PROJ-15-diktat-verlauf.md) | Diktat-Verlauf (letzte 20 Einträge) | Abgeschlossen |
 | [PROJ-16](PROJ-16-woerterbuch-export-import.md) | Wörterbuch Export/Import | Abgeschlossen |
 | [PROJ-17](PROJ-17-ui-polishing.md) | UI-Polishing (Frosted Glass, Animationen, Icons) | Abgeschlossen |
+| [PROJ-18](PROJ-18-onboarding.md) | Onboarding / First-Run-Experience | Abgeschlossen |
