@@ -22,6 +22,20 @@ public final class AppSettings: ObservableObject {
     @Published public var whisperLanguage: WhisperLanguage {
         didSet { UserDefaults.standard.set(whisperLanguage.rawValue, forKey: "whisperLanguage") }
     }
+    @Published public var dictationShortcut: ShortcutConfig {
+        didSet {
+            if let d = try? JSONEncoder().encode(dictationShortcut) {
+                UserDefaults.standard.set(d, forKey: "dictationShortcut")
+            }
+        }
+    }
+    @Published public var transformShortcut: ShortcutConfig {
+        didSet {
+            if let d = try? JSONEncoder().encode(transformShortcut) {
+                UserDefaults.standard.set(d, forKey: "transformShortcut")
+            }
+        }
+    }
 
     public init() {
         let d = UserDefaults.standard
@@ -32,6 +46,12 @@ public final class AppSettings: ObservableObject {
         whisperModel     = WhisperModel(rawValue: d.string(forKey: "whisperModel") ?? "") ?? .largev3
         previewEnabled   = d.object(forKey: "previewEnabled")  as? Bool ?? false
         whisperLanguage  = d.string(forKey: "whisperLanguage").flatMap(WhisperLanguage.init) ?? .german
+        dictationShortcut = d.data(forKey: "dictationShortcut")
+            .flatMap { try? JSONDecoder().decode(ShortcutConfig.self, from: $0) }
+            ?? .defaultDictation
+        transformShortcut = d.data(forKey: "transformShortcut")
+            .flatMap { try? JSONDecoder().decode(ShortcutConfig.self, from: $0) }
+            ?? .defaultTransform
     }
 
     static let defaultPrompt = """

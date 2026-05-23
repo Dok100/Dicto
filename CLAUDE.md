@@ -33,6 +33,7 @@ Optional: Glättung via Ollama (glm4, http://localhost:11434).
 | PROJ-17 UI-Polishing | Abgeschlossen (Level A+B+C ✅) |
 | PROJ-18 Onboarding / First-Run-Experience | Abgeschlossen |
 | PROJ-19 Einstellungs-Tabs + Diktat-Statistiken | Abgeschlossen |
+| PROJ-20 Konfigurierbarer Tastatur-Shortcut | Abgeschlossen |
 
 ## Nutzer-Kontext
 

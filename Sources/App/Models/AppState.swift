@@ -46,7 +46,10 @@ final class AppState: ObservableObject {
 
     init() {
         let audio = AudioService()
-        let hotkey = HotkeyService()
+        let hotkey = HotkeyService(
+            dictation: settings.dictationShortcut,
+            transform: settings.transformShortcut
+        )
         let whisper = WhisperService()
         let paste = PasteService()
         self.audioService = audio
@@ -109,6 +112,16 @@ final class AppState: ObservableObject {
                 Task { await whisper.transcribe(fileURL: url, model: model, language: language) }
             }
         }
+
+        // Shortcut-Änderungen aus Settings → HotkeyService weiterleiten
+        settings.$dictationShortcut
+            .dropFirst()
+            .sink { [weak hotkey] config in hotkey?.dictationShortcut = config }
+            .store(in: &cancellables)
+        settings.$transformShortcut
+            .dropFirst()
+            .sink { [weak hotkey] config in hotkey?.transformShortcut = config }
+            .store(in: &cancellables)
 
         Task { await whisper.loadModelIfNeeded(model: settings.whisperModel) }
 

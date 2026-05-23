@@ -62,6 +62,24 @@ struct GeneralSettingsView: View {
             } header: {
                 Text("Verhalten")
             }
+
+            // ── Sektion 4: Tastaturkürzel ─────────────────────────────────────
+            Section {
+                ShortcutRecorderView(label: "Diktieren",       shortcut: $settings.dictationShortcut)
+                ShortcutRecorderView(label: "Transformieren",  shortcut: $settings.transformShortcut)
+
+                Text("Fn-Taste allein oder mit Modifier: halten zum Aufnehmen, loslassen zum Stoppen. Normale Tasten: mindestens einen Modifier (⌘ ⌥ ⌃ ⇧) halten.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Button("Auf Standard zurücksetzen") {
+                    settings.dictationShortcut = .defaultDictation
+                    settings.transformShortcut = .defaultTransform
+                }
+                .font(.caption)
+            } header: {
+                Text("Tastaturkürzel")
+            }
         }
         .formStyle(.grouped)
         .frame(maxWidth: .infinity, maxHeight: .infinity)

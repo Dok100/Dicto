@@ -1,24 +1,41 @@
 import AppKit
 
 final class HotkeyService {
+
+    // MARK: – Callbacks
+
     var onKeyDown: (() -> Void)?
     var onKeyUp: (() -> Void)?
     var onTransformKeyDown: (() -> Void)?
     var onTransformKeyUp: (() -> Void)?
 
     private(set) var isAvailable = false
-    private var globalMonitor: Any?
-    private var localMonitor: Any?
-    private var isFnDown = false
-    private var isTransformMode = false
 
-    // Globe/Fn-Taste: keyCode 63, modifierFlags enthält .function wenn gedrückt.
-    // Voraussetzung: Systemeinstellungen → Tastatur → 🌐-Taste → "Keine Aktion"
-    private static let fnKeyCode: UInt16 = 63
+    // MARK: – Konfiguration
 
-    var isAccessibilityGranted: Bool { AXIsProcessTrusted() }
+    var dictationShortcut: ShortcutConfig {
+        didSet { reinstallMonitors() }
+    }
+    var transformShortcut: ShortcutConfig {
+        didSet { reinstallMonitors() }
+    }
 
-    init() {
+    // MARK: – Interna
+
+    private var flagsMonitorGlobal: Any?
+    private var flagsMonitorLocal:  Any?
+    private var keyDownMonitor: Any?
+    private var keyUpMonitor:   Any?
+
+    private enum ActiveMode { case none, dictation, transform }
+    private var activeMode: ActiveMode = .none
+
+    // MARK: – Init
+
+    init(dictation: ShortcutConfig = .defaultDictation,
+         transform: ShortcutConfig = .defaultTransform) {
+        self.dictationShortcut = dictation
+        self.transformShortcut = transform
         tryInstallMonitor()
     }
 
@@ -27,43 +44,114 @@ final class HotkeyService {
         tryInstallMonitor()
     }
 
+    // MARK: – Monitor-Installation
+
     private func tryInstallMonitor() {
-        globalMonitor = NSEvent.addGlobalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
-            self?.handleEvent(event)
+        removeAllMonitors()
+
+        // flagsChanged – immer aktiv (Fn-Taste + Modifier-only-Shortcuts)
+        flagsMonitorGlobal = NSEvent.addGlobalMonitorForEvents(matching: .flagsChanged) { [weak self] e in
+            self?.handleFlagsChanged(e)
         }
-        localMonitor = NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
-            self?.handleEvent(event)
-            return event
+        flagsMonitorLocal = NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { [weak self] e in
+            self?.handleFlagsChanged(e)
+            return e
         }
-        isAvailable = globalMonitor != nil
+
+        // keyDown/keyUp – für normale Tastenkombinationen
+        keyDownMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [weak self] e in
+            self?.handleKeyDown(e)
+        }
+        keyUpMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyUp) { [weak self] e in
+            self?.handleKeyUp(e)
+        }
+
+        isAvailable = flagsMonitorGlobal != nil
     }
 
-    private func handleEvent(_ event: NSEvent) {
-        guard event.keyCode == Self.fnKeyCode else { return }
-        let fnCurrentlyDown = event.modifierFlags.contains(.function)
-        guard fnCurrentlyDown != isFnDown else { return }
-        isFnDown = fnCurrentlyDown
+    private func reinstallMonitors() {
+        activeMode = .none
+        tryInstallMonitor()
+    }
 
-        if fnCurrentlyDown {
-            // Alt (Option) bereits gehalten → Transform-Modus
-            isTransformMode = event.modifierFlags.contains(.option)
-            if isTransformMode {
+    private func removeAllMonitors() {
+        for m in [flagsMonitorGlobal, flagsMonitorLocal, keyDownMonitor, keyUpMonitor] {
+            if let m { NSEvent.removeMonitor(m) }
+        }
+        flagsMonitorGlobal = nil
+        flagsMonitorLocal  = nil
+        keyDownMonitor     = nil
+        keyUpMonitor       = nil
+    }
+
+    // MARK: – flagsChanged (Fn-Taste)
+
+    private func handleFlagsChanged(_ event: NSEvent) {
+        // Nur Fn-basierte Shortcuts hier behandeln
+        guard event.keyCode == 63 else { return }
+
+        let fnNowDown = event.modifierFlags.contains(.function)
+
+        if fnNowDown && activeMode == .none {
+            // Transform zuerst prüfen (spezifischer als Diktat)
+            if transformShortcut.isFlagsBased && fnModifiersMatch(event: event, config: transformShortcut) {
+                activeMode = .transform
                 onTransformKeyDown?()
-            } else {
+            } else if dictationShortcut.isFlagsBased && fnModifiersMatch(event: event, config: dictationShortcut) {
+                activeMode = .dictation
                 onKeyDown?()
             }
-        } else {
-            if isTransformMode {
-                onTransformKeyUp?()
-            } else {
-                onKeyUp?()
+        } else if !fnNowDown {
+            switch activeMode {
+            case .transform: activeMode = .none; onTransformKeyUp?()
+            case .dictation: activeMode = .none; onKeyUp?()
+            case .none: break
             }
-            isTransformMode = false
         }
     }
 
-    deinit {
-        if let m = globalMonitor { NSEvent.removeMonitor(m) }
-        if let m = localMonitor { NSEvent.removeMonitor(m) }
+    private func fnModifiersMatch(event: NSEvent, config: ShortcutConfig) -> Bool {
+        let want = config.modifierFlags   // Nur die vom Nutzer konfigurierten Modifier
+        let have = event.modifierFlags.intersection([.command, .option, .control, .shift])
+        return want == have
     }
+
+    // MARK: – keyDown / keyUp (normale Tasten)
+
+    private func handleKeyDown(_ event: NSEvent) {
+        guard activeMode == .none else { return }
+        let mods = event.modifierFlags.intersection([.command, .option, .control, .shift])
+
+        // Transform zuerst (spezifischer)
+        if !transformShortcut.isFlagsBased,
+           event.keyCode == transformShortcut.keyCode,
+           mods == transformShortcut.modifierFlags {
+            activeMode = .transform
+            onTransformKeyDown?()
+        } else if !dictationShortcut.isFlagsBased,
+                  event.keyCode == dictationShortcut.keyCode,
+                  mods == dictationShortcut.modifierFlags {
+            activeMode = .dictation
+            onKeyDown?()
+        }
+    }
+
+    private func handleKeyUp(_ event: NSEvent) {
+        switch activeMode {
+        case .transform:
+            if !transformShortcut.isFlagsBased, event.keyCode == transformShortcut.keyCode {
+                activeMode = .none
+                onTransformKeyUp?()
+            }
+        case .dictation:
+            if !dictationShortcut.isFlagsBased, event.keyCode == dictationShortcut.keyCode {
+                activeMode = .none
+                onKeyUp?()
+            }
+        case .none:
+            break
+        }
+    }
+
+    deinit { removeAllMonitors() }
 }
