@@ -8,7 +8,8 @@ struct PopoverRootView: View {
     // Treibt die State-Transition-Animation: SwiftUI erkennt durch die neue ID,
     // dass der Inhalt neu gerendert werden soll, und wendet .transition() an.
     private var stateTag: String {
-        if appState.isRecording { return "recording" }
+        if appState.isTransformRecording { return "transform-recording" }
+        if appState.isRecording          { return "recording" }
         switch appState.transcriptionState {
         case .idle:         return "idle"
         case .loadingModel: return "loading"
@@ -303,7 +304,11 @@ struct PopoverRootView: View {
     private var transcriptionArea: some View {
         switch appState.transcriptionState {
         case .idle:
-            idleView
+            if appState.isRecording {
+                RecordingRingsView(isTransform: appState.isTransformRecording)
+            } else {
+                idleView
+            }
 
         case .loadingModel(let progress):
             VStack(spacing: 8) {
@@ -326,15 +331,7 @@ struct PopoverRootView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
         case .transcribing:
-            VStack(spacing: 8) {
-                ProgressView()
-                    .progressViewStyle(.circular)
-                    .scaleEffect(0.8)
-                Text("Transkribiere …")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            TranscribingDotsView()
 
         case .done(let text):
             if appState.settings.previewEnabled || appState.isTransformResult {
@@ -404,6 +401,94 @@ struct PopoverRootView: View {
                 .background(.quaternary, in: RoundedRectangle(cornerRadius: 5))
                 .foregroundStyle(.secondary)
         }
+    }
+}
+
+// MARK: – Level B: Pulsierende Aufnahme-Ringe
+
+private struct RecordingRingsView: View {
+    let isTransform: Bool
+    @State private var animate = false
+
+    private var color: Color  { isTransform ? .purple : .red }
+    private var icon: String  { isTransform ? "wand.and.sparkles" : "mic.fill" }
+    private var label: String { isTransform ? "Transform-Aufnahme läuft …" : "Aufnahme läuft …" }
+
+    var body: some View {
+        VStack(spacing: 20) {
+            ZStack {
+                // 3 Ringe, jeweils mit Versatz starten – erzeugt Ripple-Effekt
+                ForEach(0..<3, id: \.self) { i in
+                    Circle()
+                        .stroke(color.opacity(animate ? 0 : 0.45), lineWidth: 1.5)
+                        .scaleEffect(animate ? 3.2 : 1.0)
+                        .animation(
+                            .easeOut(duration: 1.6)
+                                .repeatForever(autoreverses: false)
+                                .delay(Double(i) * 0.52),
+                            value: animate
+                        )
+                }
+                // Gefüllter Hintergrundkreis
+                Circle()
+                    .fill(color.opacity(0.1))
+                    .frame(width: 68, height: 68)
+                // Icon
+                Image(systemName: icon)
+                    .font(.system(size: 28, weight: .medium))
+                    .foregroundStyle(color)
+            }
+            .frame(width: 90, height: 90)
+
+            Text(label)
+                .font(.subheadline)
+                .foregroundStyle(color.opacity(0.85))
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onAppear {
+            // Minimaler Delay damit SwiftUI den initialen Zustand rendert
+            // bevor die Animation startet – verhindert Sprung bei .id()-Wechsel
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                animate = true
+            }
+        }
+        .onDisappear { animate = false }
+    }
+}
+
+// MARK: – Level B: Hüpfende Punkte beim Transkribieren
+
+private struct TranscribingDotsView: View {
+    @State private var animate = false
+
+    var body: some View {
+        VStack(spacing: 12) {
+            HStack(spacing: 9) {
+                ForEach(0..<3, id: \.self) { i in
+                    Circle()
+                        .fill(Color.secondary.opacity(0.65))
+                        .frame(width: 9, height: 9)
+                        .scaleEffect(animate ? 1.0 : 0.4)
+                        .opacity(animate ? 1.0 : 0.25)
+                        .animation(
+                            .easeInOut(duration: 0.42)
+                                .repeatForever(autoreverses: true)
+                                .delay(Double(i) * 0.14),
+                            value: animate
+                        )
+                }
+            }
+            Text("Transkribiere …")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                animate = true
+            }
+        }
+        .onDisappear { animate = false }
     }
 }
 

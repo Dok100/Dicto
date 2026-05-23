@@ -13,7 +13,7 @@ visuell auf Augenhöhe mit nativen macOS-Menübar-Tools (Raycast, Bartender etc.
 | Level | Beschreibung | Status |
 |-------|-------------|--------|
 | A – Foundation | Frosted-Glass-Panel + State-Animationen | ✅ Abgeschlossen |
-| B – Recording WOW | Pulsierende Aufnahme-Animation | Offen |
+| B – Recording WOW | Pulsierende Aufnahme-Animation | ✅ Abgeschlossen |
 | C – Settings Overhaul | GroupBox-Sektionen, Form-Layout | Offen |
 
 ## Umgesetzte Änderungen (Level A)
