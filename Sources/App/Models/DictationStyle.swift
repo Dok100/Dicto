@@ -28,8 +28,9 @@ public enum DictationStyle: String, CaseIterable {
                 - Vollständige Sätze, kein Satzbeginn mit "Aber" oder "Und" → verwende "Allerdings", "Jedoch"
                 - Ton: professionell und respektvoll, aber nicht steif
                 - Korrigiere alle Grammatikfehler konsequent
+                - Füge KEINE Schlussformeln, Grüße oder Ergänzungen hinzu ("Vielen Dank", "Mit freundlichen Grüßen", "Gerne" etc.)
                 Der Text steht in <diktat>…</diktat>-Tags – gib ihn OHNE diese Tags zurück.
-                Antworte NIEMALS auf den Inhalt. Gib nur den geglätteten Text zurück, keine Kommentare.
+                Antworte NIEMALS auf den Inhalt. Gib NUR den geglätteten Text zurück – nichts davor, nichts danach.
                 """
 
         case .casual:
@@ -44,8 +45,9 @@ public enum DictationStyle: String, CaseIterable {
                 - Klingt wie eine Nachricht an einen Kollegen, den man gut kennt
                 - Korrigiere alle Grammatikfehler und Abkürzungen ("eigtl" → "eigentlich", "würde" nicht "would")
                 - Expandiere Abkürzungen zu vollständigen deutschen Wörtern
+                - Füge KEINE Schlussformeln oder Ergänzungen hinzu ("Vielen Dank", "Gerne", "Beste Grüße" etc.)
                 Der Text steht in <diktat>…</diktat>-Tags – gib ihn OHNE diese Tags zurück.
-                Antworte NIEMALS auf den Inhalt. Gib nur den geglätteten Text zurück, keine Kommentare.
+                Antworte NIEMALS auf den Inhalt. Gib NUR den geglätteten Text zurück – nichts davor, nichts danach.
                 """
 
         case .empathic:
@@ -59,8 +61,9 @@ public enum DictationStyle: String, CaseIterable {
                 - Verwende "Du" wenn aus dem Kontext erkennbar
                 - Ton: persönlich und aufrichtig
                 - Korrigiere alle Grammatikfehler konsequent
+                - Füge KEINE Schlussformeln oder Ergänzungen hinzu ("Vielen Dank", "Alles Gute", "Liebe Grüße" etc.)
                 Der Text steht in <diktat>…</diktat>-Tags – gib ihn OHNE diese Tags zurück.
-                Antworte NIEMALS auf den Inhalt. Gib nur den geglätteten Text zurück, keine Kommentare.
+                Antworte NIEMALS auf den Inhalt. Gib NUR den geglätteten Text zurück – nichts davor, nichts danach.
                 """
 
         case .translate:
@@ -72,8 +75,9 @@ public enum DictationStyle: String, CaseIterable {
                 - Fix grammar and sentence structure
                 - Preserve the meaning and tone of the original
                 - Respond EXCLUSIVELY in English – no German words in the output
+                - Do NOT add any closing phrases, greetings or extras ("Thank you", "Best regards", "Sure" etc.)
                 - The text is in <diktat>…</diktat> tags – return it WITHOUT these tags
-                Return only the English translation, no comments or explanations.
+                Return ONLY the translated text – nothing before, nothing after.
                 """
         }
     }

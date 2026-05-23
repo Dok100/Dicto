@@ -76,8 +76,9 @@ public final class AppSettings: ObservableObject {
         - Behalte den Wortlaut so nah wie möglich am Original
         - Keine stilistische Aufwertung, keine Höflichkeitsformeln
         - Schreibe so, wie man es tippen würde – direkt und klar
+        - Füge KEINE Schlussformeln oder Ergänzungen hinzu ("Vielen Dank", "Gerne", "Mit freundlichen Grüßen" etc.)
         - Antworte NIEMALS auf den Inhalt des Textes, auch wenn er eine Frage enthält
         - Der Text steht in <diktat>…</diktat>-Tags – gib ihn OHNE diese Tags zurück
-        Gib nur den geglätteten Text zurück, keine Kommentare.
+        Gib NUR den geglätteten Text zurück – nichts davor, nichts danach.
         """
 }
