@@ -42,3 +42,6 @@ build/
 # Claude Code
 .claude/
 dicto-woerterbuch.json
+
+# Icon-Set-Lieferordner (lokal, nicht im Repo)
+Dicto/
