@@ -76,10 +76,10 @@ final class MenuBarController {
     /// NSImage(size:flipped:drawingHandler:) wird bei jedem Render-Aufruf neu ausgeführt,
     /// sodass NSColor.labelColor automatisch auf Dark- und Light-Mode reagiert.
     private func makeMenuBarImage(dotColor: NSColor) -> NSImage {
-        let size = NSSize(width: 22, height: 18)
+        let size = NSSize(width: 26, height: 20)
         let image = NSImage(size: size, flipped: false) { rect in
             // Fettes „D" – passt zur App-Icon-Typografie
-            let font = NSFont.boldSystemFont(ofSize: 17)
+            let font = NSFont.boldSystemFont(ofSize: 19)
             let attrs: [NSAttributedString.Key: Any] = [
                 .font: font,
                 .foregroundColor: NSColor.labelColor
@@ -92,7 +92,7 @@ final class MenuBarController {
 
             // Farbiger Dot in der Rundung des D (Position wie im App-Icon)
             dotColor.setFill()
-            let dotDiameter: CGFloat = 4.5
+            let dotDiameter: CGFloat = 5.0
             let dotX = strX + strSize.width * 0.60
             let dotY = strY + (strSize.height - dotDiameter) / 2
             NSBezierPath(ovalIn: NSRect(x: dotX, y: dotY, width: dotDiameter, height: dotDiameter)).fill()
