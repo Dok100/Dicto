@@ -22,3 +22,4 @@
 | [PROJ-18](PROJ-18-onboarding.md) | Onboarding / First-Run-Experience | Abgeschlossen |
 | [PROJ-19](PROJ-19-settings-tabs-stats.md) | Einstellungs-Tabs + Diktat-Statistiken | Abgeschlossen |
 | [PROJ-20](PROJ-20-konfigurierbarer-shortcut.md) | Konfigurierbarer Tastatur-Shortcut | Abgeschlossen |
+| [PROJ-21](PROJ-21-uebersetzung-en.md) | Deutsch → Englisch Übersetzung (→ EN Stil) | Abgeschlossen |

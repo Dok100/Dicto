@@ -79,11 +79,13 @@ final class AppState: ObservableObject {
         hotkey.onKeyDown = { [weak self] in
             self?.targetApp = NSWorkspace.shared.frontmostApplication
             self?.isRecording = true
+            if self?.settings.soundFeedbackEnabled == true { SoundFeedback.playStart() }
             audio.startRecording()
         }
         hotkey.onKeyUp = { [weak self] in
             guard let self else { return }
             self.isRecording = false
+            if settings.soundFeedbackEnabled { SoundFeedback.playStop() }
             let model = self.settings.whisperModel
             let language = self.settings.whisperLanguage
             if let url = audio.stopRecording() {
@@ -97,6 +99,7 @@ final class AppState: ObservableObject {
             self.isTransformMode = true
             self.isRecording = true
             self.isTransformRecording = true
+            if settings.soundFeedbackEnabled { SoundFeedback.playStart() }
             audio.startRecording()
             Task { @MainActor [weak self] in
                 self?.selectedTextForTransform = await paste.captureSelectedText()
@@ -106,6 +109,7 @@ final class AppState: ObservableObject {
             guard let self else { return }
             self.isRecording = false
             self.isTransformRecording = false
+            if settings.soundFeedbackEnabled { SoundFeedback.playStop() }
             let model = self.settings.whisperModel
             let language = self.settings.whisperLanguage
             if let url = audio.stopRecording() {

@@ -19,6 +19,9 @@ public final class AppSettings: ObservableObject {
     @Published public var previewEnabled: Bool {
         didSet { UserDefaults.standard.set(previewEnabled, forKey: "previewEnabled") }
     }
+    @Published public var soundFeedbackEnabled: Bool {
+        didSet { UserDefaults.standard.set(soundFeedbackEnabled, forKey: "soundFeedbackEnabled") }
+    }
     @Published public var whisperLanguage: WhisperLanguage {
         didSet { UserDefaults.standard.set(whisperLanguage.rawValue, forKey: "whisperLanguage") }
     }
@@ -44,7 +47,8 @@ public final class AppSettings: ObservableObject {
         ollamaModel      = d.string(forKey: "ollamaModel")     ?? "glm4"
         ollamaPrompt     = d.string(forKey: "ollamaPrompt")    ?? AppSettings.defaultPrompt
         whisperModel     = WhisperModel(rawValue: d.string(forKey: "whisperModel") ?? "") ?? .largev3
-        previewEnabled   = d.object(forKey: "previewEnabled")  as? Bool ?? false
+        previewEnabled        = d.object(forKey: "previewEnabled")        as? Bool ?? false
+        soundFeedbackEnabled  = d.object(forKey: "soundFeedbackEnabled") as? Bool ?? true
         whisperLanguage  = d.string(forKey: "whisperLanguage").flatMap(WhisperLanguage.init) ?? .german
         dictationShortcut = d.data(forKey: "dictationShortcut")
             .flatMap { try? JSONDecoder().decode(ShortcutConfig.self, from: $0) }

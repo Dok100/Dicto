@@ -59,6 +59,11 @@ struct GeneralSettingsView: View {
                 Text("Text im Panel bearbeiten, bevor er eingefügt wird.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+
+                Toggle("Sound-Feedback", isOn: $settings.soundFeedbackEnabled)
+                Text("Kurzes Klicken beim Start und sanftes Pop beim Stopp der Aufnahme.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             } header: {
                 Text("Verhalten")
             }

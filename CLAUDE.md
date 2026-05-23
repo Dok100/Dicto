@@ -10,7 +10,7 @@ Optional: Glättung via Ollama (glm4, http://localhost:11434).
 
 ## Aktueller Phasenstand
 
-**Stand**: PROJ-1–PROJ-16 abgeschlossen, PROJ-17 in Bearbeitung.
+**Stand**: PROJ-1–PROJ-21 abgeschlossen.
 
 | Phase | Status |
 |-------|--------|
@@ -34,6 +34,7 @@ Optional: Glättung via Ollama (glm4, http://localhost:11434).
 | PROJ-18 Onboarding / First-Run-Experience | Abgeschlossen |
 | PROJ-19 Einstellungs-Tabs + Diktat-Statistiken | Abgeschlossen |
 | PROJ-20 Konfigurierbarer Tastatur-Shortcut | Abgeschlossen |
+| PROJ-21 Deutsch → Englisch Übersetzung (→ EN Stil) | Abgeschlossen |
 
 ## Nutzer-Kontext
 
@@ -42,7 +43,7 @@ Optional: Glättung via Ollama (glm4, http://localhost:11434).
 - macOS-API-Fallstricke (CGEventTap, NSPasteboard, etc.) proaktiv erklären
 - Hardware: MacBook Pro M4, 48 GB RAM, macOS Sequoia
 - Xcode, XcodeGen, swiftformat sind installiert
-- Ollama läuft lokal mit glm4
+- Ollama läuft lokal mit qwen2.5:32b (empfohlen) und glm4
 
 ## Projekt-Konventionen
 
