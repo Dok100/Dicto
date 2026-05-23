@@ -28,57 +28,18 @@ struct PopoverRootView: View {
 
             Divider().opacity(0.4)
 
-            Group {
-                if showHistory {
-                    historyView
-                        .transition(.opacity.combined(with: .move(edge: .trailing)))
-                } else {
-                    statusArea
-                        .id(stateTag)
-                        .transition(.opacity.combined(with: .scale(scale: 0.97, anchor: .center)))
-                }
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
+            mainContent
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
 
-            if showPreviewActions {
-                Divider().opacity(0.4)
-                previewActions
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 10)
-                    .transition(.opacity.combined(with: .move(edge: .bottom)))
-            }
+            previewActionsSection
 
             Divider().opacity(0.4)
 
-            // Stil-Picker in eigener Zeile – volle Breite, kein Layout-Konflikt mit Footer
-            VStack(spacing: 4) {
-                Picker("Stil", selection: $appState.dictationStyle) {
-                    ForEach(DictationStyle.allCases, id: \.self) { style in
-                        Text(style.label).tag(style)
-                    }
-                }
-                .pickerStyle(.segmented)
-                .labelsHidden()
-                .disabled(appState.isRecording)
-
-                // Hinweis wenn Übersetzung gewählt aber Ollama deaktiviert
-                if appState.dictationStyle == .translate && !appState.settings.ollamaEnabled {
-                    HStack(spacing: 4) {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .font(.system(size: 10))
-                            .foregroundStyle(.orange)
-                        Text("Ollama muss aktiviert sein für die Übersetzung.")
-                            .font(.system(size: 10))
-                            .foregroundStyle(.orange)
-                    }
-                    .transition(.opacity.combined(with: .scale(scale: 0.95, anchor: .top)))
-                }
-            }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 8)
-            .animation(.spring(response: 0.25), value: appState.dictationStyle == .translate && !appState.settings.ollamaEnabled)
+            stylePicker
+                .padding(.horizontal, 14)
+                .padding(.vertical, 8)
 
             Divider().opacity(0.4)
 
@@ -428,6 +389,98 @@ struct PopoverRootView: View {
             }
         }
     }
+
+    // MARK: – Haupt-Inhaltsbereich (Status oder Verlauf)
+
+    @ViewBuilder
+    private var mainContent: some View {
+        if showHistory {
+            historyView
+                .transition(.opacity.combined(with: .move(edge: .trailing)))
+        } else {
+            statusArea
+                .id(stateTag)
+                .transition(.opacity.combined(with: .scale(scale: 0.97, anchor: .center)))
+        }
+    }
+
+    // MARK: – Preview-Aktionen (optional)
+
+    @ViewBuilder
+    private var previewActionsSection: some View {
+        if showPreviewActions {
+            Divider().opacity(0.4)
+            previewActions
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .transition(.opacity.combined(with: .move(edge: .bottom)))
+        }
+    }
+
+    // MARK: – Stil-Picker (feste + eigene Stile)
+
+    private var stylePicker: some View {
+        VStack(spacing: 6) {
+            Picker("Stil", selection: Binding(
+                get: { appState.dictationStyle },
+                set: { appState.selectFixedStyle($0) }
+            )) {
+                ForEach(DictationStyle.allCases, id: \.self) { style in
+                    Text(style.label).tag(style)
+                }
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .disabled(appState.isRecording)
+
+            if !appState.settings.customStyles.isEmpty {
+                customStylesRow
+            }
+
+            if appState.dictationStyle == .translate
+                && appState.selectedCustomStyle == nil
+                && !appState.settings.ollamaEnabled {
+                ollamaWarning("Ollama muss aktiviert sein für die Übersetzung.")
+            }
+            if appState.selectedCustomStyle != nil && !appState.settings.ollamaEnabled {
+                ollamaWarning("Ollama muss aktiviert sein für eigene Stile.")
+            }
+        }
+        .animation(.spring(response: 0.25), value: appState.settings.customStyles.count)
+        .animation(.spring(response: 0.25), value: appState.selectedCustomStyle?.id)
+    }
+
+    private var customStylesRow: some View {
+        VStack(spacing: 4) {
+            Divider().opacity(0.3)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 6) {
+                    ForEach(appState.settings.customStyles) { style in
+                        Button(style.name) { appState.selectCustomStyle(style) }
+                            .buttonStyle(CustomStyleChipStyle(
+                                isSelected: appState.selectedCustomStyle?.id == style.id
+                            ))
+                            .disabled(appState.isRecording)
+                    }
+                }
+                .padding(.horizontal, 1)
+            }
+        }
+        .transition(.opacity.combined(with: .move(edge: .bottom)))
+    }
+
+    @ViewBuilder
+    private func ollamaWarning(_ text: String) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 10))
+                .foregroundStyle(.orange)
+            Text(text)
+                .font(.system(size: 10))
+                .foregroundStyle(.orange)
+        }
+        .transition(.opacity.combined(with: .scale(scale: 0.95, anchor: .top)))
+    }
 }
 
 // MARK: – Level B: Pulsierende Aufnahme-Ringe
@@ -544,5 +597,23 @@ private struct PermissionHint: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+// MARK: – Custom-Stil-Chip-ButtonStyle
+
+struct CustomStyleChipStyle: ButtonStyle {
+    let isSelected: Bool
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(size: 11, weight: .medium))
+            .padding(.horizontal, 9)
+            .padding(.vertical, 4)
+            .background(isSelected ? Color.accentColor : Color.secondary.opacity(0.15))
+            .foregroundStyle(isSelected ? Color.white : Color.primary)
+            .clipShape(RoundedRectangle(cornerRadius: 5))
+            .opacity(configuration.isPressed ? 0.7 : 1.0)
+            .animation(.easeOut(duration: 0.12), value: isSelected)
     }
 }

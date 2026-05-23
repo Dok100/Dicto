@@ -25,6 +25,13 @@ public final class AppSettings: ObservableObject {
     @Published public var whisperLanguage: WhisperLanguage {
         didSet { UserDefaults.standard.set(whisperLanguage.rawValue, forKey: "whisperLanguage") }
     }
+    @Published public var customStyles: [CustomStyle] {
+        didSet {
+            if let d = try? JSONEncoder().encode(customStyles) {
+                UserDefaults.standard.set(d, forKey: "customStyles")
+            }
+        }
+    }
     @Published public var dictationShortcut: ShortcutConfig {
         didSet {
             if let d = try? JSONEncoder().encode(dictationShortcut) {
@@ -49,6 +56,9 @@ public final class AppSettings: ObservableObject {
         whisperModel     = WhisperModel(rawValue: d.string(forKey: "whisperModel") ?? "") ?? .largev3
         previewEnabled        = d.object(forKey: "previewEnabled")        as? Bool ?? false
         soundFeedbackEnabled  = d.object(forKey: "soundFeedbackEnabled") as? Bool ?? true
+        customStyles          = d.data(forKey: "customStyles")
+            .flatMap { try? JSONDecoder().decode([CustomStyle].self, from: $0) }
+            ?? []
         whisperLanguage  = d.string(forKey: "whisperLanguage").flatMap(WhisperLanguage.init) ?? .german
         dictationShortcut = d.data(forKey: "dictationShortcut")
             .flatMap { try? JSONDecoder().decode(ShortcutConfig.self, from: $0) }

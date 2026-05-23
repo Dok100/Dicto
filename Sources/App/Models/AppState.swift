@@ -27,6 +27,20 @@ final class AppState: ObservableObject {
         didSet { UserDefaults.standard.set(dictationStyle.rawValue, forKey: "dictationStyle") }
     }
 
+    /// Aktiver eigener Stil – überschreibt `dictationStyle` wenn gesetzt.
+    @Published private(set) var selectedCustomStyle: CustomStyle?
+
+    /// Fixen Stil wählen und eigenen Stil abwählen.
+    func selectFixedStyle(_ style: DictationStyle) {
+        dictationStyle = style
+        selectedCustomStyle = nil
+    }
+
+    /// Eigenen Stil wählen.
+    func selectCustomStyle(_ style: CustomStyle) {
+        selectedCustomStyle = style
+    }
+
     let hotkeyService: HotkeyService
     let audioService: AudioService
     let whisperService: WhisperService
@@ -151,8 +165,14 @@ final class AppState: ObservableObject {
             return
         }
 
-        let effectivePrompt = dictationStyle.systemPrompt ?? settings.ollamaPrompt
-        let processor: any TextPostProcessor = settings.ollamaEnabled
+        let effectivePrompt: String
+        if let custom = selectedCustomStyle {
+            effectivePrompt = custom.prompt
+        } else {
+            effectivePrompt = dictationStyle.systemPrompt ?? settings.ollamaPrompt
+        }
+        let useOllama = settings.ollamaEnabled || selectedCustomStyle != nil
+        let processor: any TextPostProcessor = useOllama
             ? OllamaPostProcessor(baseURL: settings.ollamaBaseURL, model: settings.ollamaModel, systemPrompt: effectivePrompt)
             : PassthroughPostProcessor()
 
@@ -177,7 +197,8 @@ final class AppState: ObservableObject {
         }
 
         historyService.add(text: processed)
-        statsService.record(text: processed, style: dictationStyle.rawValue, isTransform: false)
+        let styleName = selectedCustomStyle?.name ?? dictationStyle.rawValue
+        statsService.record(text: processed, style: styleName, isTransform: false)
         transcriptionState = .done(processed)
     }
 
