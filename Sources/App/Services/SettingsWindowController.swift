@@ -94,7 +94,12 @@ final class SettingsWindowController: NSWindowController, NSToolbarDelegate {
         guard let tab = SettingsTab(rawValue: item.itemIdentifier.rawValue),
               tab != currentTab else { return }
         currentTab = tab
+
+        // Aktuelle Größe merken – NSHostingController meldet beim ersten Rendern (0,0)
+        // und würde das Fenster beim ViewController-Wechsel auf winzig schrumpfen.
+        let size = window?.contentView?.frame.size ?? NSSize(width: 500, height: 520)
         window?.contentViewController = viewController(for: tab)
+        window?.setContentSize(size)
     }
 
     private func viewController(for tab: SettingsTab) -> NSViewController {
