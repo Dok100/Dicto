@@ -34,6 +34,7 @@ final class AppState: ObservableObject {
     let settings = AppSettings()
     let dictionaryService = DictionaryService()
     let historyService = HistoryService()
+    let statsService = StatsService()
 
     var onOpenSettings: (() -> Void)?
 
@@ -159,6 +160,7 @@ final class AppState: ObservableObject {
         }
 
         historyService.add(text: processed)
+        statsService.record(text: processed, style: dictationStyle.rawValue, isTransform: false)
         transcriptionState = .done(processed)
     }
 
@@ -180,6 +182,7 @@ final class AppState: ObservableObject {
         }
 
         // Transform zeigt immer Vorschau – Auto-Einfügen ergibt im Transform-Modus keinen Sinn
+        statsService.record(text: result, style: dictationStyle.rawValue, isTransform: true)
         isTransformResult = true
         transcriptionState = .done(result)
     }

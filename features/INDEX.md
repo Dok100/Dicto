@@ -20,3 +20,4 @@
 | [PROJ-16](PROJ-16-woerterbuch-export-import.md) | Wörterbuch Export/Import | Abgeschlossen |
 | [PROJ-17](PROJ-17-ui-polishing.md) | UI-Polishing (Frosted Glass, Animationen, Icons) | Abgeschlossen |
 | [PROJ-18](PROJ-18-onboarding.md) | Onboarding / First-Run-Experience | Abgeschlossen |
+| [PROJ-19](PROJ-19-settings-tabs-stats.md) | Einstellungs-Tabs + Diktat-Statistiken | Abgeschlossen |
