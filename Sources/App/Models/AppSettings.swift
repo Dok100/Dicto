@@ -54,7 +54,7 @@ public final class AppSettings: ObservableObject {
         let d = UserDefaults.standard
         ollamaEnabled    = d.object(forKey: "ollamaEnabled")   as? Bool ?? true
         ollamaBaseURL    = d.string(forKey: "ollamaBaseURL")   ?? "http://localhost:11434"
-        ollamaModel      = d.string(forKey: "ollamaModel")     ?? "glm4"
+        ollamaModel      = d.string(forKey: "ollamaModel")     ?? "qwen2.5:32b"
         ollamaPrompt     = d.string(forKey: "ollamaPrompt")    ?? AppSettings.defaultPrompt
         transcriptionEngine = TranscriptionEngine(rawValue: d.string(forKey: "transcriptionEngine") ?? "") ?? .whisper
         whisperModel     = WhisperModel(rawValue: d.string(forKey: "whisperModel") ?? "") ?? .largev3

@@ -6,7 +6,7 @@ Persistenter Kontext für Claude Code über Sessions hinweg.
 
 Native macOS-Menübar-App für Push-to-Talk-Diktat, vollständig lokal auf Apple Silicon.
 Fn-Taste → Aufnahme → WhisperKit-Transkription → Text an Cursor-Position einfügen.
-Optional: Glättung via Ollama (glm4, http://localhost:11434).
+Optional: Glättung via Ollama (qwen2.5:32b, http://localhost:11434).
 
 ## Aktueller Phasenstand
 
