@@ -206,7 +206,8 @@ final class AppState: ObservableObject {
         historyService.add(text: processed)
         let styleName = selectedCustomStyle?.name ?? dictationStyle.rawValue
         statsService.record(text: processed, style: styleName, isTransform: false)
-        transcriptionState = .done(processed)
+        // Kein Preview gewünscht → direkt idle, Panel zeigt kein Ergebnis
+        transcriptionState = .idle
     }
 
     @MainActor
