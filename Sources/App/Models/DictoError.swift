@@ -18,6 +18,7 @@ enum DictoError: Error {
 
     // OpenAI
     case openAIKeyMissing
+    case openAIAuthFailed
     case openAINotReachable
     case openAITimeout
     case openAIUnknown
@@ -34,6 +35,7 @@ enum DictoError: Error {
         case .ollamaEmptyResponse:   return "Leere Antwort von Ollama"
         case .ollamaUnknown:         return "Ollama-Fehler"
         case .openAIKeyMissing:      return "Kein API-Key"
+        case .openAIAuthFailed:      return "API-Key ungültig"
         case .openAINotReachable:    return "OpenAI nicht erreichbar"
         case .openAITimeout:         return "OpenAI antwortet nicht"
         case .openAIUnknown:         return "OpenAI-Fehler"
@@ -61,6 +63,8 @@ enum DictoError: Error {
             return "Ein unbekannter Fehler ist bei der KI-Verarbeitung aufgetreten. Bitte versuche es erneut."
         case .openAIKeyMissing:
             return "Bitte trage deinen OpenAI API-Key unter Einstellungen → KI ein."
+        case .openAIAuthFailed:
+            return "Der API-Key wurde abgelehnt (401). Prüfe ob der Key unter Einstellungen → KI korrekt eingetragen ist."
         case .openAINotReachable:
             return "Die OpenAI API ist nicht erreichbar. Prüfe deine Internetverbindung oder den konfigurierten Basis-URL."
         case .openAITimeout:

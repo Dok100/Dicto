@@ -34,8 +34,12 @@ final class OpenAITransformProcessor {
             Task {
                 do {
                     let (asyncBytes, response) = try await URLSession.shared.bytes(for: request)
-                    if let http = response as? HTTPURLResponse, http.statusCode != 200 {
-                        throw DictoError.openAINotReachable
+                    if let http = response as? HTTPURLResponse {
+                        switch http.statusCode {
+                        case 200: break
+                        case 401, 403: throw DictoError.openAIAuthFailed
+                        default: throw DictoError.openAINotReachable
+                        }
                     }
                     for try await line in asyncBytes.lines {
                         guard line.hasPrefix("data: ") else { continue }
