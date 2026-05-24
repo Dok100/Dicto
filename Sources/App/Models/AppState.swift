@@ -233,13 +233,23 @@ final class AppState: ObservableObject {
 
         let raw: String
         if useOllama {
-            let processor: OllamaPostProcessor
+            let stream: AsyncThrowingStream<String, Error>
             do {
-                processor = try OllamaPostProcessor(
-                    baseURL: settings.ollamaBaseURL,
-                    model: settings.ollamaModel,
-                    systemPrompt: effectivePrompt
-                )
+                switch settings.llmProvider {
+                case .ollama:
+                    stream = try OllamaPostProcessor(
+                        baseURL: settings.ollamaBaseURL,
+                        model: settings.ollamaModel,
+                        systemPrompt: effectivePrompt
+                    ).streamProcess(text: text)
+                case .openAI:
+                    stream = try OpenAIPostProcessor(
+                        baseURL: settings.openAIBaseURL,
+                        apiKey: settings.openAIApiKey,
+                        model: settings.openAIModel,
+                        systemPrompt: effectivePrompt
+                    ).streamProcess(text: text)
+                }
             } catch let e as DictoError {
                 transcriptionState = .error(e.displayMessage)
                 return
@@ -250,7 +260,7 @@ final class AppState: ObservableObject {
             transcriptionState = .streaming("")
             var accumulated = ""
             do {
-                for try await chunk in processor.streamProcess(text: text) {
+                for try await chunk in stream {
                     accumulated += chunk
                     transcriptionState = .streaming(accumulated)
                 }
@@ -298,12 +308,21 @@ final class AppState: ObservableObject {
 
         let result: String
         if settings.ollamaEnabled, !original.isEmpty {
-            let processor: OllamaTransformProcessor
+            let stream: AsyncThrowingStream<String, Error>
             do {
-                processor = try OllamaTransformProcessor(
-                    baseURL: settings.ollamaBaseURL,
-                    model: settings.ollamaModel
-                )
+                switch settings.llmProvider {
+                case .ollama:
+                    stream = try OllamaTransformProcessor(
+                        baseURL: settings.ollamaBaseURL,
+                        model: settings.ollamaModel
+                    ).streamProcess(original: original, command: command)
+                case .openAI:
+                    stream = try OpenAITransformProcessor(
+                        baseURL: settings.openAIBaseURL,
+                        apiKey: settings.openAIApiKey,
+                        model: settings.openAIModel
+                    ).streamProcess(original: original, command: command)
+                }
             } catch let e as DictoError {
                 transcriptionState = .error(e.displayMessage)
                 return
@@ -314,7 +333,7 @@ final class AppState: ObservableObject {
             transcriptionState = .streaming("")
             var accumulated = ""
             do {
-                for try await chunk in processor.streamProcess(original: original, command: command) {
+                for try await chunk in stream {
                     accumulated += chunk
                     transcriptionState = .streaming(accumulated)
                 }

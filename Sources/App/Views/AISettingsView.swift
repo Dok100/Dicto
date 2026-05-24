@@ -7,61 +7,44 @@ struct AISettingsView: View {
     @State private var loadingModels = false
     @State private var editingStyle: CustomStyle? = nil
 
+    // API-Key wird in @State gehalten (Keychain-backed Property ist nicht @Published)
+    @State private var openAIApiKey: String = ""
+    @State private var showApiKey: Bool = false
+
     var body: some View {
         Form {
             // ── Sektion 1: KI-Verarbeitung ────────────────────────────────────
             Section {
                 HStack {
-                    Toggle("Textglättung via Ollama", isOn: $settings.ollamaEnabled)
+                    Toggle("Textglättung via KI", isOn: $settings.ollamaEnabled)
                     if settings.ollamaEnabled {
                         Spacer()
-                        ollamaStatusDot
+                        llmStatusDot
                     }
                 }
-                .task(id: settings.ollamaEnabled) {
+                .task(id: "\(settings.ollamaEnabled)-\(settings.llmProvider)") {
                     guard settings.ollamaEnabled else { ollamaReachable = nil; return }
-                    await checkOllama()
+                    if settings.llmProvider == .ollama { await checkOllama() }
+                    else { ollamaReachable = nil }
                 }
 
                 if settings.ollamaEnabled {
-                    LabeledContent("Modell") {
-                        if availableModels.isEmpty {
-                            HStack(spacing: 6) {
-                                TextField("glm4", text: $settings.ollamaModel)
-                                    .textFieldStyle(.roundedBorder)
-                                if loadingModels {
-                                    ProgressView().scaleEffect(0.6).frame(width: 14, height: 14)
-                                }
-                            }
-                        } else {
-                            Picker("", selection: $settings.ollamaModel) {
-                                ForEach(availableModels, id: \.self) { model in
-                                    Text(model).tag(model)
-                                }
-                                // Manuell eingetipptes Modell das nicht in der Liste ist
-                                if !availableModels.contains(settings.ollamaModel) {
-                                    Text(settings.ollamaModel + " (manuell)").tag(settings.ollamaModel)
-                                }
-                            }
-                            .labelsHidden()
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                        }
-                    }
-                    .task(id: settings.ollamaBaseURL) {
-                        await fetchModels()
-                    }
-                    VStack(alignment: .leading, spacing: 4) {
-                        LabeledContent("Endpoint") {
-                            TextField("http://localhost:11434", text: $settings.ollamaBaseURL)
-                                .textFieldStyle(.roundedBorder)
-                        }
-                        if !isValidBaseURL {
-                            Label("Ungültige URL – bitte http:// oder https:// verwenden.", systemImage: "exclamationmark.triangle.fill")
-                                .font(.caption)
-                                .foregroundStyle(.orange)
+                    // ── Anbieter-Picker ───────────────────────────────────────
+                    Picker("Anbieter", selection: $settings.llmProvider) {
+                        ForEach(LLMProvider.allCases, id: \.self) { provider in
+                            Text(provider.label).tag(provider)
                         }
                     }
 
+                    // ── Anbieter-spezifische Einstellungen ────────────────────
+                    switch settings.llmProvider {
+                    case .ollama:
+                        ollamaSettings
+                    case .openAI:
+                        openAISettings
+                    }
+
+                    // ── System-Prompt (geteilt) ───────────────────────────────
                     VStack(alignment: .leading, spacing: 6) {
                         Text("System-Prompt (Neutral)")
                             .font(.subheadline)
@@ -130,11 +113,14 @@ struct AISettingsView: View {
             } header: {
                 Text("Eigene Stile")
             } footer: {
-                Text("Eigene Stile erscheinen im Panel unterhalb der festen Stile und verwenden immer Ollama.")
+                Text("Eigene Stile erscheinen im Panel unterhalb der festen Stile und verwenden immer den konfigurierten KI-Anbieter.")
             }
         }
         .formStyle(.grouped)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onAppear {
+            openAIApiKey = settings.openAIApiKey
+        }
         .sheet(item: $editingStyle) { style in
             CustomStyleEditView(style: style) { saved in
                 if let idx = settings.customStyles.firstIndex(where: { $0.id == saved.id }) {
@@ -149,10 +135,104 @@ struct AISettingsView: View {
         }
     }
 
+    // MARK: – Ollama-Einstellungen
+
+    @ViewBuilder
+    private var ollamaSettings: some View {
+        LabeledContent("Modell") {
+            if availableModels.isEmpty {
+                HStack(spacing: 6) {
+                    TextField("glm4", text: $settings.ollamaModel)
+                        .textFieldStyle(.roundedBorder)
+                    if loadingModels {
+                        ProgressView().scaleEffect(0.6).frame(width: 14, height: 14)
+                    }
+                }
+            } else {
+                Picker("", selection: $settings.ollamaModel) {
+                    ForEach(availableModels, id: \.self) { model in
+                        Text(model).tag(model)
+                    }
+                    if !availableModels.contains(settings.ollamaModel) {
+                        Text(settings.ollamaModel + " (manuell)").tag(settings.ollamaModel)
+                    }
+                }
+                .labelsHidden()
+                .frame(maxWidth: .infinity, alignment: .trailing)
+            }
+        }
+        .task(id: settings.ollamaBaseURL) {
+            await fetchModels()
+        }
+        VStack(alignment: .leading, spacing: 4) {
+            LabeledContent("Endpoint") {
+                TextField("http://localhost:11434", text: $settings.ollamaBaseURL)
+                    .textFieldStyle(.roundedBorder)
+            }
+            if !isValidOllamaURL {
+                Label("Ungültige URL – bitte http:// oder https:// verwenden.", systemImage: "exclamationmark.triangle.fill")
+                    .font(.caption)
+                    .foregroundStyle(.orange)
+            }
+        }
+    }
+
+    // MARK: – OpenAI-Einstellungen
+
+    @ViewBuilder
+    private var openAISettings: some View {
+        LabeledContent("API-Key") {
+            HStack(spacing: 6) {
+                if showApiKey {
+                    TextField("sk-…", text: $openAIApiKey)
+                        .textFieldStyle(.roundedBorder)
+                } else {
+                    SecureField("sk-…", text: $openAIApiKey)
+                        .textFieldStyle(.roundedBorder)
+                }
+                Button {
+                    showApiKey.toggle()
+                } label: {
+                    Image(systemName: showApiKey ? "eye.slash" : "eye")
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+                .help(showApiKey ? "API-Key verbergen" : "API-Key anzeigen")
+            }
+            .onChange(of: openAIApiKey) { _, new in
+                settings.openAIApiKey = new   // sofort in Keychain schreiben
+            }
+        }
+        LabeledContent("Modell") {
+            TextField("gpt-4o-mini", text: $settings.openAIModel)
+                .textFieldStyle(.roundedBorder)
+        }
+        VStack(alignment: .leading, spacing: 4) {
+            LabeledContent("Basis-URL") {
+                TextField("https://api.openai.com/v1", text: $settings.openAIBaseURL)
+                    .textFieldStyle(.roundedBorder)
+            }
+            Text("Kompatibel mit OpenAI-Proxies, Groq, LM Studio u.a.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            if !isValidOpenAIURL {
+                Label("Ungültige URL – bitte http:// oder https:// verwenden.", systemImage: "exclamationmark.triangle.fill")
+                    .font(.caption)
+                    .foregroundStyle(.orange)
+            }
+        }
+    }
+
     // MARK: – Hilfsmethoden
 
-    private var isValidBaseURL: Bool {
+    private var isValidOllamaURL: Bool {
         guard let url = URL(string: settings.ollamaBaseURL),
+              let scheme = url.scheme else { return false }
+        return scheme == "http" || scheme == "https"
+    }
+
+    private var isValidOpenAIURL: Bool {
+        guard let url = URL(string: settings.openAIBaseURL),
               let scheme = url.scheme else { return false }
         return scheme == "http" || scheme == "https"
     }
@@ -161,28 +241,31 @@ struct AISettingsView: View {
         settings.customStyles.removeAll { $0.id == style.id }
     }
 
-    // MARK: – Ollama-Status-Dot
+    // MARK: – Status-Dot
 
     @ViewBuilder
-    private var ollamaStatusDot: some View {
-        switch ollamaReachable {
-        case .none:
-            ProgressView().scaleEffect(0.5).frame(width: 14, height: 14)
-        case .some(true):
-            Image(systemName: "circle.fill")
-                .foregroundStyle(.green)
-                .font(.caption)
-                .help("Ollama erreichbar")
-        case .some(false):
-            Image(systemName: "circle.fill")
-                .foregroundStyle(.red)
-                .font(.caption)
-                .help("Ollama nicht erreichbar – läuft der Server?")
+    private var llmStatusDot: some View {
+        // Nur bei Ollama zeigen wir einen Erreichbarkeits-Indikator
+        if settings.llmProvider == .ollama {
+            switch ollamaReachable {
+            case .none:
+                ProgressView().scaleEffect(0.5).frame(width: 14, height: 14)
+            case .some(true):
+                Image(systemName: "circle.fill")
+                    .foregroundStyle(.green)
+                    .font(.caption)
+                    .help("Ollama erreichbar")
+            case .some(false):
+                Image(systemName: "circle.fill")
+                    .foregroundStyle(.red)
+                    .font(.caption)
+                    .help("Ollama nicht erreichbar – läuft der Server?")
+            }
         }
     }
 
     private func fetchModels() async {
-        guard isValidBaseURL,
+        guard isValidOllamaURL,
               let url = URL(string: "\(settings.ollamaBaseURL)/api/tags") else { return }
         loadingModels = true
         defer { loadingModels = false }
@@ -193,7 +276,6 @@ struct AISettingsView: View {
             let response = try JSONDecoder().decode(OllamaTagsResponse.self, from: data)
             let names = response.models.map { $0.name }.sorted()
             availableModels = names
-            // Aktuelles Modell auf erstes setzen wenn es nicht in der Liste ist
             if !names.isEmpty && !names.contains(settings.ollamaModel) {
                 settings.ollamaModel = names[0]
             }

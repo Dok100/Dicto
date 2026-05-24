@@ -31,3 +31,4 @@
 | [PROJ-27](PROJ-27-escape-taste.md) | Escape-Taste zum Schließen des Panels | Abgeschlossen |
 | [PROJ-28](PROJ-28-ollama-streaming.md) | Ollama Streaming + Large v3 Turbo | Abgeschlossen |
 | [PROJ-29](PROJ-29-apple-speech.md) | Apple Speech Engine (live, kein Download) | Abgeschlossen |
+| [PROJ-30](PROJ-30-openai-api.md) | OpenAI API als LLM-Alternative (Keychain-sicher) | Abgeschlossen |

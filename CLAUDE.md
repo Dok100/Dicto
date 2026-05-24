@@ -10,7 +10,7 @@ Optional: Glättung via Ollama (qwen2.5:32b, http://localhost:11434).
 
 ## Aktueller Phasenstand
 
-**Stand**: PROJ-1–PROJ-23, PROJ-26–PROJ-29 abgeschlossen.
+**Stand**: PROJ-1–PROJ-23, PROJ-26–PROJ-30 abgeschlossen.
 
 | Phase | Status |
 |-------|--------|
@@ -41,6 +41,7 @@ Optional: Glättung via Ollama (qwen2.5:32b, http://localhost:11434).
 | PROJ-27 Escape-Taste zum Schließen des Panels | Abgeschlossen |
 | PROJ-28 Ollama Streaming + Whisper Large v3 Turbo | Abgeschlossen |
 | PROJ-29 Apple Speech Engine (live, kein Download) | Abgeschlossen |
+| PROJ-30 OpenAI API als LLM-Alternative (Keychain-sicher) | Abgeschlossen |
 
 ## Nutzer-Kontext
 

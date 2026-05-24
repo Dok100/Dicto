@@ -49,6 +49,20 @@ public final class AppSettings: ObservableObject {
             }
         }
     }
+    @Published public var llmProvider: LLMProvider {
+        didSet { UserDefaults.standard.set(llmProvider.rawValue, forKey: "llmProvider") }
+    }
+    @Published public var openAIModel: String {
+        didSet { UserDefaults.standard.set(openAIModel, forKey: "openAIModel") }
+    }
+    @Published public var openAIBaseURL: String {
+        didSet { UserDefaults.standard.set(openAIBaseURL, forKey: "openAIBaseURL") }
+    }
+    /// API-Key wird im macOS Keychain gespeichert – nicht in UserDefaults.
+    public var openAIApiKey: String {
+        get { KeychainService.shared.load(forKey: "openAIApiKey") ?? "" }
+        set { KeychainService.shared.save(newValue, forKey: "openAIApiKey") }
+    }
 
     public init() {
         let d = UserDefaults.standard
@@ -70,6 +84,9 @@ public final class AppSettings: ObservableObject {
         transformShortcut = d.data(forKey: "transformShortcut")
             .flatMap { try? JSONDecoder().decode(ShortcutConfig.self, from: $0) }
             ?? .defaultTransform
+        llmProvider  = LLMProvider(rawValue: d.string(forKey: "llmProvider") ?? "") ?? .ollama
+        openAIModel  = d.string(forKey: "openAIModel")   ?? "gpt-4o-mini"
+        openAIBaseURL = d.string(forKey: "openAIBaseURL") ?? "https://api.openai.com/v1"
     }
 
     static let defaultPrompt = """
