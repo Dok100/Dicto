@@ -48,9 +48,9 @@ final class MenuBarController {
 
         // Status-Dot aktualisieren wenn sich Zustand ändert
         appState.$transcriptionState
-            .combineLatest(appState.$isRecording, appState.$hasMicrophonePermission, appState.$isTransformMode)
+            .combineLatest(appState.$isRecording, appState.$isTransformRecording)
             .receive(on: RunLoop.main)
-            .sink { [weak self, weak appState] _, _, _, _ in
+            .sink { [weak self, weak appState] _, _, _ in
                 guard let self, let appState else { return }
                 self.updateStatusDot(appState: appState)
             }
@@ -64,23 +64,27 @@ final class MenuBarController {
     private func updateStatusDot(appState: AppState) {
         guard let button = statusItem.button else { return }
 
-        let imageName: String
-        if appState.isRecording || appState.isTransformMode {
-            // Aufnahme (Diktat oder Transform): Recording-Icon
-            imageName = "MenuBar-recording"
+        let symbolName: String
+        if appState.isRecording {
+            // Aufnahme läuft: ausgefülltes Mikrofon
+            symbolName = appState.isTransformRecording ? "wand.and.sparkles" : "mic.fill"
         } else if case .loadingModel = appState.transcriptionState {
-            imageName = "MenuBar-transcribing"
+            // Modell wird geladen: Wellenform
+            symbolName = "waveform"
         } else if case .transcribing = appState.transcriptionState {
-            imageName = "MenuBar-transcribing"
+            // Transkription läuft: Wellenform
+            symbolName = "waveform"
+        } else if case .error = appState.transcriptionState {
+            symbolName = "exclamationmark.circle"
         } else {
-            // Idle, Fehler, Done – alles ohne aktive Verarbeitung
-            imageName = "MenuBar-idle"
+            // Idle / Done: normales Mikrofon
+            symbolName = "mic"
         }
 
-        if let image = NSImage(named: imageName) {
-            image.isTemplate = true   // macOS töngt für Dark/Light-Mode
-            button.image = image
-        }
+        let config = NSImage.SymbolConfiguration(pointSize: 14, weight: .medium)
+        button.image = NSImage(systemSymbolName: symbolName, accessibilityDescription: nil)?
+            .withSymbolConfiguration(config)
+        button.image?.isTemplate = true   // macOS töngt für Dark/Light-Mode
         button.title = ""
     }
 
