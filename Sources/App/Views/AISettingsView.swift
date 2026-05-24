@@ -3,6 +3,8 @@ import SwiftUI
 struct AISettingsView: View {
     @ObservedObject var settings: AppSettings
     @State private var ollamaReachable: Bool? = nil
+    @State private var availableModels: [String] = []
+    @State private var loadingModels = false
     @State private var editingStyle: CustomStyle? = nil
 
     var body: some View {
@@ -23,8 +25,30 @@ struct AISettingsView: View {
 
                 if settings.ollamaEnabled {
                     LabeledContent("Modell") {
-                        TextField("glm4", text: $settings.ollamaModel)
-                            .textFieldStyle(.roundedBorder)
+                        if availableModels.isEmpty {
+                            HStack(spacing: 6) {
+                                TextField("glm4", text: $settings.ollamaModel)
+                                    .textFieldStyle(.roundedBorder)
+                                if loadingModels {
+                                    ProgressView().scaleEffect(0.6).frame(width: 14, height: 14)
+                                }
+                            }
+                        } else {
+                            Picker("", selection: $settings.ollamaModel) {
+                                ForEach(availableModels, id: \.self) { model in
+                                    Text(model).tag(model)
+                                }
+                                // Manuell eingetipptes Modell das nicht in der Liste ist
+                                if !availableModels.contains(settings.ollamaModel) {
+                                    Text(settings.ollamaModel + " (manuell)").tag(settings.ollamaModel)
+                                }
+                            }
+                            .labelsHidden()
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                        }
+                    }
+                    .task(id: settings.ollamaBaseURL) {
+                        await fetchModels()
                     }
                     VStack(alignment: .leading, spacing: 4) {
                         LabeledContent("Endpoint") {
@@ -157,6 +181,27 @@ struct AISettingsView: View {
         }
     }
 
+    private func fetchModels() async {
+        guard isValidBaseURL,
+              let url = URL(string: "\(settings.ollamaBaseURL)/api/tags") else { return }
+        loadingModels = true
+        defer { loadingModels = false }
+        do {
+            let (data, _) = try await URLSession.shared.data(
+                for: URLRequest(url: url, timeoutInterval: 4)
+            )
+            let response = try JSONDecoder().decode(OllamaTagsResponse.self, from: data)
+            let names = response.models.map { $0.name }.sorted()
+            availableModels = names
+            // Aktuelles Modell auf erstes setzen wenn es nicht in der Liste ist
+            if !names.isEmpty && !names.contains(settings.ollamaModel) {
+                settings.ollamaModel = names[0]
+            }
+        } catch {
+            availableModels = []
+        }
+    }
+
     private func checkOllama() async {
         ollamaReachable = nil
         guard let url = URL(string: settings.ollamaBaseURL) else { ollamaReachable = false; return }
@@ -169,6 +214,13 @@ struct AISettingsView: View {
             ollamaReachable = false
         }
     }
+}
+
+// MARK: – Ollama /api/tags Response
+
+private struct OllamaTagsResponse: Decodable {
+    struct Model: Decodable { let name: String }
+    let models: [Model]
 }
 
 // MARK: – Edit-Sheet

@@ -23,7 +23,7 @@
 | [PROJ-19](PROJ-19-settings-tabs-stats.md) | Einstellungs-Tabs + Diktat-Statistiken | Abgeschlossen |
 | [PROJ-20](PROJ-20-konfigurierbarer-shortcut.md) | Konfigurierbarer Tastatur-Shortcut | Abgeschlossen |
 | [PROJ-21](PROJ-21-uebersetzung-en.md) | Deutsch → Englisch Übersetzung (→ EN Stil) | Abgeschlossen |
-| PROJ-22 | (reserviert) | – |
+| [PROJ-22](PROJ-22-ollama-modellauswahl.md) | Ollama Modellauswahl (Dropdown aus /api/tags) | Abgeschlossen |
 | [PROJ-23](PROJ-23-sound-feedback.md) | Sound-Feedback bei Aufnahme Start/Stop | Abgeschlossen |
 | PROJ-24 | (reserviert) | – |
 | PROJ-25 | (reserviert) | – |
