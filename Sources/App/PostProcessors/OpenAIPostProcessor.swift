@@ -9,7 +9,9 @@ final class OpenAIPostProcessor {
     private let systemPrompt: String
 
     init(baseURL: String, apiKey: String, model: String, systemPrompt: String) throws {
-        guard !apiKey.trimmingCharacters(in: .whitespaces).isEmpty else {
+        // Whitespace + Zeilenumbrüche entfernen (1Password & Co. kopieren manchmal \n mit)
+        let trimmedKey = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedKey.isEmpty else {
             throw DictoError.openAIKeyMissing
         }
         guard let url = URL(string: "\(baseURL)/chat/completions"),
@@ -17,7 +19,7 @@ final class OpenAIPostProcessor {
             throw DictoError.openAINotReachable
         }
         self.url = url
-        self.apiKey = apiKey
+        self.apiKey = trimmedKey
         self.model = model
         self.systemPrompt = systemPrompt
     }

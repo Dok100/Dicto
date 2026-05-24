@@ -59,9 +59,10 @@ public final class AppSettings: ObservableObject {
         didSet { UserDefaults.standard.set(openAIBaseURL, forKey: "openAIBaseURL") }
     }
     /// API-Key wird im macOS Keychain gespeichert – nicht in UserDefaults.
+    /// Beim Schreiben werden Whitespace und Zeilenumbrüche automatisch entfernt.
     public var openAIApiKey: String {
         get { KeychainService.shared.load(forKey: "openAIApiKey") ?? "" }
-        set { KeychainService.shared.save(newValue, forKey: "openAIApiKey") }
+        set { KeychainService.shared.save(newValue.trimmingCharacters(in: .whitespacesAndNewlines), forKey: "openAIApiKey") }
     }
 
     public init() {

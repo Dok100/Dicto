@@ -15,7 +15,8 @@ final class OpenAITransformProcessor {
         """
 
     init(baseURL: String, apiKey: String, model: String) throws {
-        guard !apiKey.trimmingCharacters(in: .whitespaces).isEmpty else {
+        let trimmedKey = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedKey.isEmpty else {
             throw DictoError.openAIKeyMissing
         }
         guard let url = URL(string: "\(baseURL)/chat/completions"),
@@ -23,7 +24,7 @@ final class OpenAITransformProcessor {
             throw DictoError.openAINotReachable
         }
         self.url = url
-        self.apiKey = apiKey
+        self.apiKey = trimmedKey
         self.model = model
     }
 
