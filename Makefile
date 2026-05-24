@@ -47,12 +47,15 @@ install-app: build
 	@BUILD_DIR=$$(xcodebuild -scheme $(SCHEME) -destination '$(DESTINATION)' \
 		-showBuildSettings 2>/dev/null | grep ' BUILT_PRODUCTS_DIR' | head -1 | awk '{print $$3}'); \
 	if [ -z "$$BUILD_DIR" ]; then echo "✗ Build-Verzeichnis nicht gefunden."; exit 1; fi; \
+	pkill -f "/Applications/Dicto.app" 2>/dev/null; sleep 1; \
 	if [ -d "/Applications/Dicto.app" ]; then \
-		echo "→ Alte Version wird ersetzt..."; \
-		rm -rf "/Applications/Dicto.app"; \
+		echo "→ Inhalte werden in-place aktualisiert (Accessibility-Berechtigung bleibt erhalten)..."; \
+		rsync -a --delete "$$BUILD_DIR/Dicto.app/" "/Applications/Dicto.app/"; \
+	else \
+		cp -R "$$BUILD_DIR/Dicto.app" /Applications/; \
 	fi; \
-	cp -R "$$BUILD_DIR/Dicto.app" /Applications/; \
-	echo "✓ Dicto.app ist jetzt unter /Applications verfügbar."
+	echo "✓ Dicto.app aktualisiert – Accessibility-Berechtigung bleibt erhalten."; \
+	open /Applications/Dicto.app
 
 # ── Clean ─────────────────────────────────────────────────────────────────────
 .PHONY: clean
