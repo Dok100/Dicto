@@ -37,14 +37,20 @@ final class MenuBarController {
             }
         }
 
-        // Panel automatisch öffnen wenn Vorschau nötig ist
+        // Panel automatisch öffnen wenn Vorschau nötig ist oder Streaming läuft
         appState.$transcriptionState
             .receive(on: RunLoop.main)
             .sink { [weak self, weak appState] state in
                 guard let self, let appState else { return }
-                if case .done = state,
-                   appState.settings.previewEnabled || appState.isTransformResult {
+                switch state {
+                case .streaming:
                     self.showPanel()
+                case .done:
+                    if appState.settings.previewEnabled || appState.isTransformResult {
+                        self.showPanel()
+                    }
+                default:
+                    break
                 }
             }
             .store(in: &cancellables)

@@ -14,6 +14,7 @@ struct PopoverRootView: View {
         case .idle:         return "idle"
         case .loadingModel: return "loading"
         case .transcribing: return "transcribing"
+        case .streaming:    return "streaming"
         case .done:         return "done"
         case .error:        return "error"
         }
@@ -53,7 +54,10 @@ struct PopoverRootView: View {
         .animation(.spring(response: 0.28, dampingFraction: 0.82), value: showHistory)
         .animation(.spring(response: 0.28, dampingFraction: 0.82), value: showPreviewActions)
         .onChange(of: appState.transcriptionState) { state in
-            if case .done = state { showHistory = false }
+            switch state {
+            case .done, .streaming: showHistory = false
+            default: break
+            }
         }
         .onReceive(NotificationCenter.default.publisher(for: .dictoCmdReturn)) { _ in
             guard case .done(let text) = appState.transcriptionState else { return }
@@ -126,6 +130,7 @@ struct PopoverRootView: View {
         case .idle:                return "Bereit"
         case .loadingModel:        return "Modell wird geladen …"
         case .transcribing:        return "Transkribiere …"
+        case .streaming:           return "KI schreibt …"
         case .done:                return "Fertig"
         case .error:               return "Fehler"
         }
@@ -309,6 +314,9 @@ struct PopoverRootView: View {
 
         case .transcribing:
             TranscribingDotsView()
+
+        case .streaming(let text):
+            StreamingTextView(text: text)
 
         case .done(let text):
             if appState.settings.previewEnabled || appState.isTransformResult {
@@ -597,6 +605,71 @@ private struct TranscribingDotsView: View {
             }
         }
         .onDisappear { animate = false }
+    }
+}
+
+// MARK: – Streaming-Textanzeige
+
+private struct StreamingTextView: View {
+    let text: String
+    @State private var showCursor = true
+    @State private var dotPhase = 0
+
+    var body: some View {
+        Group {
+            if text.isEmpty {
+                // Warte auf ersten Token → pulsierende Punkte
+                waitingView
+            } else {
+                // Text läuft ein
+                scrollingText
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onAppear {
+            Timer.scheduledTimer(withTimeInterval: 0.55, repeats: true) { _ in
+                withAnimation(.easeInOut(duration: 0.15)) { showCursor.toggle() }
+            }
+            Timer.scheduledTimer(withTimeInterval: 0.45, repeats: true) { _ in
+                dotPhase = (dotPhase + 1) % 4
+            }
+        }
+    }
+
+    // Drei pulsierende Punkte + Label während Ollama den ersten Token berechnet
+    private var waitingView: some View {
+        VStack(spacing: 12) {
+            HStack(spacing: 9) {
+                ForEach(0..<3, id: \.self) { i in
+                    Circle()
+                        .fill(Color.accentColor.opacity(dotPhase == i ? 0.9 : 0.25))
+                        .frame(width: 9, height: 9)
+                        .scaleEffect(dotPhase == i ? 1.2 : 0.85)
+                        .animation(.easeInOut(duration: 0.3), value: dotPhase)
+                }
+            }
+            Text("Warte auf Antwort …")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private var scrollingText: some View {
+        ScrollViewReader { proxy in
+            ScrollView {
+                (Text(text) + Text(showCursor ? "▍" : " ")
+                    .foregroundColor(.accentColor))
+                    .font(.body)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .id("streamBottom")
+                    .padding(.bottom, 2)
+            }
+            .onChange(of: text) { _ in
+                withAnimation(.easeOut(duration: 0.1)) {
+                    proxy.scrollTo("streamBottom", anchor: .bottom)
+                }
+            }
+        }
     }
 }
 

@@ -28,5 +28,7 @@
 	<string>© 2026 Oliver Kern</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Dicto benötigt Mikrofon-Zugriff für Push-to-Talk-Diktat.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Dicto nutzt Apples Spracherkennung für lokale Live-Transkription.</string>
 </dict>
 </plist>

@@ -6,6 +6,10 @@ enum DictoError: Error {
     case whisperModelLoad
     case whisperTranscription
 
+    // Apple Speech
+    case appleSpeechDenied
+    case appleSpeechUnavailable
+
     // Ollama
     case ollamaNotReachable
     case ollamaTimeout
@@ -15,9 +19,11 @@ enum DictoError: Error {
     /// Kurze Überschrift (1 Zeile)
     var title: String {
         switch self {
-        case .whisperModelLoad:      return "Sprachmodell nicht geladen"
-        case .whisperTranscription:  return "Transkription fehlgeschlagen"
-        case .ollamaNotReachable:    return "Ollama nicht erreichbar"
+        case .whisperModelLoad:         return "Sprachmodell nicht geladen"
+        case .whisperTranscription:     return "Transkription fehlgeschlagen"
+        case .appleSpeechDenied:        return "Spracherkennung nicht erlaubt"
+        case .appleSpeechUnavailable:   return "Spracherkennung nicht verfügbar"
+        case .ollamaNotReachable:       return "Ollama nicht erreichbar"
         case .ollamaTimeout:         return "Ollama antwortet nicht"
         case .ollamaEmptyResponse:   return "Leere Antwort von Ollama"
         case .ollamaUnknown:         return "Ollama-Fehler"
@@ -31,6 +37,10 @@ enum DictoError: Error {
             return "Das Whisper-Modell konnte nicht geladen werden. Prüfe deine Internetverbindung (erster Download) oder starte Dicto neu."
         case .whisperTranscription:
             return "Die Spracherkennung ist fehlgeschlagen. Bitte versuche es erneut."
+        case .appleSpeechDenied:
+            return "Bitte erlaube die Spracherkennung unter Systemeinstellungen → Datenschutz → Spracherkennung."
+        case .appleSpeechUnavailable:
+            return "Die Apple-Spracherkennung ist auf diesem Gerät nicht verfügbar. Wechsle zu Whisper in den Einstellungen."
         case .ollamaNotReachable:
             return "Ollama läuft nicht oder ist unter einer anderen Adresse erreichbar. Prüfe unter Einstellungen → KI ob der Server läuft."
         case .ollamaTimeout:

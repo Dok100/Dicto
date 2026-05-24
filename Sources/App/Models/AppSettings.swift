@@ -13,6 +13,9 @@ public final class AppSettings: ObservableObject {
     @Published public var ollamaPrompt: String {
         didSet { UserDefaults.standard.set(ollamaPrompt, forKey: "ollamaPrompt") }
     }
+    @Published public var transcriptionEngine: TranscriptionEngine {
+        didSet { UserDefaults.standard.set(transcriptionEngine.rawValue, forKey: "transcriptionEngine") }
+    }
     @Published public var whisperModel: WhisperModel {
         didSet { UserDefaults.standard.set(whisperModel.rawValue, forKey: "whisperModel") }
     }
@@ -53,6 +56,7 @@ public final class AppSettings: ObservableObject {
         ollamaBaseURL    = d.string(forKey: "ollamaBaseURL")   ?? "http://localhost:11434"
         ollamaModel      = d.string(forKey: "ollamaModel")     ?? "glm4"
         ollamaPrompt     = d.string(forKey: "ollamaPrompt")    ?? AppSettings.defaultPrompt
+        transcriptionEngine = TranscriptionEngine(rawValue: d.string(forKey: "transcriptionEngine") ?? "") ?? .whisper
         whisperModel     = WhisperModel(rawValue: d.string(forKey: "whisperModel") ?? "") ?? .largev3
         previewEnabled        = d.object(forKey: "previewEnabled")        as? Bool ?? false
         soundFeedbackEnabled  = d.object(forKey: "soundFeedbackEnabled") as? Bool ?? true

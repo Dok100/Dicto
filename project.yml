@@ -55,6 +55,7 @@ targets:
         LSMinimumSystemVersion: "14.0"
         LSUIElement: true
         NSMicrophoneUsageDescription: "Dicto benötigt Mikrofon-Zugriff für Push-to-Talk-Diktat."
+        NSSpeechRecognitionUsageDescription: "Dicto nutzt Apples Spracherkennung für lokale Live-Transkription."
         NSHumanReadableCopyright: "© 2026 Oliver Kern"
     entitlements:
       path: Sources/App/Dicto.entitlements

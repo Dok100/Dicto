@@ -10,7 +10,7 @@ Optional: Glättung via Ollama (glm4, http://localhost:11434).
 
 ## Aktueller Phasenstand
 
-**Stand**: PROJ-1–PROJ-21, PROJ-23, PROJ-26, PROJ-27 abgeschlossen.
+**Stand**: PROJ-1–PROJ-21, PROJ-23, PROJ-26–PROJ-29 abgeschlossen.
 
 | Phase | Status |
 |-------|--------|
@@ -38,6 +38,8 @@ Optional: Glättung via Ollama (glm4, http://localhost:11434).
 | PROJ-23 Sound-Feedback (Tink/Pop bei Start/Stop) | Abgeschlossen |
 | PROJ-26 Eigene Stile konfigurieren (Custom-Prompts) | Abgeschlossen |
 | PROJ-27 Escape-Taste zum Schließen des Panels | Abgeschlossen |
+| PROJ-28 Ollama Streaming + Whisper Large v3 Turbo | Abgeschlossen |
+| PROJ-29 Apple Speech Engine (live, kein Download) | Abgeschlossen |
 
 ## Nutzer-Kontext
 

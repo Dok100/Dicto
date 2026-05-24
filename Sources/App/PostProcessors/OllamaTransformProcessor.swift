@@ -20,41 +20,54 @@ final class OllamaTransformProcessor {
         self.model = model
     }
 
-    func process(original: String, command: String) async throws -> String {
-        do {
-            let result = try await transform(original: original, command: command)
-            return result.isEmpty ? original : result
-        } catch let e as DictoError {
-            throw e
-        } catch let e as URLError {
-            throw DictoError.from(e)
-        } catch {
-            throw DictoError.ollamaUnknown
+    /// Liefert die Antwort als AsyncThrowingStream – jeder Wert ist ein neues Textfragment.
+    func streamProcess(original: String, command: String) -> AsyncThrowingStream<String, Error> {
+        let request = makeRequest(original: original, command: command)
+        return AsyncThrowingStream { continuation in
+            Task {
+                do {
+                    let (asyncBytes, _) = try await URLSession.shared.bytes(for: request)
+                    for try await line in asyncBytes.lines {
+                        guard !line.isEmpty else { continue }
+                        guard let data = line.data(using: .utf8),
+                              let chunk = try? JSONDecoder().decode(OllamaStreamChunk.self, from: data)
+                        else { continue }
+                        if !chunk.message.content.isEmpty {
+                            continuation.yield(chunk.message.content)
+                        }
+                        if chunk.done { break }
+                    }
+                    continuation.finish()
+                } catch let e as DictoError {
+                    continuation.finish(throwing: e)
+                } catch let e as URLError {
+                    continuation.finish(throwing: DictoError.from(e))
+                } catch {
+                    continuation.finish(throwing: DictoError.ollamaUnknown)
+                }
+            }
         }
     }
 
-    private func transform(original: String, command: String) async throws -> String {
+    private func makeRequest(original: String, command: String) -> URLRequest {
         var request = URLRequest(url: url, timeoutInterval: 120)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
         let body: [String: Any] = [
             "model": model,
-            "stream": false,
+            "stream": true,
             "messages": [
                 ["role": "system", "content": Self.systemPrompt],
                 ["role": "user",   "content": "<original>\(original)</original>\n<befehl>\(command)</befehl>"]
             ]
         ]
-        request.httpBody = try JSONSerialization.data(withJSONObject: body)
-
-        let (data, _) = try await URLSession.shared.data(for: request)
-        let response = try JSONDecoder().decode(OllamaTransformResponse.self, from: data)
-        return response.message.content.trimmingCharacters(in: .whitespacesAndNewlines)
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+        return request
     }
 }
 
-private struct OllamaTransformResponse: Decodable {
+private struct OllamaStreamChunk: Decodable {
     struct Message: Decodable { let content: String }
     let message: Message
+    let done: Bool
 }

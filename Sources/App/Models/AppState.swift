@@ -45,6 +45,7 @@ final class AppState: ObservableObject {
     let audioService: AudioService
     let whisperService: WhisperService
     let pasteService: PasteService
+    let appleSpeechService = AppleSpeechService()
     let settings = AppSettings()
     let dictionaryService = DictionaryService()
     let historyService = HistoryService()
@@ -90,20 +91,59 @@ final class AppState: ObservableObject {
             DispatchQueue.main.async { self?.hasMicrophonePermission = granted }
         }
 
+        // Apple Speech Callbacks – feuern auf beliebigem Thread
+        appleSpeechService.onPartialResult = { [weak self] text in
+            Task { @MainActor [weak self] in
+                guard let self, self.isRecording else { return }
+                // Nur anzeigen wenn kein Ollama danach folgt – sonst würde der
+                // Rohtext und der geglättete Text nacheinander streamen (doppelt).
+                let useOllama = self.settings.ollamaEnabled || self.selectedCustomStyle != nil
+                if !useOllama {
+                    self.transcriptionState = .streaming(text)
+                }
+            }
+        }
+        appleSpeechService.onFinalResult = { [weak self] text in
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                self.isRecording = false
+                self.isTransformRecording = false
+                await self.handleTranscriptionDone(text: text)
+            }
+        }
+        appleSpeechService.onError = { [weak self] _ in
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                self.isRecording = false
+                self.isTransformRecording = false
+                self.transcriptionState = .error(DictoError.appleSpeechUnavailable.displayMessage)
+            }
+        }
+
         hotkey.onKeyDown = { [weak self] in
-            self?.targetApp = NSWorkspace.shared.frontmostApplication
-            self?.isRecording = true
-            if self?.settings.soundFeedbackEnabled == true { SoundFeedback.playStart() }
-            audio.startRecording()
+            guard let self else { return }
+            self.targetApp = NSWorkspace.shared.frontmostApplication
+            self.isRecording = true
+            if settings.soundFeedbackEnabled { SoundFeedback.playStart() }
+            if settings.transcriptionEngine == .apple {
+                appleSpeechService.startRecording(locale: settings.whisperLanguage.appleLocale)
+            } else {
+                audio.startRecording()
+            }
         }
         hotkey.onKeyUp = { [weak self] in
             guard let self else { return }
-            self.isRecording = false
             if settings.soundFeedbackEnabled { SoundFeedback.playStop() }
-            let model = self.settings.whisperModel
-            let language = self.settings.whisperLanguage
-            if let url = audio.stopRecording() {
-                Task { await whisper.transcribe(fileURL: url, model: model, language: language) }
+            if settings.transcriptionEngine == .apple {
+                appleSpeechService.stopRecording()
+                // isRecording wird in onFinalResult zurückgesetzt
+            } else {
+                self.isRecording = false
+                let model = self.settings.whisperModel
+                let language = self.settings.whisperLanguage
+                if let url = audio.stopRecording() {
+                    Task { await whisper.transcribe(fileURL: url, model: model, language: language) }
+                }
             }
         }
 
@@ -114,20 +154,29 @@ final class AppState: ObservableObject {
             self.isRecording = true
             self.isTransformRecording = true
             if settings.soundFeedbackEnabled { SoundFeedback.playStart() }
-            audio.startRecording()
             Task { @MainActor [weak self] in
                 self?.selectedTextForTransform = await paste.captureSelectedText()
+            }
+            if settings.transcriptionEngine == .apple {
+                appleSpeechService.startRecording(locale: settings.whisperLanguage.appleLocale)
+            } else {
+                audio.startRecording()
             }
         }
         hotkey.onTransformKeyUp = { [weak self] in
             guard let self else { return }
-            self.isRecording = false
-            self.isTransformRecording = false
             if settings.soundFeedbackEnabled { SoundFeedback.playStop() }
-            let model = self.settings.whisperModel
-            let language = self.settings.whisperLanguage
-            if let url = audio.stopRecording() {
-                Task { await whisper.transcribe(fileURL: url, model: model, language: language) }
+            if settings.transcriptionEngine == .apple {
+                appleSpeechService.stopRecording()
+                // isRecording/isTransformRecording werden in onFinalResult zurückgesetzt
+            } else {
+                self.isRecording = false
+                self.isTransformRecording = false
+                let model = self.settings.whisperModel
+                let language = self.settings.whisperLanguage
+                if let url = audio.stopRecording() {
+                    Task { await whisper.transcribe(fileURL: url, model: model, language: language) }
+                }
             }
         }
 
@@ -153,6 +202,8 @@ final class AppState: ObservableObject {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             paste.requestAccessibilityIfNeeded()
         }
+        // Apple Speech Permission vorab anfragen (nur Dialog, kein Zwang)
+        appleSpeechService.requestAuthorization { _ in }
     }
 
     func recheckPermissions() {
@@ -179,28 +230,40 @@ final class AppState: ObservableObject {
             effectivePrompt = dictationStyle.systemPrompt ?? settings.ollamaPrompt
         }
         let useOllama = settings.ollamaEnabled || selectedCustomStyle != nil
-        let processor: any TextPostProcessor
-        do {
-            processor = useOllama
-                ? try OllamaPostProcessor(baseURL: settings.ollamaBaseURL, model: settings.ollamaModel, systemPrompt: effectivePrompt)
-                : PassthroughPostProcessor()
-        } catch let e as DictoError {
-            transcriptionState = .error(e.displayMessage)
-            return
-        } catch {
-            transcriptionState = .error(DictoError.ollamaNotReachable.displayMessage)
-            return
-        }
 
         let raw: String
-        do {
-            raw = try await processor.process(text: text)
-        } catch let e as DictoError {
-            transcriptionState = .error(e.displayMessage)
-            return
-        } catch {
-            transcriptionState = .error(DictoError.ollamaUnknown.displayMessage)
-            return
+        if useOllama {
+            let processor: OllamaPostProcessor
+            do {
+                processor = try OllamaPostProcessor(
+                    baseURL: settings.ollamaBaseURL,
+                    model: settings.ollamaModel,
+                    systemPrompt: effectivePrompt
+                )
+            } catch let e as DictoError {
+                transcriptionState = .error(e.displayMessage)
+                return
+            } catch {
+                transcriptionState = .error(DictoError.ollamaNotReachable.displayMessage)
+                return
+            }
+            transcriptionState = .streaming("")
+            var accumulated = ""
+            do {
+                for try await chunk in processor.streamProcess(text: text) {
+                    accumulated += chunk
+                    transcriptionState = .streaming(accumulated)
+                }
+            } catch let e as DictoError {
+                transcriptionState = .error(e.displayMessage)
+                return
+            } catch {
+                transcriptionState = .error(DictoError.ollamaUnknown.displayMessage)
+                return
+            }
+            raw = accumulated.isEmpty ? text : accumulated
+        } else {
+            raw = text
         }
 
         let processed = dictionaryService.apply(
@@ -248,9 +311,13 @@ final class AppState: ObservableObject {
                 transcriptionState = .error(DictoError.ollamaNotReachable.displayMessage)
                 return
             }
+            transcriptionState = .streaming("")
+            var accumulated = ""
             do {
-                result = try await processor.process(original: original, command: command)
-                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                for try await chunk in processor.streamProcess(original: original, command: command) {
+                    accumulated += chunk
+                    transcriptionState = .streaming(accumulated)
+                }
             } catch let e as DictoError {
                 transcriptionState = .error(e.displayMessage)
                 return
@@ -258,6 +325,7 @@ final class AppState: ObservableObject {
                 transcriptionState = .error(DictoError.ollamaUnknown.displayMessage)
                 return
             }
+            result = accumulated.isEmpty ? original : accumulated.trimmingCharacters(in: .whitespacesAndNewlines)
         } else if !original.isEmpty {
             // Ollama deaktiviert, aber Text vorhanden → ohne KI-Verarbeitung zeigen
             result = original

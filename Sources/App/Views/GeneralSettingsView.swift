@@ -30,25 +30,45 @@ struct GeneralSettingsView: View {
                 }
             }
 
-            // ── Sektion 2: Sprache & Modell ───────────────────────────────────
+            // ── Sektion 2: Spracherkennungs-Engine ───────────────────────────
             Section {
-                Picker("Modell", selection: $settings.whisperModel) {
-                    ForEach(WhisperModel.allCases, id: \.self) { m in
-                        Text(m.label).tag(m)
+                Picker("Engine", selection: $settings.transcriptionEngine) {
+                    ForEach(TranscriptionEngine.allCases, id: \.self) { e in
+                        Text(e.label).tag(e)
                     }
                 }
                 .pickerStyle(.radioGroup)
 
-                Text("Modellwechsel wird beim nächsten Diktat angewendet.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                if settings.transcriptionEngine == .apple {
+                    Label("Text erscheint live während du sprichst. Vollständig lokal – kein Download nötig.", systemImage: "info.circle")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            } header: {
+                Text("Spracherkennung")
+            }
 
+            // ── Sektion 3: Sprache & Whisper-Modell ──────────────────────────
+            Section {
                 Picker("Sprache", selection: $settings.whisperLanguage) {
                     ForEach(WhisperLanguage.allCases, id: \.self) { l in
                         Text(l.label).tag(l)
                     }
                 }
                 .pickerStyle(.radioGroup)
+
+                if settings.transcriptionEngine == .whisper {
+                    Picker("Whisper-Modell", selection: $settings.whisperModel) {
+                        ForEach(WhisperModel.allCases, id: \.self) { m in
+                            Text(m.label).tag(m)
+                        }
+                    }
+                    .pickerStyle(.radioGroup)
+
+                    Text("Modellwechsel wird beim nächsten Diktat angewendet.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             } header: {
                 Text("Sprache & Modell")
             }
