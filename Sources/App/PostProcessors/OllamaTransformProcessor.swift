@@ -17,20 +17,21 @@ final class OllamaTransformProcessor {
         self.model = model
     }
 
-    func process(original: String, command: String) async -> String {
+    func process(original: String, command: String) async throws -> String {
         do {
-            return try await transform(original: original, command: command)
-        } catch let error as URLError where error.code == .timedOut {
-            return "⚠ Ollama Timeout – Modell zu langsam (>\(Int(timeoutSeconds))s). Versuche es erneut oder wähle ein kleineres Modell."
+            let result = try await transform(original: original, command: command)
+            return result.isEmpty ? original : result
+        } catch let e as DictoError {
+            throw e
+        } catch let e as URLError {
+            throw DictoError.from(e)
         } catch {
-            return "⚠ Ollama Fehler: \(error.localizedDescription)"
+            throw DictoError.ollamaUnknown
         }
     }
 
-    private let timeoutSeconds: Double = 120
-
     private func transform(original: String, command: String) async throws -> String {
-        var request = URLRequest(url: url, timeoutInterval: timeoutSeconds)
+        var request = URLRequest(url: url, timeoutInterval: 120)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
@@ -39,15 +40,14 @@ final class OllamaTransformProcessor {
             "stream": false,
             "messages": [
                 ["role": "system", "content": Self.systemPrompt],
-                ["role": "user", "content": "<original>\(original)</original>\n<befehl>\(command)</befehl>"]
+                ["role": "user",   "content": "<original>\(original)</original>\n<befehl>\(command)</befehl>"]
             ]
         ]
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
         let (data, _) = try await URLSession.shared.data(for: request)
         let response = try JSONDecoder().decode(OllamaTransformResponse.self, from: data)
-        let cleaned = response.message.content.trimmingCharacters(in: .whitespacesAndNewlines)
-        return cleaned.isEmpty ? original : cleaned
+        return response.message.content.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }
 

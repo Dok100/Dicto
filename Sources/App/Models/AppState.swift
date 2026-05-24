@@ -183,9 +183,19 @@ final class AppState: ObservableObject {
             ? OllamaPostProcessor(baseURL: settings.ollamaBaseURL, model: settings.ollamaModel, systemPrompt: effectivePrompt)
             : PassthroughPostProcessor()
 
+        let raw: String
+        do {
+            raw = try await processor.process(text: text)
+        } catch let e as DictoError {
+            transcriptionState = .error(e.displayMessage)
+            return
+        } catch {
+            transcriptionState = .error(DictoError.ollamaUnknown.displayMessage)
+            return
+        }
+
         let processed = dictionaryService.apply(
-            to: await processor.process(text: text)
-                .trimmingCharacters(in: .whitespacesAndNewlines)
+            to: raw.trimmingCharacters(in: .whitespacesAndNewlines)
         )
 
         if settings.previewEnabled {
@@ -206,7 +216,6 @@ final class AppState: ObservableObject {
         historyService.add(text: processed)
         let styleName = selectedCustomStyle?.name ?? dictationStyle.rawValue
         statsService.record(text: processed, style: styleName, isTransform: false)
-        // Kein Preview gewünscht → direkt idle, Panel zeigt kein Ergebnis
         transcriptionState = .idle
     }
 
@@ -221,8 +230,19 @@ final class AppState: ObservableObject {
                 baseURL: settings.ollamaBaseURL,
                 model: settings.ollamaModel
             )
-            result = await processor.process(original: original, command: command)
-                .trimmingCharacters(in: .whitespacesAndNewlines)
+            do {
+                result = try await processor.process(original: original, command: command)
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+            } catch let e as DictoError {
+                transcriptionState = .error(e.displayMessage)
+                return
+            } catch {
+                transcriptionState = .error(DictoError.ollamaUnknown.displayMessage)
+                return
+            }
+        } else if !original.isEmpty {
+            // Ollama deaktiviert, aber Text vorhanden → ohne KI-Verarbeitung zeigen
+            result = original
         } else {
             result = command
         }
@@ -236,6 +256,11 @@ final class AppState: ObservableObject {
     @MainActor
     func dismissResult() {
         isTransformResult = false
+        transcriptionState = .idle
+    }
+
+    @MainActor
+    func dismissError() {
         transcriptionState = .idle
     }
 

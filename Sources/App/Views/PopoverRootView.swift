@@ -332,17 +332,45 @@ struct PopoverRootView: View {
             }
 
         case .error(let message):
-            VStack(spacing: 8) {
-                Image(systemName: "exclamationmark.triangle")
-                    .font(.system(size: 26))
-                    .foregroundStyle(.red)
-                Text(message)
-                    .font(.caption)
-                    .foregroundStyle(.red)
-                    .multilineTextAlignment(.center)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            errorView(message: message)
         }
+    }
+
+    // MARK: – Fehler-Ansicht
+
+    private func errorView(message: String) -> some View {
+        // Nachricht ist "Titel\nDetail" – erste Zeile = Titel, Rest = Detail
+        let lines = message.split(separator: "\n", maxSplits: 1, omittingEmptySubsequences: false)
+        let title  = lines.first.map(String.init) ?? message
+        let detail = lines.dropFirst().first.map(String.init) ?? ""
+
+        return VStack(spacing: 10) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 24))
+                .foregroundStyle(.red)
+
+            Text(title)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(.red)
+                .multilineTextAlignment(.center)
+
+            if !detail.isEmpty {
+                Text(detail)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Button("Schließen") {
+                appState.dismissError()
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+            .padding(.top, 4)
+        }
+        .padding(.horizontal, 8)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     // MARK: – Idle-Ansicht

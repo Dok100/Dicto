@@ -11,11 +11,16 @@ final class OllamaPostProcessor: TextPostProcessor {
         self.systemPrompt = systemPrompt
     }
 
-    func process(text: String) async -> String {
+    func process(text: String) async throws -> String {
         do {
-            return try await smooth(text: text)
+            let result = try await smooth(text: text)
+            return result.isEmpty ? text : result
+        } catch let e as DictoError {
+            throw e
+        } catch let e as URLError {
+            throw DictoError.from(e)
         } catch {
-            return text  // Fallback: Originaltext bei jedem Fehler
+            throw DictoError.ollamaUnknown
         }
     }
 
@@ -28,22 +33,15 @@ final class OllamaPostProcessor: TextPostProcessor {
             "model": model,
             "stream": false,
             "messages": [
-                [
-                    "role": "system",
-                    "content": systemPrompt
-                ],
-                [
-                    "role": "user",
-                    "content": "<diktat>\(text)</diktat>"
-                ]
+                ["role": "system", "content": systemPrompt],
+                ["role": "user",   "content": "<diktat>\(text)</diktat>"]
             ]
         ]
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
         let (data, _) = try await URLSession.shared.data(for: request)
         let response = try JSONDecoder().decode(OllamaChatResponse.self, from: data)
-        let cleaned = response.message.content.trimmingCharacters(in: .whitespacesAndNewlines)
-        return cleaned.isEmpty ? text : cleaned
+        return response.message.content.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }
 

@@ -1,3 +1,3 @@
 struct PassthroughPostProcessor: TextPostProcessor {
-    func process(text: String) async -> String { text }
+    func process(text: String) async throws -> String { text }
 }

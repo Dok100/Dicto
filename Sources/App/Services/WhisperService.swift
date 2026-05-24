@@ -19,8 +19,9 @@ final class WhisperService: ObservableObject {
             loadedModel = model
             await MainActor.run { state = .idle }
         } catch {
-            let msg = error.localizedDescription
-            await MainActor.run { state = .error("Modell konnte nicht geladen werden:\n\(msg)") }
+            await MainActor.run {
+                state = .error(DictoError.whisperModelLoad.displayMessage)
+            }
         }
     }
 
@@ -39,8 +40,9 @@ final class WhisperService: ObservableObject {
             let final = text.isEmpty ? "(kein Text erkannt)" : text
             await MainActor.run { state = .done(final) }
         } catch {
-            let msg = error.localizedDescription
-            await MainActor.run { state = .error("Transkription fehlgeschlagen:\n\(msg)") }
+            await MainActor.run {
+                state = .error(DictoError.whisperTranscription.displayMessage)
+            }
         }
     }
 }
