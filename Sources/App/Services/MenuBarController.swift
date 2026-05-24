@@ -8,11 +8,14 @@ final class MenuBarController {
     private var cancellables = Set<AnyCancellable>()
     private var clickOutsideMonitor: Any?
     private var cmdReturnMonitor: Any?
+    private var escapeMonitor: Any?
+    private weak var appState: AppState?
     private var settingsWindowController: SettingsWindowController?
     private var onboardingWindowController: OnboardingWindowController?
 
     init(appState: AppState) {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        self.appState = appState
         setupStatusItem()
         setupPanel(appState: appState)
 
@@ -154,14 +157,30 @@ final class MenuBarController {
                   event.keyCode == 36 else { return }
             NotificationCenter.default.post(name: .dictoCmdReturn, object: nil)
         }
+        // ⎋ Escape: Ergebnis/Fehler schließen oder Panel ausblenden
+        escapeMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [weak self, weak appState] event in
+            guard event.keyCode == 53,  // Escape
+                  event.modifierFlags.intersection(.deviceIndependentFlagsMask).isEmpty else { return }
+            guard let appState else { return }
+            switch appState.transcriptionState {
+            case .done:
+                Task { @MainActor in appState.dismissResult() }
+            case .error:
+                Task { @MainActor in appState.dismissError() }
+            default:
+                self?.hidePanel()
+            }
+        }
     }
 
     private func hidePanel() {
         panel.orderOut(nil)
         if let m = clickOutsideMonitor { NSEvent.removeMonitor(m) }
-        if let m = cmdReturnMonitor { NSEvent.removeMonitor(m) }
+        if let m = cmdReturnMonitor    { NSEvent.removeMonitor(m) }
+        if let m = escapeMonitor       { NSEvent.removeMonitor(m) }
         cmdReturnMonitor = nil
         clickOutsideMonitor = nil
+        escapeMonitor = nil
     }
 
     private func positionPanel() {

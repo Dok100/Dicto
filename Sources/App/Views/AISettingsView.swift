@@ -26,9 +26,16 @@ struct AISettingsView: View {
                         TextField("glm4", text: $settings.ollamaModel)
                             .textFieldStyle(.roundedBorder)
                     }
-                    LabeledContent("Endpoint") {
-                        TextField("http://localhost:11434", text: $settings.ollamaBaseURL)
-                            .textFieldStyle(.roundedBorder)
+                    VStack(alignment: .leading, spacing: 4) {
+                        LabeledContent("Endpoint") {
+                            TextField("http://localhost:11434", text: $settings.ollamaBaseURL)
+                                .textFieldStyle(.roundedBorder)
+                        }
+                        if !isValidBaseURL {
+                            Label("Ungültige URL – bitte http:// oder https:// verwenden.", systemImage: "exclamationmark.triangle.fill")
+                                .font(.caption)
+                                .foregroundStyle(.orange)
+                        }
                     }
 
                     VStack(alignment: .leading, spacing: 6) {
@@ -119,6 +126,12 @@ struct AISettingsView: View {
     }
 
     // MARK: – Hilfsmethoden
+
+    private var isValidBaseURL: Bool {
+        guard let url = URL(string: settings.ollamaBaseURL),
+              let scheme = url.scheme else { return false }
+        return scheme == "http" || scheme == "https"
+    }
 
     private func deleteStyle(_ style: CustomStyle) {
         settings.customStyles.removeAll { $0.id == style.id }

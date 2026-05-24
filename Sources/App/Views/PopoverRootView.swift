@@ -381,6 +381,7 @@ struct PopoverRootView: View {
             shortcutRow(keys: ["⌥", "Fn"], description: "Transformieren",      icon: "wand.and.sparkles")
             Divider().padding(.vertical, 2)
             shortcutRow(keys: ["⌘", "↩"],  description: "Einfügen / Kopieren", icon: "return")
+            shortcutRow(keys: ["⎋"],       description: "Schließen",           icon: "xmark")
             shortcutRow(keys: ["⌘", "Q"],  description: "Beenden",             icon: "xmark.circle")
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)

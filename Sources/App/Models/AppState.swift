@@ -179,9 +179,18 @@ final class AppState: ObservableObject {
             effectivePrompt = dictationStyle.systemPrompt ?? settings.ollamaPrompt
         }
         let useOllama = settings.ollamaEnabled || selectedCustomStyle != nil
-        let processor: any TextPostProcessor = useOllama
-            ? OllamaPostProcessor(baseURL: settings.ollamaBaseURL, model: settings.ollamaModel, systemPrompt: effectivePrompt)
-            : PassthroughPostProcessor()
+        let processor: any TextPostProcessor
+        do {
+            processor = useOllama
+                ? try OllamaPostProcessor(baseURL: settings.ollamaBaseURL, model: settings.ollamaModel, systemPrompt: effectivePrompt)
+                : PassthroughPostProcessor()
+        } catch let e as DictoError {
+            transcriptionState = .error(e.displayMessage)
+            return
+        } catch {
+            transcriptionState = .error(DictoError.ollamaNotReachable.displayMessage)
+            return
+        }
 
         let raw: String
         do {
@@ -226,10 +235,19 @@ final class AppState: ObservableObject {
 
         let result: String
         if settings.ollamaEnabled, !original.isEmpty {
-            let processor = OllamaTransformProcessor(
-                baseURL: settings.ollamaBaseURL,
-                model: settings.ollamaModel
-            )
+            let processor: OllamaTransformProcessor
+            do {
+                processor = try OllamaTransformProcessor(
+                    baseURL: settings.ollamaBaseURL,
+                    model: settings.ollamaModel
+                )
+            } catch let e as DictoError {
+                transcriptionState = .error(e.displayMessage)
+                return
+            } catch {
+                transcriptionState = .error(DictoError.ollamaNotReachable.displayMessage)
+                return
+            }
             do {
                 result = try await processor.process(original: original, command: command)
                     .trimmingCharacters(in: .whitespacesAndNewlines)

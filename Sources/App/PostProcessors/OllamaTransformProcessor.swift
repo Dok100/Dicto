@@ -12,8 +12,11 @@ final class OllamaTransformProcessor {
         Schreibe auf Deutsch, es sei denn der Befehl verlangt ausdrücklich eine andere Sprache.
         """
 
-    init(baseURL: String, model: String) {
-        self.url = URL(string: "\(baseURL)/api/chat")!
+    init(baseURL: String, model: String) throws {
+        guard let url = URL(string: "\(baseURL)/api/chat") else {
+            throw DictoError.ollamaNotReachable
+        }
+        self.url = url
         self.model = model
     }
 

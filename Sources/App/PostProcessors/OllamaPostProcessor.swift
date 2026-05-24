@@ -5,8 +5,11 @@ final class OllamaPostProcessor: TextPostProcessor {
     private let model: String
     private let systemPrompt: String
 
-    init(baseURL: String, model: String, systemPrompt: String) {
-        self.url = URL(string: "\(baseURL)/api/chat")!
+    init(baseURL: String, model: String, systemPrompt: String) throws {
+        guard let url = URL(string: "\(baseURL)/api/chat") else {
+            throw DictoError.ollamaNotReachable
+        }
+        self.url = url
         self.model = model
         self.systemPrompt = systemPrompt
     }

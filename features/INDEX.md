@@ -28,3 +28,4 @@
 | PROJ-24 | (reserviert) | – |
 | PROJ-25 | (reserviert) | – |
 | [PROJ-26](PROJ-26-eigene-stile.md) | Eigene Stile konfigurieren (Custom-Prompts) | Abgeschlossen |
+| [PROJ-27](PROJ-27-escape-taste.md) | Escape-Taste zum Schließen des Panels | Abgeschlossen |
