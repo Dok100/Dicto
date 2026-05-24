@@ -153,6 +153,9 @@ struct PopoverRootView: View {
             footerButton(icon: showHistory ? "clock.fill" : "clock", help: "Verlauf") {
                 withAnimation { showHistory.toggle() }
             }
+            footerButton(icon: "questionmark.circle", help: "Hilfe") {
+                appState.onOpenHelp?()
+            }
             Spacer()
             footerButton(icon: "power", help: "Beenden ⌘Q") {
                 NSApplication.shared.terminate(nil)

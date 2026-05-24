@@ -12,6 +12,7 @@ final class MenuBarController {
     private weak var appState: AppState?
     private var settingsWindowController: SettingsWindowController?
     private var onboardingWindowController: OnboardingWindowController?
+    private var helpWindowController: HelpWindowController?
 
     init(appState: AppState) {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -23,6 +24,12 @@ final class MenuBarController {
         appState.onOpenSettings = { [weak self] in
             self?.hidePanel()
             self?.settingsWindowController?.show()
+        }
+
+        helpWindowController = HelpWindowController()
+        appState.onOpenHelp = { [weak self] in
+            self?.hidePanel()
+            self?.helpWindowController?.show()
         }
 
         // Onboarding beim ersten Start anzeigen

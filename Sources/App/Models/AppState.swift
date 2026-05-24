@@ -52,6 +52,7 @@ final class AppState: ObservableObject {
     let statsService = StatsService()
 
     var onOpenSettings: (() -> Void)?
+    var onOpenHelp: (() -> Void)?
 
     private var targetApp: NSRunningApplication?
     @Published private(set) var isTransformMode = false
