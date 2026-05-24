@@ -20,7 +20,7 @@ final class OllamaPostProcessor: TextPostProcessor {
     }
 
     private func smooth(text: String) async throws -> String {
-        var request = URLRequest(url: url, timeoutInterval: 30)
+        var request = URLRequest(url: url, timeoutInterval: 120)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 

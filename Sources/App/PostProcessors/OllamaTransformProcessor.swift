@@ -20,13 +20,17 @@ final class OllamaTransformProcessor {
     func process(original: String, command: String) async -> String {
         do {
             return try await transform(original: original, command: command)
+        } catch let error as URLError where error.code == .timedOut {
+            return "⚠ Ollama Timeout – Modell zu langsam (>\(Int(timeoutSeconds))s). Versuche es erneut oder wähle ein kleineres Modell."
         } catch {
-            return original  // Fallback: Originaltext bei Fehler
+            return "⚠ Ollama Fehler: \(error.localizedDescription)"
         }
     }
 
+    private let timeoutSeconds: Double = 120
+
     private func transform(original: String, command: String) async throws -> String {
-        var request = URLRequest(url: url, timeoutInterval: 30)
+        var request = URLRequest(url: url, timeoutInterval: timeoutSeconds)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
