@@ -21,10 +21,10 @@ final class AppState: ObservableObject {
     var isAccessibilityAuthorized: Bool { pasteService.isAccessibilityAuthorized }
 
     @Published var dictationStyle: DictationStyle = {
-        let raw = UserDefaults.standard.string(forKey: "dictationStyle") ?? ""
+        let raw = UserDefaults.standard.string(forKey: StorageKey.Defaults.dictationStyle) ?? ""
         return DictationStyle(rawValue: raw) ?? .neutral
     }() {
-        didSet { UserDefaults.standard.set(dictationStyle.rawValue, forKey: "dictationStyle") }
+        didSet { UserDefaults.standard.set(dictationStyle.rawValue, forKey: StorageKey.Defaults.dictationStyle) }
     }
 
     /// Aktiver eigener Stil – überschreibt `dictationStyle` wenn gesetzt.

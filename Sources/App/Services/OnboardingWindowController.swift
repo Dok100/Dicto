@@ -3,14 +3,12 @@ import SwiftUI
 
 final class OnboardingWindowController: NSWindowController {
 
-    private static let completedKey = "onboardingCompleted"
-
     static var isNeeded: Bool {
-        !UserDefaults.standard.bool(forKey: completedKey)
+        !UserDefaults.standard.bool(forKey: StorageKey.Defaults.onboardingCompleted)
     }
 
     static func markCompleted() {
-        UserDefaults.standard.set(true, forKey: completedKey)
+        UserDefaults.standard.set(true, forKey: StorageKey.Defaults.onboardingCompleted)
     }
 
     init(settings: AppSettings, onComplete: @escaping () -> Void) {

@@ -4,7 +4,7 @@ public final class HistoryService: ObservableObject {
     @Published public private(set) var entries: [DictationEntry] = []
 
     private let maxEntries = 20
-    private let storageKey = "dictationHistory"
+    private let storageKey = StorageKey.Defaults.dictationHistory
 
     public init() { load() }
 

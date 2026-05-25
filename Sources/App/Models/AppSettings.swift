@@ -2,92 +2,92 @@ import Foundation
 
 public final class AppSettings: ObservableObject {
     @Published public var ollamaEnabled: Bool {
-        didSet { UserDefaults.standard.set(ollamaEnabled, forKey: "ollamaEnabled") }
+        didSet { UserDefaults.standard.set(ollamaEnabled, forKey: StorageKey.Defaults.ollamaEnabled) }
     }
     @Published public var ollamaBaseURL: String {
-        didSet { UserDefaults.standard.set(ollamaBaseURL, forKey: "ollamaBaseURL") }
+        didSet { UserDefaults.standard.set(ollamaBaseURL, forKey: StorageKey.Defaults.ollamaBaseURL) }
     }
     @Published public var ollamaModel: String {
-        didSet { UserDefaults.standard.set(ollamaModel, forKey: "ollamaModel") }
+        didSet { UserDefaults.standard.set(ollamaModel, forKey: StorageKey.Defaults.ollamaModel) }
     }
     @Published public var ollamaPrompt: String {
-        didSet { UserDefaults.standard.set(ollamaPrompt, forKey: "ollamaPrompt") }
+        didSet { UserDefaults.standard.set(ollamaPrompt, forKey: StorageKey.Defaults.ollamaPrompt) }
     }
     @Published public var transcriptionEngine: TranscriptionEngine {
-        didSet { UserDefaults.standard.set(transcriptionEngine.rawValue, forKey: "transcriptionEngine") }
+        didSet { UserDefaults.standard.set(transcriptionEngine.rawValue, forKey: StorageKey.Defaults.transcriptionEngine) }
     }
     @Published public var whisperModel: WhisperModel {
-        didSet { UserDefaults.standard.set(whisperModel.rawValue, forKey: "whisperModel") }
+        didSet { UserDefaults.standard.set(whisperModel.rawValue, forKey: StorageKey.Defaults.whisperModel) }
     }
     @Published public var previewEnabled: Bool {
-        didSet { UserDefaults.standard.set(previewEnabled, forKey: "previewEnabled") }
+        didSet { UserDefaults.standard.set(previewEnabled, forKey: StorageKey.Defaults.previewEnabled) }
     }
     @Published public var soundFeedbackEnabled: Bool {
-        didSet { UserDefaults.standard.set(soundFeedbackEnabled, forKey: "soundFeedbackEnabled") }
+        didSet { UserDefaults.standard.set(soundFeedbackEnabled, forKey: StorageKey.Defaults.soundFeedbackEnabled) }
     }
     @Published public var whisperLanguage: WhisperLanguage {
-        didSet { UserDefaults.standard.set(whisperLanguage.rawValue, forKey: "whisperLanguage") }
+        didSet { UserDefaults.standard.set(whisperLanguage.rawValue, forKey: StorageKey.Defaults.whisperLanguage) }
     }
     @Published public var customStyles: [CustomStyle] {
         didSet {
             if let d = try? JSONEncoder().encode(customStyles) {
-                UserDefaults.standard.set(d, forKey: "customStyles")
+                UserDefaults.standard.set(d, forKey: StorageKey.Defaults.customStyles)
             }
         }
     }
     @Published public var dictationShortcut: ShortcutConfig {
         didSet {
             if let d = try? JSONEncoder().encode(dictationShortcut) {
-                UserDefaults.standard.set(d, forKey: "dictationShortcut")
+                UserDefaults.standard.set(d, forKey: StorageKey.Defaults.dictationShortcut)
             }
         }
     }
     @Published public var transformShortcut: ShortcutConfig {
         didSet {
             if let d = try? JSONEncoder().encode(transformShortcut) {
-                UserDefaults.standard.set(d, forKey: "transformShortcut")
+                UserDefaults.standard.set(d, forKey: StorageKey.Defaults.transformShortcut)
             }
         }
     }
     @Published public var llmProvider: LLMProvider {
-        didSet { UserDefaults.standard.set(llmProvider.rawValue, forKey: "llmProvider") }
+        didSet { UserDefaults.standard.set(llmProvider.rawValue, forKey: StorageKey.Defaults.llmProvider) }
     }
     @Published public var openAIModel: String {
-        didSet { UserDefaults.standard.set(openAIModel, forKey: "openAIModel") }
+        didSet { UserDefaults.standard.set(openAIModel, forKey: StorageKey.Defaults.openAIModel) }
     }
     @Published public var openAIBaseURL: String {
-        didSet { UserDefaults.standard.set(openAIBaseURL, forKey: "openAIBaseURL") }
+        didSet { UserDefaults.standard.set(openAIBaseURL, forKey: StorageKey.Defaults.openAIBaseURL) }
     }
     /// API-Key wird im macOS Keychain gespeichert – nicht in UserDefaults.
     /// Beim Schreiben werden Whitespace und Zeilenumbrüche automatisch entfernt.
     public var openAIApiKey: String {
-        get { KeychainService.shared.load(forKey: "openAIApiKey") ?? "" }
-        set { KeychainService.shared.save(newValue.trimmingCharacters(in: .whitespacesAndNewlines), forKey: "openAIApiKey") }
+        get { KeychainService.shared.load(forKey: StorageKey.Keychain.openAIApiKey) ?? "" }
+        set { KeychainService.shared.save(newValue.trimmingCharacters(in: .whitespacesAndNewlines), forKey: StorageKey.Keychain.openAIApiKey) }
     }
 
     public init() {
         let d = UserDefaults.standard
-        ollamaEnabled    = d.object(forKey: "ollamaEnabled")   as? Bool ?? true
-        ollamaBaseURL    = d.string(forKey: "ollamaBaseURL")   ?? "http://localhost:11434"
-        ollamaModel      = d.string(forKey: "ollamaModel")     ?? "qwen2.5:32b"
-        ollamaPrompt     = d.string(forKey: "ollamaPrompt")    ?? AppSettings.defaultPrompt
-        transcriptionEngine = TranscriptionEngine(rawValue: d.string(forKey: "transcriptionEngine") ?? "") ?? .whisper
-        whisperModel     = WhisperModel(rawValue: d.string(forKey: "whisperModel") ?? "") ?? .largev3
-        previewEnabled        = d.object(forKey: "previewEnabled")        as? Bool ?? false
-        soundFeedbackEnabled  = d.object(forKey: "soundFeedbackEnabled") as? Bool ?? true
-        customStyles          = d.data(forKey: "customStyles")
+        ollamaEnabled    = d.object(forKey: StorageKey.Defaults.ollamaEnabled)   as? Bool ?? true
+        ollamaBaseURL    = d.string(forKey: StorageKey.Defaults.ollamaBaseURL)   ?? "http://localhost:11434"
+        ollamaModel      = d.string(forKey: StorageKey.Defaults.ollamaModel)     ?? "qwen2.5:32b"
+        ollamaPrompt     = d.string(forKey: StorageKey.Defaults.ollamaPrompt)    ?? AppSettings.defaultPrompt
+        transcriptionEngine = TranscriptionEngine(rawValue: d.string(forKey: StorageKey.Defaults.transcriptionEngine) ?? "") ?? .whisper
+        whisperModel     = WhisperModel(rawValue: d.string(forKey: StorageKey.Defaults.whisperModel) ?? "") ?? .largev3
+        previewEnabled        = d.object(forKey: StorageKey.Defaults.previewEnabled)        as? Bool ?? false
+        soundFeedbackEnabled  = d.object(forKey: StorageKey.Defaults.soundFeedbackEnabled)  as? Bool ?? true
+        customStyles          = d.data(forKey: StorageKey.Defaults.customStyles)
             .flatMap { try? JSONDecoder().decode([CustomStyle].self, from: $0) }
             ?? []
-        whisperLanguage  = d.string(forKey: "whisperLanguage").flatMap(WhisperLanguage.init) ?? .german
-        dictationShortcut = d.data(forKey: "dictationShortcut")
+        whisperLanguage  = d.string(forKey: StorageKey.Defaults.whisperLanguage).flatMap(WhisperLanguage.init) ?? .german
+        dictationShortcut = d.data(forKey: StorageKey.Defaults.dictationShortcut)
             .flatMap { try? JSONDecoder().decode(ShortcutConfig.self, from: $0) }
             ?? .defaultDictation
-        transformShortcut = d.data(forKey: "transformShortcut")
+        transformShortcut = d.data(forKey: StorageKey.Defaults.transformShortcut)
             .flatMap { try? JSONDecoder().decode(ShortcutConfig.self, from: $0) }
             ?? .defaultTransform
-        llmProvider  = LLMProvider(rawValue: d.string(forKey: "llmProvider") ?? "") ?? .ollama
-        openAIModel  = d.string(forKey: "openAIModel")   ?? "gpt-4o-mini"
-        openAIBaseURL = d.string(forKey: "openAIBaseURL") ?? "https://api.openai.com/v1"
+        llmProvider   = LLMProvider(rawValue: d.string(forKey: StorageKey.Defaults.llmProvider) ?? "") ?? .ollama
+        openAIModel   = d.string(forKey: StorageKey.Defaults.openAIModel)   ?? "gpt-4o-mini"
+        openAIBaseURL = d.string(forKey: StorageKey.Defaults.openAIBaseURL) ?? "https://api.openai.com/v1"
     }
 
     static let defaultPrompt = """

@@ -3,7 +3,7 @@ import Foundation
 public final class DictionaryService: ObservableObject {
     @Published public private(set) var entries: [WordEntry] = []
 
-    private let storageKey = "dictionaryEntries"
+    private let storageKey = StorageKey.Defaults.dictionaryEntries
 
     public init() { load() }
 
