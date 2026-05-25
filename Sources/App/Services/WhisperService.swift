@@ -20,7 +20,7 @@ final class WhisperService: ObservableObject {
             await MainActor.run { state = .idle }
         } catch {
             await MainActor.run {
-                state = .error(DictoError.whisperModelLoad.displayMessage)
+                state = .error(.whisperModelLoad)
             }
         }
     }
@@ -41,7 +41,7 @@ final class WhisperService: ObservableObject {
             await MainActor.run { state = .done(final) }
         } catch {
             await MainActor.run {
-                state = .error(DictoError.whisperTranscription.displayMessage)
+                state = .error(.whisperTranscription)
             }
         }
     }

@@ -1,7 +1,7 @@
 import Foundation
 
 /// Strukturierte, nutzerfreundliche Fehlermeldungen für Dicto.
-enum DictoError: Error {
+enum DictoError: Error, Equatable {
     // Whisper
     case whisperModelLoad
     case whisperTranscription
@@ -96,6 +96,29 @@ enum DictoError: Error {
              .networkConnectionLost,
              .notConnectedToInternet:      return .openAINotReachable
         default:                           return .openAIUnknown
+        }
+    }
+
+    // MARK: – Actionable Properties (für Fehler-View)
+
+    /// macOS-Systemeinstellungen-URL, falls der Fehler eine Permission betrifft.
+    var systemSettingsURL: URL? {
+        switch self {
+        case .appleSpeechDenied:
+            return URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_SpeechRecognition")
+        default:
+            return nil
+        }
+    }
+
+    /// `true` wenn das Problem durch Öffnen der App-Einstellungen (KI-Tab) behoben werden kann.
+    var needsAppSettings: Bool {
+        switch self {
+        case .openAIKeyMissing, .openAIAuthFailed,
+             .ollamaNotReachable, .ollamaTimeout:
+            return true
+        default:
+            return false
         }
     }
 }

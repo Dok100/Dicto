@@ -10,7 +10,7 @@ Optional: Glättung via Ollama (qwen2.5:32b, http://localhost:11434).
 
 ## Aktueller Phasenstand
 
-**Stand**: PROJ-1–PROJ-23, PROJ-26–PROJ-37 abgeschlossen.
+**Stand**: PROJ-1–PROJ-23, PROJ-26–PROJ-38 abgeschlossen.
 
 | Phase | Status |
 |-------|--------|
@@ -44,11 +44,12 @@ Optional: Glättung via Ollama (qwen2.5:32b, http://localhost:11434).
 | PROJ-30 OpenAI API als LLM-Alternative (Keychain-sicher) | Abgeschlossen |
 | PROJ-31 In-App Hilfe-Fenster (8 Abschnitte) | Abgeschlossen |
 | PROJ-32 Onboarding überarbeitet (5 Schritte) | Abgeschlossen |
-| PROJ-33 Storage-Konstanten (Keys als enum) | Offen |
-| PROJ-34 LLMProcessorFactory | Offen |
-| PROJ-35 Provider-Konsolidierung (ollamaEnabled entfernen) | Offen |
-| PROJ-36 AppState aufteilen (God Object → Services) | Offen |
-| PROJ-37 Unit Tests | Offen |
+| PROJ-33 Storage-Konstanten (Keys als enum) | Abgeschlossen |
+| PROJ-34 LLMProcessorFactory | Abgeschlossen |
+| PROJ-35 Provider-Konsolidierung (ollamaEnabled entfernen) | Abgeschlossen |
+| PROJ-36 AppState aufteilen (God Object → Services) | Abgeschlossen |
+| PROJ-37 Unit Tests | Abgeschlossen |
+| PROJ-38 Fehleranzeige im Popover (Auto-Open, typsicher) | Abgeschlossen |
 
 ## Nutzer-Kontext
 

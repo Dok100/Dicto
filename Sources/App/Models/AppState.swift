@@ -173,7 +173,7 @@ private extension AppState {
                 guard let self else { return }
                 self.isRecording = false
                 self.isTransformRecording = false
-                self.transcriptionState = .error(DictoError.appleSpeechUnavailable.displayMessage)
+                self.transcriptionState = .error(.appleSpeechUnavailable)
             }
         }
     }
@@ -288,10 +288,10 @@ private extension AppState {
                     text: text
                 )
             } catch let e as DictoError {
-                transcriptionState = .error(e.displayMessage)
+                transcriptionState = .error(e)
                 return
             } catch {
-                transcriptionState = .error(DictoError.ollamaNotReachable.displayMessage)
+                transcriptionState = .error(.ollamaNotReachable)
                 return
             }
             guard let accumulated = await runLLMStream(stream) else { return }
@@ -340,10 +340,10 @@ private extension AppState {
                     command: command
                 )
             } catch let e as DictoError {
-                transcriptionState = .error(e.displayMessage)
+                transcriptionState = .error(e)
                 return
             } catch {
-                transcriptionState = .error(DictoError.ollamaNotReachable.displayMessage)
+                transcriptionState = .error(.ollamaNotReachable)
                 return
             }
             guard let accumulated = await runLLMStream(stream) else { return }
@@ -372,10 +372,10 @@ private extension AppState {
                 transcriptionState = .streaming(accumulated)
             }
         } catch let e as DictoError {
-            transcriptionState = .error(e.displayMessage)
+            transcriptionState = .error(e)
             return nil
         } catch {
-            transcriptionState = .error(DictoError.ollamaUnknown.displayMessage)
+            transcriptionState = .error(.ollamaUnknown)
             return nil
         }
         return accumulated

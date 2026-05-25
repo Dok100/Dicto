@@ -45,8 +45,8 @@ final class MenuBarController {
             }
         }
 
-        // Panel nur öffnen wenn Preview aktiv oder Transform-Ergebnis wartet.
-        // Ohne Preview: KI arbeitet still im Hintergrund, Text erscheint direkt am Cursor.
+        // Panel öffnen wenn Preview aktiv, Transform-Ergebnis wartet, oder ein Fehler aufgetreten ist.
+        // Fehler immer anzeigen – unabhängig von previewEnabled, damit der Nutzer nicht ins Leere schaut.
         appState.$transcriptionState
             .receive(on: RunLoop.main)
             .sink { [weak self, weak appState] state in
@@ -57,6 +57,8 @@ final class MenuBarController {
                     if needsPanel { self.showPanel() }
                 case .done:
                     if needsPanel { self.showPanel() }
+                case .error:
+                    self.showPanel()   // Fehler immer sichtbar machen
                 default:
                     break
                 }

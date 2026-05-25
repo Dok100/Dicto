@@ -4,5 +4,5 @@ enum TranscriptionState: Equatable {
     case transcribing
     case streaming(String)      // Ollama-Antwort trifft live ein
     case done(String)
-    case error(String)
+    case error(DictoError)      // typsicher – kein String-Parsing mehr nötig
 }

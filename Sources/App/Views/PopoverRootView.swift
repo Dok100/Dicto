@@ -342,42 +342,56 @@ struct PopoverRootView: View {
                 .onChange(of: text) { editableText = $1 }
             }
 
-        case .error(let message):
-            errorView(message: message)
+        case .error(let error):
+            errorView(error: error)
         }
     }
 
     // MARK: – Fehler-Ansicht
 
-    private func errorView(message: String) -> some View {
-        // Nachricht ist "Titel\nDetail" – erste Zeile = Titel, Rest = Detail
-        let lines = message.split(separator: "\n", maxSplits: 1, omittingEmptySubsequences: false)
-        let title  = lines.first.map(String.init) ?? message
-        let detail = lines.dropFirst().first.map(String.init) ?? ""
-
-        return VStack(spacing: 10) {
+    private func errorView(error: DictoError) -> some View {
+        VStack(spacing: 10) {
             Image(systemName: "exclamationmark.triangle.fill")
                 .font(.system(size: 24))
                 .foregroundStyle(.red)
 
-            Text(title)
+            Text(error.title)
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(.red)
                 .multilineTextAlignment(.center)
 
-            if !detail.isEmpty {
-                Text(detail)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
+            Text(error.detail)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
 
-            Button("Schließen") {
-                appState.dismissError()
+            // Aktions-Buttons: Einstellungen öffnen wenn sinnvoll
+            VStack(spacing: 6) {
+                if error.needsAppSettings {
+                    Button("KI-Einstellungen öffnen") {
+                        appState.onOpenSettings?()
+                        appState.dismissError()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.small)
+                }
+
+                if let url = error.systemSettingsURL {
+                    Button("Systemeinstellungen öffnen") {
+                        NSWorkspace.shared.open(url)
+                        appState.dismissError()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.small)
+                }
+
+                Button("Schließen") {
+                    appState.dismissError()
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
             }
-            .buttonStyle(.bordered)
-            .controlSize(.small)
             .padding(.top, 4)
         }
         .padding(.horizontal, 8)
