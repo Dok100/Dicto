@@ -44,18 +44,18 @@ final class MenuBarController {
             }
         }
 
-        // Panel automatisch öffnen wenn Vorschau nötig ist oder Streaming läuft
+        // Panel nur öffnen wenn Preview aktiv oder Transform-Ergebnis wartet.
+        // Ohne Preview: KI arbeitet still im Hintergrund, Text erscheint direkt am Cursor.
         appState.$transcriptionState
             .receive(on: RunLoop.main)
             .sink { [weak self, weak appState] state in
                 guard let self, let appState else { return }
+                let needsPanel = appState.settings.previewEnabled || appState.isTransformResult
                 switch state {
                 case .streaming:
-                    self.showPanel()
+                    if needsPanel { self.showPanel() }
                 case .done:
-                    if appState.settings.previewEnabled || appState.isTransformResult {
-                        self.showPanel()
-                    }
+                    if needsPanel { self.showPanel() }
                 default:
                     break
                 }
@@ -88,7 +88,9 @@ final class MenuBarController {
             // Modell wird geladen: Wellenform
             symbolName = "waveform"
         } else if case .transcribing = appState.transcriptionState {
-            // Transkription läuft: Wellenform
+            symbolName = "waveform"
+        } else if case .streaming = appState.transcriptionState {
+            // KI verarbeitet – auch ohne Panel sichtbar im Menübar-Icon
             symbolName = "waveform"
         } else if case .error = appState.transcriptionState {
             symbolName = "exclamationmark.circle"
