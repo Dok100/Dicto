@@ -391,7 +391,10 @@ struct PopoverRootView: View {
             shortcutRow(keys: ["Fn"],       description: "Diktieren",           icon: "mic.fill")
             transformRow
             Divider().padding(.vertical, 2)
-            shortcutRow(keys: ["⌘", "↩"],  description: "Einfügen / Kopieren", icon: "return")
+            // ⌘↩ funktioniert nur im Preview-Modus (Panel muss offen sein)
+            if appState.settings.previewEnabled {
+                shortcutRow(keys: ["⌘", "↩"],  description: "Einfügen",        icon: "return")
+            }
             shortcutRow(keys: ["⎋"],       description: "Schließen",           icon: "xmark")
             shortcutRow(keys: ["⌘", "Q"],  description: "Beenden",             icon: "xmark.circle")
         }
