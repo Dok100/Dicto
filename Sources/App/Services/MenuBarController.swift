@@ -8,6 +8,7 @@ final class MenuBarController {
     private var cancellables = Set<AnyCancellable>()
     private var clickOutsideMonitor: Any?
     private var cmdReturnMonitor: Any?
+    private var cmdReturnLocalMonitor: Any?
     private var escapeMonitor: Any?
     private weak var appState: AppState?
     private var settingsWindowController: SettingsWindowController?
@@ -165,12 +166,20 @@ final class MenuBarController {
         ) { [weak self] _ in
             self?.hidePanel()
         }
-        // ⌘+Return: nonactivatingPanel empfängt keine Tastatur-Events solange Dicto
-        // nicht die aktive App ist – daher globaler Monitor statt .keyboardShortcut()
+        // ⌘+Return: globaler Monitor für den Fall dass das Panel NICHT Key ist
+        // (anderer App im Vordergrund, Dicto nicht aktiv)
         cmdReturnMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { event in
             guard event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command,
                   event.keyCode == 36 else { return }
             NotificationCenter.default.post(name: .dictoCmdReturn, object: nil)
+        }
+        // ⌘+Return: lokaler Monitor für den Fall dass das Panel Key ist
+        // (makeKey() wurde aufgerufen → Events kommen lokal an, globaler Monitor greift nicht)
+        cmdReturnLocalMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+            guard event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command,
+                  event.keyCode == 36 else { return event }
+            NotificationCenter.default.post(name: .dictoCmdReturn, object: nil)
+            return nil  // Ereignis konsumieren
         }
         // ⎋ Escape: Ergebnis/Fehler schließen oder Panel ausblenden
         escapeMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [weak self, weak appState] event in
@@ -190,12 +199,14 @@ final class MenuBarController {
 
     private func hidePanel() {
         panel.orderOut(nil)
-        if let m = clickOutsideMonitor { NSEvent.removeMonitor(m) }
-        if let m = cmdReturnMonitor    { NSEvent.removeMonitor(m) }
-        if let m = escapeMonitor       { NSEvent.removeMonitor(m) }
-        cmdReturnMonitor = nil
-        clickOutsideMonitor = nil
-        escapeMonitor = nil
+        if let m = clickOutsideMonitor   { NSEvent.removeMonitor(m) }
+        if let m = cmdReturnMonitor      { NSEvent.removeMonitor(m) }
+        if let m = cmdReturnLocalMonitor { NSEvent.removeMonitor(m) }
+        if let m = escapeMonitor         { NSEvent.removeMonitor(m) }
+        clickOutsideMonitor   = nil
+        cmdReturnMonitor      = nil
+        cmdReturnLocalMonitor = nil
+        escapeMonitor         = nil
     }
 
     private func positionPanel() {
