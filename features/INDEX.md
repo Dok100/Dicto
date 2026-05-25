@@ -38,5 +38,5 @@
 | [PROJ-34](PROJ-34-llm-processor-factory.md) | LLMProcessorFactory (Provider-switch zentralisieren) | Abgeschlossen |
 | [PROJ-35](PROJ-35-provider-konsolidierung.md) | Provider-Konsolidierung (ollamaEnabled entfernen) | Abgeschlossen |
 | [PROJ-36](PROJ-36-appstate-aufteilen.md) | AppState aufteilen (init() mit privaten Hilfsmethoden) | Abgeschlossen |
-| [PROJ-37](PROJ-37-unit-tests.md) | Unit Tests (DictoError, Settings, PostProcessor, Keychain) | Stufe 1 abgeschlossen (74 Tests) |
+| [PROJ-37](PROJ-37-unit-tests.md) | Unit Tests (DictoError, Settings, PostProcessor, Keychain) | Stufe 1+2 abgeschlossen (121 Tests) |
 | [PROJ-38](PROJ-38-fehleranzeige.md) | Fehleranzeige im Popover (Auto-Open, typsicher, actionable) | Abgeschlossen |

@@ -537,3 +537,355 @@ final class KeychainServiceTests: XCTestCase {
         XCTAssertTrue(loaded == nil || loaded == "")
     }
 }
+
+// MARK: – StatsService (Stufe 2)
+
+final class StatsServiceTests: XCTestCase {
+    var service: StatsService!
+
+    private let keys = [
+        "stats.totalDictations", "stats.totalWords",
+        "stats.transformCount", "stats.styleUsage", "stats.dailyCounts",
+    ]
+
+    override func setUp() {
+        super.setUp()
+        keys.forEach { UserDefaults.standard.removeObject(forKey: $0) }
+        service = StatsService()
+    }
+
+    override func tearDown() {
+        keys.forEach { UserDefaults.standard.removeObject(forKey: $0) }
+        super.tearDown()
+    }
+
+    func testRecordIncrementsDictationCount() {
+        service.record(text: "Hallo Welt", style: "neutral", isTransform: false)
+        XCTAssertEqual(service.totalDictations, 1)
+    }
+
+    func testRecordCountsWords() {
+        service.record(text: "Hallo schöne Welt", style: "neutral", isTransform: false)
+        XCTAssertEqual(service.totalWords, 3)
+    }
+
+    func testRecordIncrementsTransformCount() {
+        service.record(text: "Text", style: "neutral", isTransform: true)
+        XCTAssertEqual(service.transformCount, 1)
+    }
+
+    func testRecordDoesNotIncrementTransformWhenFalse() {
+        service.record(text: "Text", style: "neutral", isTransform: false)
+        XCTAssertEqual(service.transformCount, 0)
+    }
+
+    func testRecordAccumulatesAcrossMultipleCalls() {
+        service.record(text: "Hallo Welt", style: "neutral", isTransform: false)         // 2 Wörter
+        service.record(text: "Noch drei Wörter hier", style: "neutral", isTransform: false) // 4 Wörter
+        XCTAssertEqual(service.totalDictations, 2)
+        XCTAssertEqual(service.totalWords, 6)
+    }
+
+    func testAverageWordsCalculation() {
+        service.record(text: "Hallo Welt", style: "neutral", isTransform: false)          // 2
+        service.record(text: "Noch drei Wörter hier", style: "neutral", isTransform: false) // 4
+        XCTAssertEqual(service.averageWords, 3) // (2+4)/2
+    }
+
+    func testAverageWordsZeroWhenNoDictations() {
+        XCTAssertEqual(service.averageWords, 0)
+    }
+
+    func testFavoriteStyleReturnsMostUsed() {
+        service.record(text: "Text", style: "formal", isTransform: false)
+        service.record(text: "Text", style: "formal", isTransform: false)
+        service.record(text: "Text", style: "neutral", isTransform: false)
+        XCTAssertEqual(service.favoriteStyle, "formal")
+    }
+
+    func testFavoriteStyleReturnsPlaceholderWhenEmpty() {
+        XCTAssertEqual(service.favoriteStyle, "–")
+    }
+
+    func testStyleUsageAccumulates() {
+        service.record(text: "Text", style: "formal", isTransform: false)
+        service.record(text: "Text", style: "formal", isTransform: false)
+        service.record(text: "Text", style: "neutral", isTransform: false)
+        XCTAssertEqual(service.styleUsage["formal"], 2)
+        XCTAssertEqual(service.styleUsage["neutral"], 1)
+    }
+
+    func testTodayCount() {
+        service.record(text: "Text", style: "neutral", isTransform: false)
+        service.record(text: "Text", style: "neutral", isTransform: false)
+        XCTAssertEqual(service.todayCount, 2)
+    }
+
+    func testPersistence() {
+        service.record(text: "Persistenz Test mit Wörtern", style: "formal", isTransform: true)
+        let reloaded = StatsService()
+        XCTAssertEqual(reloaded.totalDictations, 1)
+        XCTAssertEqual(reloaded.totalWords, 4)
+        XCTAssertEqual(reloaded.transformCount, 1)
+        XCTAssertEqual(reloaded.styleUsage["formal"], 1)
+    }
+}
+
+// MARK: – PassthroughPostProcessor (Stufe 2)
+
+final class PassthroughPostProcessorTests: XCTestCase {
+    func testProcessReturnsUnchangedText() async throws {
+        let result = try await PassthroughPostProcessor().process(text: "Hallo Welt")
+        XCTAssertEqual(result, "Hallo Welt")
+    }
+
+    func testProcessReturnsEmptyString() async throws {
+        let result = try await PassthroughPostProcessor().process(text: "")
+        XCTAssertEqual(result, "")
+    }
+
+    func testProcessPreservesWhitespaceAndNewlines() async throws {
+        let input = "  Zeile 1\n  Zeile 2  "
+        let result = try await PassthroughPostProcessor().process(text: input)
+        XCTAssertEqual(result, input)
+    }
+}
+
+// MARK: – LLMProcessorFactory (Stufe 2)
+//
+// Testet ausschließlich Fehler die bei der Initialisierung geworfen werden
+// (ungültige Konfiguration) – kein Netzwerkaufruf nötig.
+
+final class LLMProcessorFactoryTests: XCTestCase {
+    private let defaultsKeys = [
+        "llmProvider", "openAIBaseURL", "openAIModel",
+        "ollamaBaseURL", "ollamaModel",
+    ]
+
+    override func setUp() {
+        super.setUp()
+        defaultsKeys.forEach { UserDefaults.standard.removeObject(forKey: $0) }
+        KeychainService.shared.delete(forKey: StorageKey.Keychain.openAIApiKey)
+    }
+
+    override func tearDown() {
+        defaultsKeys.forEach { UserDefaults.standard.removeObject(forKey: $0) }
+        KeychainService.shared.delete(forKey: StorageKey.Keychain.openAIApiKey)
+        super.tearDown()
+    }
+
+    // MARK: dictationStream – OpenAI
+
+    func testDictationStreamThrowsOpenAIKeyMissingWhenEmpty() {
+        let s = AppSettings()
+        s.llmProvider = .openAI
+        // Kein Key in Keychain → openAIApiKey == ""
+        XCTAssertThrowsError(
+            try LLMProcessorFactory.dictationStream(settings: s, systemPrompt: "test", text: "hallo")
+        ) { XCTAssertEqual($0 as? DictoError, .openAIKeyMissing) }
+    }
+
+    func testDictationStreamThrowsOpenAINotReachableForNonHTTPURL() {
+        let s = AppSettings()
+        s.llmProvider = .openAI
+        s.openAIApiKey = "sk-test"
+        s.openAIBaseURL = "ftp://example.com" // kein http/https → ungültig
+        XCTAssertThrowsError(
+            try LLMProcessorFactory.dictationStream(settings: s, systemPrompt: "test", text: "hallo")
+        ) { XCTAssertEqual($0 as? DictoError, .openAINotReachable) }
+    }
+
+    func testDictationStreamSucceedsWithValidOpenAIConfig() {
+        let s = AppSettings()
+        s.llmProvider = .openAI
+        s.openAIApiKey = "sk-test"
+        s.openAIBaseURL = "https://api.openai.com/v1"
+        XCTAssertNoThrow(
+            try LLMProcessorFactory.dictationStream(settings: s, systemPrompt: "test", text: "hallo")
+        )
+    }
+
+    // MARK: dictationStream – Ollama
+
+    func testDictationStreamSucceedsWithValidOllamaConfig() {
+        let s = AppSettings()
+        s.llmProvider = .ollama
+        s.ollamaBaseURL = "http://localhost:11434"
+        XCTAssertNoThrow(
+            try LLMProcessorFactory.dictationStream(settings: s, systemPrompt: "test", text: "hallo")
+        )
+    }
+
+    // MARK: transformStream – OpenAI
+
+    func testTransformStreamThrowsOpenAIKeyMissingWhenEmpty() {
+        let s = AppSettings()
+        s.llmProvider = .openAI
+        XCTAssertThrowsError(
+            try LLMProcessorFactory.transformStream(settings: s, original: "text", command: "befehl")
+        ) { XCTAssertEqual($0 as? DictoError, .openAIKeyMissing) }
+    }
+
+    func testTransformStreamThrowsOpenAINotReachableForNonHTTPURL() {
+        let s = AppSettings()
+        s.llmProvider = .openAI
+        s.openAIApiKey = "sk-test"
+        s.openAIBaseURL = "ftp://example.com"
+        XCTAssertThrowsError(
+            try LLMProcessorFactory.transformStream(settings: s, original: "text", command: "befehl")
+        ) { XCTAssertEqual($0 as? DictoError, .openAINotReachable) }
+    }
+}
+
+// MARK: – DictoError: Actionable Properties (PROJ-38, Stufe 2)
+
+extension DictoErrorTests {
+    func testNeedsAppSettingsForOpenAIErrors() {
+        XCTAssertTrue(DictoError.openAIKeyMissing.needsAppSettings)
+        XCTAssertTrue(DictoError.openAIAuthFailed.needsAppSettings)
+    }
+
+    func testNeedsAppSettingsForOllamaErrors() {
+        XCTAssertTrue(DictoError.ollamaNotReachable.needsAppSettings)
+        XCTAssertTrue(DictoError.ollamaTimeout.needsAppSettings)
+    }
+
+    func testNeedsAppSettingsIsFalseForOtherErrors() {
+        XCTAssertFalse(DictoError.whisperModelLoad.needsAppSettings)
+        XCTAssertFalse(DictoError.whisperTranscription.needsAppSettings)
+        XCTAssertFalse(DictoError.appleSpeechUnavailable.needsAppSettings)
+        XCTAssertFalse(DictoError.ollamaEmptyResponse.needsAppSettings)
+        XCTAssertFalse(DictoError.openAIUnknown.needsAppSettings)
+    }
+
+    func testSystemSettingsURLPresentForAppleSpeechDenied() {
+        XCTAssertNotNil(DictoError.appleSpeechDenied.systemSettingsURL)
+    }
+
+    func testSystemSettingsURLNilForNonPermissionErrors() {
+        XCTAssertNil(DictoError.ollamaNotReachable.systemSettingsURL)
+        XCTAssertNil(DictoError.openAIKeyMissing.systemSettingsURL)
+        XCTAssertNil(DictoError.whisperModelLoad.systemSettingsURL)
+        XCTAssertNil(DictoError.appleSpeechUnavailable.systemSettingsURL)
+    }
+}
+
+// MARK: – TranscriptionState (Stufe 2)
+
+final class TranscriptionStateTests: XCTestCase {
+    func testIdleEquality() {
+        XCTAssertEqual(TranscriptionState.idle, .idle)
+    }
+
+    func testTranscribingEquality() {
+        XCTAssertEqual(TranscriptionState.transcribing, .transcribing)
+    }
+
+    func testLoadingModelEqualityForSameProgress() {
+        XCTAssertEqual(TranscriptionState.loadingModel(0.5), .loadingModel(0.5))
+    }
+
+    func testLoadingModelInequalityForDifferentProgress() {
+        XCTAssertNotEqual(TranscriptionState.loadingModel(0.3), .loadingModel(0.7))
+    }
+
+    func testStreamingEquality() {
+        XCTAssertEqual(TranscriptionState.streaming("Hallo"), .streaming("Hallo"))
+    }
+
+    func testDoneEquality() {
+        XCTAssertEqual(TranscriptionState.done("Text"), .done("Text"))
+    }
+
+    func testErrorEqualityWithSameDictoError() {
+        // Typsicherer Error-Vergleich dank PROJ-38 (DictoError statt String)
+        XCTAssertEqual(TranscriptionState.error(.ollamaNotReachable), .error(.ollamaNotReachable))
+    }
+
+    func testErrorInequalityForDifferentErrors() {
+        XCTAssertNotEqual(
+            TranscriptionState.error(.ollamaNotReachable),
+            TranscriptionState.error(.openAIKeyMissing)
+        )
+    }
+
+    func testDifferentStatesAreNotEqual() {
+        XCTAssertNotEqual(TranscriptionState.idle, .transcribing)
+        XCTAssertNotEqual(TranscriptionState.done("a"), .streaming("a"))
+        XCTAssertNotEqual(TranscriptionState.idle, .done(""))
+    }
+}
+
+// MARK: – CustomStyle (Stufe 2)
+
+final class CustomStyleTests: XCTestCase {
+    func testInitSetsNameAndPrompt() {
+        let id = UUID()
+        let style = CustomStyle(id: id, name: "Mein Stil", prompt: "Bitte formell")
+        XCTAssertEqual(style.id, id)
+        XCTAssertEqual(style.name, "Mein Stil")
+        XCTAssertEqual(style.prompt, "Bitte formell")
+    }
+
+    func testAutoGeneratedIDsAreUnique() {
+        let a = CustomStyle(name: "A", prompt: "P")
+        let b = CustomStyle(name: "A", prompt: "P")
+        XCTAssertNotEqual(a.id, b.id)
+    }
+
+    func testEqualityBasedOnAllFields() {
+        let id = UUID()
+        let a = CustomStyle(id: id, name: "Stil", prompt: "Prompt")
+        let b = CustomStyle(id: id, name: "Stil", prompt: "Prompt")
+        XCTAssertEqual(a, b)
+    }
+
+    func testCodableRoundtrip() throws {
+        let style = CustomStyle(name: "Codier-Test", prompt: "System-Prompt hier")
+        let data = try JSONEncoder().encode(style)
+        let decoded = try JSONDecoder().decode(CustomStyle.self, from: data)
+        XCTAssertEqual(style, decoded)
+        XCTAssertEqual(decoded.name, "Codier-Test")
+        XCTAssertEqual(decoded.prompt, "System-Prompt hier")
+    }
+}
+
+// MARK: – ShortcutConfig (Stufe 2)
+
+final class ShortcutConfigTests: XCTestCase {
+    func testDefaultDictationIsFlagsBased() {
+        XCTAssertTrue(ShortcutConfig.defaultDictation.isFlagsBased)
+    }
+
+    func testDefaultDictationKeyCode() {
+        XCTAssertEqual(ShortcutConfig.defaultDictation.keyCode, 63) // Fn-Taste
+    }
+
+    func testDefaultDictationHasNoModifiers() {
+        XCTAssertEqual(ShortcutConfig.defaultDictation.modifierFlags, [])
+    }
+
+    func testDefaultTransformHasOptionModifier() {
+        XCTAssertTrue(ShortcutConfig.defaultTransform.modifierFlags.contains(.option))
+    }
+
+    func testDisplayKeysFnOnly() {
+        XCTAssertEqual(ShortcutConfig.defaultDictation.displayKeys, ["Fn"])
+    }
+
+    func testDisplayKeysOptionFn() {
+        XCTAssertEqual(ShortcutConfig.defaultTransform.displayKeys, ["⌥", "Fn"])
+    }
+
+    func testFallbackLabelForUnknownKeyCode() {
+        let config = ShortcutConfig(isFlagsBased: false, keyCode: 255, modifierRaw: 0)
+        XCTAssertEqual(config.displayKeys, ["(255)"])
+    }
+
+    func testCodableRoundtrip() throws {
+        let config = ShortcutConfig.defaultTransform
+        let data = try JSONEncoder().encode(config)
+        let decoded = try JSONDecoder().decode(ShortcutConfig.self, from: data)
+        XCTAssertEqual(config, decoded)
+    }
+}

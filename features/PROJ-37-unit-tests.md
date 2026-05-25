@@ -1,6 +1,6 @@
 # PROJ-37 – Unit Tests
 
-**Status:** Offen  
+**Status:** Stufe 1 + 2 abgeschlossen ✅ (121 Tests)  
 **Aufwand:** M–L (laufend, iterativ)  
 **Typ:** Qualitätssicherung
 
@@ -53,9 +53,23 @@ alle Szenarien getestet werden — das dauert und führt zu Regressionen.
 // Kein UITest-Target nötig, reine Unit Tests mit XCTest
 ```
 
+## Abgeschlossene Stufen
+
+### Stufe 1 (74 Tests) – Modelle, Settings, Services
+DictoError, AppSettings (inkl. Migration), KeychainService, DictionaryService,
+HistoryService, DictationStyle, WhisperLanguage, WhisperModel,
+LLMProvider, StorageKey.
+
+### Stufe 2 (47 neue Tests, gesamt 121)
+StatsService (record, averageWords, favoriteStyle, Persistenz),
+PassthroughPostProcessor, LLMProcessorFactory (Init-Fehler, Konfiguration),
+DictoError-Properties (needsAppSettings, systemSettingsURL aus PROJ-38),
+TranscriptionState (Equatable inkl. .error(DictoError)),
+CustomStyle (Init, Equality, Codable), ShortcutConfig (Defaults, displayKeys, Codable).
+
 ## Ziel-Coverage
 
-Stufe 1 + 2 abgedeckt = ~60% der Business-Logik getestet.  
+Stufe 1 + 2 abgedeckt = ~70% der Business-Logik getestet.  
 Das reicht aus, um Regressionen bei den häufigsten Änderungen zu erkennen.
 
 ## Risiko
