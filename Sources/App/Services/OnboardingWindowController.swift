@@ -13,9 +13,9 @@ final class OnboardingWindowController: NSWindowController {
         UserDefaults.standard.set(true, forKey: completedKey)
     }
 
-    init(onComplete: @escaping () -> Void) {
+    init(settings: AppSettings, onComplete: @escaping () -> Void) {
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 460, height: 480),
+            contentRect: NSRect(x: 0, y: 0, width: 480, height: 560),
             styleMask: [.titled, .closable, .fullSizeContentView],
             backing: .buffered,
             defer: false
@@ -29,7 +29,7 @@ final class OnboardingWindowController: NSWindowController {
         window.backgroundColor = .clear
         window.center()
 
-        let view = OnboardingView {
+        let view = OnboardingView(settings: settings) {
             OnboardingWindowController.markCompleted()
             onComplete()
         }
@@ -41,7 +41,7 @@ final class OnboardingWindowController: NSWindowController {
 
     func show() {
         // Größe explizit setzen – NSHostingController meldet beim ersten Rendern oft (0,0)
-        window?.setContentSize(NSSize(width: 460, height: 480))
+        window?.setContentSize(NSSize(width: 480, height: 560))
         window?.center()
         showWindow(nil)
         NSApp.activate(ignoringOtherApps: true)

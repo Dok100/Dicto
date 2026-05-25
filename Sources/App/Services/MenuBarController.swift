@@ -34,7 +34,7 @@ final class MenuBarController {
 
         // Onboarding beim ersten Start anzeigen
         if OnboardingWindowController.isNeeded {
-            onboardingWindowController = OnboardingWindowController { [weak self] in
+            onboardingWindowController = OnboardingWindowController(settings: appState.settings) { [weak self] in
                 self?.onboardingWindowController?.close()
                 self?.onboardingWindowController = nil
             }
