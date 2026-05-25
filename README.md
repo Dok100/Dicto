@@ -1,8 +1,9 @@
 # Dicto
 
-**Push-to-talk dictation for macOS — local, private, instant.**
+**Dictation for macOS. Fully local. No subscription. No cloud.**
 
-Hold a key, speak, release. Your words appear at the cursor — in any app, in under a second.
+Most dictation apps send your voice to a server. Dicto doesn't.  
+Hold a key, speak, release — your words appear at the cursor, processed entirely on your Mac.
 
 <!-- SCREENSHOT: Hero image — Dicto panel open with streaming text, over a Mail or Notion window -->
 <!-- Suggested size: 1200×750px, show the panel mid-stream with a few words appearing -->
@@ -12,77 +13,113 @@ Hold a key, speak, release. Your words appear at the cursor — in any app, in u
 ## Download
 
 > **Apple Developer Account in progress — release coming soon.**
-> 
+>
 > [⭐ Star this repo](../../stargazers) to get notified when it launches.
 
 ---
 
-## What it does
+## Why Dicto
 
-Dicto sits quietly in your menu bar. Press and hold your dictation key, speak naturally, release — the text is inserted exactly where your cursor is. No switching apps, no clicking, no copy-paste.
+The dictation app market is full. Here is why Dicto is different:
 
-**It works everywhere:** Mail, Notion, Slack, Notes, Terminal, any text field on macOS.
+| | Dicto | SuperWhisper | Wispr Flow | Apple Dictation |
+|---|---|---|---|---|
+| Fully local processing | ✅ | Partial | ❌ | Partial |
+| No subscription | ✅ | ❌ €8/mo | ❌ €15/mo | ✅ |
+| AI text smoothing | ✅ | ✅ | ✅ | ❌ |
+| Transform existing text | ✅ | ❌ | ❌ | ❌ |
+| Open source | ✅ | ❌ | ❌ | ❌ |
+| API key in Keychain | ✅ | unknown | unknown | — |
 
-<!-- SCREENSHOT: Three-panel collage — panel idle / panel recording (red dot) / panel streaming KI result -->
+**The core promise:** professional-quality dictation with AI — without your words ever leaving your Mac.
+
+---
+
+## Who it is for
+
+Dicto is built for people who care about **what happens to their data**:
+
+- 🏥 **Doctors, lawyers, therapists** — confidential content that must not touch a cloud
+- 📝 **Journalists, researchers, writers** — sensitive sources and drafts
+- 🔐 **Privacy-conscious professionals** — tired of every app wanting cloud access
+- 💸 **Subscription-fatigued users** — one app that just works, no monthly fee
+
+---
+
+## How it works
+
+Dicto sits in your menu bar. Works in any app — Mail, Notion, Slack, Notes, VS Code, Terminal.
+
+<!-- SCREENSHOT: Three-panel collage — panel idle / panel recording / panel streaming AI result -->
+
+**Three modes:**
+
+### 🎤 Dictate
+Hold your dictation key → speak → release. Text is inserted at the cursor.  
+Optional: AI smoothing removes filler words and corrects grammar automatically.
+
+### ✨ Transform
+Select text in any app → hold `⌥ Fn` → speak your instruction.
+
+> *"Make this more formal"*  
+> *"Translate to English"*  
+> *"Shorten to two sentences"*  
+> *"Fix the grammar"*
+
+**No other dictation app on macOS does this.**
+
+### 👁 Preview
+See the result before it's inserted. Edit inline, confirm with `⌘ ↩`.  
+Corrections are remembered in a personal dictionary — Dicto learns your vocabulary.
+
+---
+
+## Privacy in detail
+
+| What | Where it stays |
+|------|---------------|
+| Your voice recordings | On your Mac, deleted after transcription |
+| Transcribed text | On your Mac |
+| AI processing (Ollama) | On your Mac |
+| AI processing (OpenAI) | OpenAI's servers — **opt-in only, clearly labeled** |
+| Your OpenAI API key | macOS Keychain — encrypted, never written to disk |
+| Settings & history | On your Mac (UserDefaults) |
+
+Full details: [docs/PRIVACY.md](docs/PRIVACY.md)
 
 ---
 
 ## Features
 
-### 🎤 Two transcription engines
+### Two transcription engines
 
-| | Apple Speech | Whisper |
+| | Apple Speech | Whisper (recommended) |
 |---|---|---|
-| Download required | None | ~800 MB (one-time) |
-| Transcription | Live, word by word | After recording ends |
-| Quality | Good for everyday speech | Excellent, handles jargon |
-| Works offline | Yes | Yes |
+| Download | None | ~800 MB, one-time |
+| Speed | Live, word by word | Result after recording |
+| Quality | Good for everyday speech | Excellent — handles jargon, names, umlauts |
+| Offline | Yes | Yes |
 
-### 🧠 AI text smoothing (optional)
+### AI text smoothing
 
-Raw dictation gets cleaned up automatically — filler words removed, grammar corrected, tone adjusted. Choose your provider:
+Raw dictation gets cleaned up: filler words removed, grammar fixed, tone adjusted.  
+Choose your AI backend:
 
-- **Ollama (local)** — fully private, runs on your Mac, no cost
-- **OpenAI API** — cloud-fast, ~€0.01/day at normal usage
+- **Ollama (local)** — fully private, free, runs on your Mac
+- **OpenAI API** — faster, ~€0.01/day, opt-in
 
-Your API key is stored encrypted in the **macOS Keychain** — never in plain text.
+### Styles
 
-### ✨ Transform mode
+<!-- SCREENSHOT: Style picker in the panel -->
 
-Select text in any app → hold `⌥ Fn` → speak your instruction.
-
-> *"Make this more formal"*  
-> *"Translate to English"*  
-> *"Shorten to two sentences"*
-
-The result appears in Dicto for review before replacing the original.
-
-### 🎨 Styles
-
-Switch styles before dictating — the AI adjusts accordingly:
-
-| Style | Best for |
+| Style | Use case |
 |-------|----------|
-| Neutral | General use, clean and direct |
+| Neutral | Clean, direct — general purpose |
 | Formal | Emails, reports, business writing |
 | Casual | Slack, WhatsApp, quick notes |
-| Empathetic | Feedback, sensitive topics |
-| → EN | Dictate in German, output in English |
-
-Custom styles with your own prompt are also supported.
-
-<!-- SCREENSHOT: Style picker in the panel with "Formal" selected -->
-
-### 👁 Preview mode
-
-See the result before it's inserted. Edit inline, then confirm with `⌘ ↩`. Corrections are remembered in a personal dictionary.
-
-### 🔒 Privacy first
-
-- Audio **never leaves your device**
-- Whisper and Apple Speech run fully on-device
-- Ollama runs locally — no internet required
-- OpenAI is opt-in and clearly labeled
+| Empathetic | Feedback, sensitive conversations |
+| → EN | Dictate in German, get English output |
+| Custom | Define your own prompt (e.g. "Medical letter", "Meeting notes") |
 
 ---
 
@@ -90,37 +127,30 @@ See the result before it's inserted. Edit inline, then confirm with `⌘ ↩`. C
 
 - macOS 14.0 (Sonoma) or later
 - Apple Silicon (M1 or newer)
-- Microphone access
-- Accessibility permission (for text insertion)
+- Microphone permission
+- Accessibility permission (for automatic text insertion)
 
 ---
 
-## How to build from source
+## Build from source
 
 ```bash
-# Dependencies
+# Install dependencies
 brew install xcodegen swiftformat
 
-# Clone and build
+# Clone and run
 git clone https://github.com/Dok100/Dicto.git
 cd Dicto
-make generate   # Generate Xcode project
-make build      # Build the app
-make install-app # Install to /Applications
+make generate    # Generate Xcode project from project.yml
+make install-app # Build and install to /Applications
 ```
 
-Ollama is optional. If you want local AI smoothing:
+Optional — local AI with Ollama:
 ```bash
 brew install ollama
-ollama pull qwen2.5:32b   # recommended (~20 GB, needs 24 GB RAM)
-ollama pull qwen2.5:14b   # lighter option (~8 GB)
+ollama pull qwen2.5:14b   # lighter option (~8 GB RAM)
+ollama pull qwen2.5:32b   # best quality (~20 GB RAM)
 ```
-
----
-
-## Privacy Policy
-
-Dicto does not collect, transmit, or store any personal data. All processing happens locally unless you explicitly configure OpenAI API (opt-in). See [PRIVACY.md](docs/PRIVACY.md).
 
 ---
 
@@ -130,14 +160,14 @@ MIT — free to use, modify, and distribute.
 
 ---
 
-## Support the project
+## Support
 
-Dicto is free. If it saves you time, consider supporting development:
+Dicto is free and open source. If it saves you time or protects your privacy, consider supporting development:
 
 <!-- GUMROAD BADGE PLACEHOLDER -->
-> 💛 [Pay what you want on Gumroad](#) *(link coming soon)*
+> 💛 [Pay what you want](#) *(link coming soon)*
 
-This helps cover API costs and keeps development going.
+This covers API costs (Claude + OpenAI) and keeps the project going.
 
 ---
 
