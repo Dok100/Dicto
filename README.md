@@ -66,6 +66,7 @@ Select text in any app → hold `⌥ Fn` → speak your instruction.
 > *"Fix the grammar"*
 
 **No other dictation app on macOS does this.**
+![Dicto Panel](docs/screenshots/transform.png)
 
 ### 👁 Preview
 See the result before it's inserted. Edit inline, confirm with `⌘ ↩`.  
