@@ -10,7 +10,7 @@ Optional: Glättung via Ollama (qwen2.5:32b, http://localhost:11434).
 
 ## Aktueller Phasenstand
 
-**Stand**: PROJ-1–PROJ-23, PROJ-26–PROJ-35 abgeschlossen. PROJ-36–PROJ-37 offen (Refactoring).
+**Stand**: PROJ-1–PROJ-23, PROJ-26–PROJ-37 abgeschlossen.
 
 | Phase | Status |
 |-------|--------|

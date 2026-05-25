@@ -37,5 +37,5 @@
 | [PROJ-33](PROJ-33-storage-konstanten.md) | Storage-Konstanten (UserDefaults/Keychain-Keys als enum) | Abgeschlossen |
 | [PROJ-34](PROJ-34-llm-processor-factory.md) | LLMProcessorFactory (Provider-switch zentralisieren) | Abgeschlossen |
 | [PROJ-35](PROJ-35-provider-konsolidierung.md) | Provider-Konsolidierung (ollamaEnabled entfernen) | Abgeschlossen |
-| [PROJ-36](PROJ-36-appstate-aufteilen.md) | AppState aufteilen (God Object → fokussierte Services) | Offen |
+| [PROJ-36](PROJ-36-appstate-aufteilen.md) | AppState aufteilen (init() mit privaten Hilfsmethoden) | Abgeschlossen |
 | [PROJ-37](PROJ-37-unit-tests.md) | Unit Tests (DictoError, Settings, PostProcessor, Keychain) | Stufe 1 abgeschlossen (74 Tests) |
