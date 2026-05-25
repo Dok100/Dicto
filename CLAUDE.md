@@ -10,7 +10,7 @@ Optional: Glättung via Ollama (qwen2.5:32b, http://localhost:11434).
 
 ## Aktueller Phasenstand
 
-**Stand**: PROJ-1–PROJ-23, PROJ-26–PROJ-30 abgeschlossen.
+**Stand**: PROJ-1–PROJ-23, PROJ-26–PROJ-32 abgeschlossen. PROJ-33–PROJ-37 offen (Refactoring).
 
 | Phase | Status |
 |-------|--------|
@@ -42,6 +42,13 @@ Optional: Glättung via Ollama (qwen2.5:32b, http://localhost:11434).
 | PROJ-28 Ollama Streaming + Whisper Large v3 Turbo | Abgeschlossen |
 | PROJ-29 Apple Speech Engine (live, kein Download) | Abgeschlossen |
 | PROJ-30 OpenAI API als LLM-Alternative (Keychain-sicher) | Abgeschlossen |
+| PROJ-31 In-App Hilfe-Fenster (8 Abschnitte) | Abgeschlossen |
+| PROJ-32 Onboarding überarbeitet (5 Schritte) | Abgeschlossen |
+| PROJ-33 Storage-Konstanten (Keys als enum) | Offen |
+| PROJ-34 LLMProcessorFactory | Offen |
+| PROJ-35 Provider-Konsolidierung (ollamaEnabled entfernen) | Offen |
+| PROJ-36 AppState aufteilen (God Object → Services) | Offen |
+| PROJ-37 Unit Tests | Offen |
 
 ## Nutzer-Kontext
 
