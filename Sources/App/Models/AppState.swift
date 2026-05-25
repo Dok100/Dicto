@@ -233,25 +233,11 @@ final class AppState: ObservableObject {
         if settings.llmProvider != .disabled {
             let stream: AsyncThrowingStream<String, Error>
             do {
-                switch settings.llmProvider {
-                case .disabled:
-                    // Nicht erreichbar – äußere Bedingung schließt .disabled aus
-                    raw = text
-                    return
-                case .ollama:
-                    stream = try OllamaPostProcessor(
-                        baseURL: settings.ollamaBaseURL,
-                        model: settings.ollamaModel,
-                        systemPrompt: effectivePrompt
-                    ).streamProcess(text: text)
-                case .openAI:
-                    stream = try OpenAIPostProcessor(
-                        baseURL: settings.openAIBaseURL,
-                        apiKey: settings.openAIApiKey,
-                        model: settings.openAIModel,
-                        systemPrompt: effectivePrompt
-                    ).streamProcess(text: text)
-                }
+                stream = try LLMProcessorFactory.dictationStream(
+                    settings: settings,
+                    systemPrompt: effectivePrompt,
+                    text: text
+                )
             } catch let e as DictoError {
                 transcriptionState = .error(e.displayMessage)
                 return
@@ -259,20 +245,7 @@ final class AppState: ObservableObject {
                 transcriptionState = .error(DictoError.ollamaNotReachable.displayMessage)
                 return
             }
-            transcriptionState = .streaming("")
-            var accumulated = ""
-            do {
-                for try await chunk in stream {
-                    accumulated += chunk
-                    transcriptionState = .streaming(accumulated)
-                }
-            } catch let e as DictoError {
-                transcriptionState = .error(e.displayMessage)
-                return
-            } catch {
-                transcriptionState = .error(DictoError.ollamaUnknown.displayMessage)
-                return
-            }
+            guard let accumulated = await runLLMStream(stream) else { return }
             raw = accumulated.isEmpty ? text : accumulated
         } else {
             raw = text
@@ -312,23 +285,11 @@ final class AppState: ObservableObject {
         if settings.llmProvider != .disabled, !original.isEmpty {
             let stream: AsyncThrowingStream<String, Error>
             do {
-                switch settings.llmProvider {
-                case .disabled:
-                    // Nicht erreichbar – äußere Bedingung schließt .disabled aus
-                    result = original
-                    return
-                case .ollama:
-                    stream = try OllamaTransformProcessor(
-                        baseURL: settings.ollamaBaseURL,
-                        model: settings.ollamaModel
-                    ).streamProcess(original: original, command: command)
-                case .openAI:
-                    stream = try OpenAITransformProcessor(
-                        baseURL: settings.openAIBaseURL,
-                        apiKey: settings.openAIApiKey,
-                        model: settings.openAIModel
-                    ).streamProcess(original: original, command: command)
-                }
+                stream = try LLMProcessorFactory.transformStream(
+                    settings: settings,
+                    original: original,
+                    command: command
+                )
             } catch let e as DictoError {
                 transcriptionState = .error(e.displayMessage)
                 return
@@ -336,23 +297,10 @@ final class AppState: ObservableObject {
                 transcriptionState = .error(DictoError.ollamaNotReachable.displayMessage)
                 return
             }
-            transcriptionState = .streaming("")
-            var accumulated = ""
-            do {
-                for try await chunk in stream {
-                    accumulated += chunk
-                    transcriptionState = .streaming(accumulated)
-                }
-            } catch let e as DictoError {
-                transcriptionState = .error(e.displayMessage)
-                return
-            } catch {
-                transcriptionState = .error(DictoError.ollamaUnknown.displayMessage)
-                return
-            }
+            guard let accumulated = await runLLMStream(stream) else { return }
             result = accumulated.isEmpty ? original : accumulated.trimmingCharacters(in: .whitespacesAndNewlines)
         } else if !original.isEmpty {
-            // Ollama deaktiviert, aber Text vorhanden → ohne KI-Verarbeitung zeigen
+            // KI deaktiviert, aber Text vorhanden → ohne Verarbeitung zeigen
             result = original
         } else {
             result = command
@@ -373,6 +321,30 @@ final class AppState: ObservableObject {
     @MainActor
     func dismissError() {
         transcriptionState = .idle
+    }
+
+    // MARK: – LLM-Stream-Hilfe
+
+    /// Streamt Tokens in `transcriptionState` und gibt den vollständigen Text zurück.
+    /// Setzt bei Fehler `transcriptionState = .error(…)` und gibt `nil` zurück –
+    /// der Aufrufer kann dann einfach mit `guard let … else { return }` abbrechen.
+    @MainActor
+    private func runLLMStream(_ stream: AsyncThrowingStream<String, Error>) async -> String? {
+        transcriptionState = .streaming("")
+        var accumulated = ""
+        do {
+            for try await chunk in stream {
+                accumulated += chunk
+                transcriptionState = .streaming(accumulated)
+            }
+        } catch let e as DictoError {
+            transcriptionState = .error(e.displayMessage)
+            return nil
+        } catch {
+            transcriptionState = .error(DictoError.ollamaUnknown.displayMessage)
+            return nil
+        }
+        return accumulated
     }
 
     @MainActor
