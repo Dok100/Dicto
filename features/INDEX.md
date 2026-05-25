@@ -36,6 +36,6 @@
 | PROJ-32 | Onboarding überarbeitet (5 Schritte, Engine + KI-Wahl) | Abgeschlossen |
 | [PROJ-33](PROJ-33-storage-konstanten.md) | Storage-Konstanten (UserDefaults/Keychain-Keys als enum) | Abgeschlossen |
 | [PROJ-34](PROJ-34-llm-processor-factory.md) | LLMProcessorFactory (Provider-switch zentralisieren) | Offen |
-| [PROJ-35](PROJ-35-provider-konsolidierung.md) | Provider-Konsolidierung (ollamaEnabled entfernen) | Offen |
+| [PROJ-35](PROJ-35-provider-konsolidierung.md) | Provider-Konsolidierung (ollamaEnabled entfernen) | Abgeschlossen |
 | [PROJ-36](PROJ-36-appstate-aufteilen.md) | AppState aufteilen (God Object → fokussierte Services) | Offen |
 | [PROJ-37](PROJ-37-unit-tests.md) | Unit Tests (DictoError, Settings, PostProcessor, Keychain) | Offen |
