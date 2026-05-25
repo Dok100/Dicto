@@ -30,13 +30,11 @@ final class AppState: ObservableObject {
     /// Aktiver eigener Stil – überschreibt `dictationStyle` wenn gesetzt.
     @Published private(set) var selectedCustomStyle: CustomStyle?
 
-    /// Fixen Stil wählen und eigenen Stil abwählen.
     func selectFixedStyle(_ style: DictationStyle) {
         dictationStyle = style
         selectedCustomStyle = nil
     }
 
-    /// Eigenen Stil wählen.
     func selectCustomStyle(_ style: CustomStyle) {
         selectedCustomStyle = style
     }
@@ -61,20 +59,84 @@ final class AppState: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
 
     init() {
-        let audio = AudioService()
-        let hotkey = HotkeyService(
-            dictation: settings.dictationShortcut,
-            transform: settings.transformShortcut
-        )
+        let audio   = AudioService()
+        let hotkey  = HotkeyService(dictation: settings.dictationShortcut,
+                                    transform: settings.transformShortcut)
         let whisper = WhisperService()
-        let paste = PasteService()
-        self.audioService = audio
-        self.hotkeyService = hotkey
-        self.whisperService = whisper
-        self.pasteService = paste
-        self.hasMicrophonePermission = audio.isMicrophoneAuthorized
+        let paste   = PasteService()
+        audioService   = audio
+        hotkeyService  = hotkey
+        whisperService = whisper
+        pasteService   = paste
+        hasMicrophonePermission = audio.isMicrophoneAuthorized
 
-        whisper.$state
+        setupWhisperBinding()
+        audio.requestPermissionIfNeeded { [weak self] granted in
+            DispatchQueue.main.async { self?.hasMicrophonePermission = granted }
+        }
+        setupAppleSpeechCallbacks()
+        setupHotkeyCallbacks()
+        setupSettingsBindings()
+
+        Task { await whisperService.loadModelIfNeeded(model: settings.whisperModel) }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            paste.requestAccessibilityIfNeeded()
+        }
+        appleSpeechService.requestAuthorization { _ in }
+    }
+
+    // MARK: – Berechtigungen
+
+    func recheckPermissions() {
+        hotkeyService.retryIfNeeded()
+        hasMicrophonePermission = audioService.isMicrophoneAuthorized
+        pasteService.requestAccessibilityIfNeeded()
+        objectWillChange.send()
+    }
+
+    // MARK: – Stil-Aktionen
+
+    // MARK: – Ergebnis / Fehler
+
+    @MainActor
+    func dismissResult() {
+        isTransformResult = false
+        transcriptionState = .idle
+    }
+
+    @MainActor
+    func dismissError() {
+        transcriptionState = .idle
+    }
+
+    // MARK: – Text-Einfügung (Preview-Bestätigung)
+
+    @MainActor
+    func confirmPaste(original: String, edited: String) async {
+        dictionaryService.learnFromDiff(original: original, edited: edited)
+
+        let app = targetApp
+        targetApp = nil
+
+        if let app, app.bundleIdentifier != Bundle.main.bundleIdentifier {
+            app.activate(options: .activateIgnoringOtherApps)
+            try? await Task.sleep(nanoseconds: 100_000_000)
+            pasteService.paste(text: edited)
+            try? await Task.sleep(nanoseconds: 100_000_000)
+        }
+
+        historyService.add(text: edited)
+        isTransformResult = false
+        transcriptionState = .idle
+    }
+}
+
+// MARK: – Init-Hilfsmethoden (Wiring)
+
+private extension AppState {
+
+    func setupWhisperBinding() {
+        whisperService.$state
             .receive(on: RunLoop.main)
             .sink { [weak self] state in
                 guard let self else { return }
@@ -87,17 +149,12 @@ final class AppState: ObservableObject {
                 }
             }
             .store(in: &cancellables)
+    }
 
-        audio.requestPermissionIfNeeded { [weak self] granted in
-            DispatchQueue.main.async { self?.hasMicrophonePermission = granted }
-        }
-
-        // Apple Speech Callbacks – feuern auf beliebigem Thread
+    func setupAppleSpeechCallbacks() {
         appleSpeechService.onPartialResult = { [weak self] text in
             Task { @MainActor [weak self] in
                 guard let self, self.isRecording else { return }
-                // Nur anzeigen wenn kein Ollama danach folgt – sonst würde der
-                // Rohtext und der geglättete Text nacheinander streamen (doppelt).
                 if self.settings.llmProvider == .disabled {
                     self.transcriptionState = .streaming(text)
                 }
@@ -119,67 +176,70 @@ final class AppState: ObservableObject {
                 self.transcriptionState = .error(DictoError.appleSpeechUnavailable.displayMessage)
             }
         }
+    }
 
-        hotkey.onKeyDown = { [weak self] in
+    func setupHotkeyCallbacks() {
+        hotkeyService.onKeyDown = { [weak self] in
             guard let self else { return }
-            self.targetApp = NSWorkspace.shared.frontmostApplication
-            self.isRecording = true
+            targetApp = NSWorkspace.shared.frontmostApplication
+            isRecording = true
             if settings.soundFeedbackEnabled { SoundFeedback.playStart() }
             if settings.transcriptionEngine == .apple {
                 appleSpeechService.startRecording(locale: settings.whisperLanguage.appleLocale)
             } else {
-                audio.startRecording()
+                audioService.startRecording()
             }
         }
-        hotkey.onKeyUp = { [weak self] in
+        hotkeyService.onKeyUp = { [weak self] in
             guard let self else { return }
             if settings.soundFeedbackEnabled { SoundFeedback.playStop() }
             if settings.transcriptionEngine == .apple {
                 appleSpeechService.stopRecording()
                 // isRecording wird in onFinalResult zurückgesetzt
             } else {
-                self.isRecording = false
-                let model = self.settings.whisperModel
-                let language = self.settings.whisperLanguage
-                if let url = audio.stopRecording() {
-                    Task { await whisper.transcribe(fileURL: url, model: model, language: language) }
+                isRecording = false
+                let model    = settings.whisperModel
+                let language = settings.whisperLanguage
+                if let url = audioService.stopRecording() {
+                    Task { await self.whisperService.transcribe(fileURL: url, model: model, language: language) }
                 }
             }
         }
-
-        hotkey.onTransformKeyDown = { [weak self] in
+        hotkeyService.onTransformKeyDown = { [weak self] in
             guard let self else { return }
-            self.targetApp = NSWorkspace.shared.frontmostApplication
-            self.isTransformMode = true
-            self.isRecording = true
-            self.isTransformRecording = true
+            targetApp = NSWorkspace.shared.frontmostApplication
+            isTransformMode     = true
+            isRecording         = true
+            isTransformRecording = true
             if settings.soundFeedbackEnabled { SoundFeedback.playStart() }
             Task { @MainActor [weak self] in
-                self?.selectedTextForTransform = await paste.captureSelectedText()
+                self?.selectedTextForTransform = await self?.pasteService.captureSelectedText()
             }
             if settings.transcriptionEngine == .apple {
                 appleSpeechService.startRecording(locale: settings.whisperLanguage.appleLocale)
             } else {
-                audio.startRecording()
+                audioService.startRecording()
             }
         }
-        hotkey.onTransformKeyUp = { [weak self] in
+        hotkeyService.onTransformKeyUp = { [weak self] in
             guard let self else { return }
             if settings.soundFeedbackEnabled { SoundFeedback.playStop() }
             if settings.transcriptionEngine == .apple {
                 appleSpeechService.stopRecording()
                 // isRecording/isTransformRecording werden in onFinalResult zurückgesetzt
             } else {
-                self.isRecording = false
-                self.isTransformRecording = false
-                let model = self.settings.whisperModel
-                let language = self.settings.whisperLanguage
-                if let url = audio.stopRecording() {
-                    Task { await whisper.transcribe(fileURL: url, model: model, language: language) }
+                isRecording          = false
+                isTransformRecording = false
+                let model    = settings.whisperModel
+                let language = settings.whisperLanguage
+                if let url = audioService.stopRecording() {
+                    Task { await self.whisperService.transcribe(fileURL: url, model: model, language: language) }
                 }
             }
         }
+    }
 
+    func setupSettingsBindings() {
         // Settings-Änderungen an AppState.objectWillChange weiterleiten,
         // damit alle Views (z.B. PopoverRootView) neu rendern wenn sich
         // customStyles, llmProvider etc. ändern.
@@ -190,33 +250,21 @@ final class AppState: ObservableObject {
         // Shortcut-Änderungen aus Settings → HotkeyService weiterleiten
         settings.$dictationShortcut
             .dropFirst()
-            .sink { [weak hotkey] config in hotkey?.dictationShortcut = config }
+            .sink { [weak self] config in self?.hotkeyService.dictationShortcut = config }
             .store(in: &cancellables)
         settings.$transformShortcut
             .dropFirst()
-            .sink { [weak hotkey] config in hotkey?.transformShortcut = config }
+            .sink { [weak self] config in self?.hotkeyService.transformShortcut = config }
             .store(in: &cancellables)
-
-        Task { await whisper.loadModelIfNeeded(model: settings.whisperModel) }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            paste.requestAccessibilityIfNeeded()
-        }
-        // Apple Speech Permission vorab anfragen (nur Dialog, kein Zwang)
-        appleSpeechService.requestAuthorization { _ in }
     }
+}
 
-    func recheckPermissions() {
-        hotkeyService.retryIfNeeded()
-        hasMicrophonePermission = audioService.isMicrophoneAuthorized
-        pasteService.requestAccessibilityIfNeeded()
-        objectWillChange.send()
-    }
+// MARK: – Transkriptions-Pipeline
 
-    // MARK: – Text-Einfügung
+private extension AppState {
 
     @MainActor
-    private func handleTranscriptionDone(text: String) async {
+    func handleTranscriptionDone(text: String) async {
         if isTransformMode {
             isTransformMode = false
             await handleTransformDone(command: text)
@@ -229,6 +277,7 @@ final class AppState: ObservableObject {
         } else {
             effectivePrompt = dictationStyle.systemPrompt ?? settings.ollamaPrompt
         }
+
         let raw: String
         if settings.llmProvider != .disabled {
             let stream: AsyncThrowingStream<String, Error>
@@ -277,7 +326,7 @@ final class AppState: ObservableObject {
     }
 
     @MainActor
-    private func handleTransformDone(command: String) async {
+    func handleTransformDone(command: String) async {
         let original = selectedTextForTransform ?? ""
         selectedTextForTransform = nil
 
@@ -306,30 +355,15 @@ final class AppState: ObservableObject {
             result = command
         }
 
-        // Transform zeigt immer Vorschau – Auto-Einfügen ergibt im Transform-Modus keinen Sinn
         statsService.record(text: result, style: dictationStyle.rawValue, isTransform: true)
         isTransformResult = true
         transcriptionState = .done(result)
     }
 
-    @MainActor
-    func dismissResult() {
-        isTransformResult = false
-        transcriptionState = .idle
-    }
-
-    @MainActor
-    func dismissError() {
-        transcriptionState = .idle
-    }
-
-    // MARK: – LLM-Stream-Hilfe
-
     /// Streamt Tokens in `transcriptionState` und gibt den vollständigen Text zurück.
-    /// Setzt bei Fehler `transcriptionState = .error(…)` und gibt `nil` zurück –
-    /// der Aufrufer kann dann einfach mit `guard let … else { return }` abbrechen.
+    /// Gibt `nil` zurück wenn ein Fehler auftrat (transcriptionState wurde auf .error gesetzt).
     @MainActor
-    private func runLLMStream(_ stream: AsyncThrowingStream<String, Error>) async -> String? {
+    func runLLMStream(_ stream: AsyncThrowingStream<String, Error>) async -> String? {
         transcriptionState = .streaming("")
         var accumulated = ""
         do {
@@ -345,24 +379,5 @@ final class AppState: ObservableObject {
             return nil
         }
         return accumulated
-    }
-
-    @MainActor
-    func confirmPaste(original: String, edited: String) async {
-        dictionaryService.learnFromDiff(original: original, edited: edited)
-
-        let app = targetApp
-        targetApp = nil
-
-        if let app, app.bundleIdentifier != Bundle.main.bundleIdentifier {
-            app.activate(options: .activateIgnoringOtherApps)
-            try? await Task.sleep(nanoseconds: 100_000_000)
-            pasteService.paste(text: edited)
-            try? await Task.sleep(nanoseconds: 100_000_000)
-        }
-
-        historyService.add(text: edited)
-        isTransformResult = false
-        transcriptionState = .idle
     }
 }
