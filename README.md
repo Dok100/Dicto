@@ -6,7 +6,6 @@ Most dictation apps send your voice to a server. Dicto doesn't.
 Hold a key, speak, release — your words appear at the cursor, processed entirely on your Mac.
 
 ![Dicto Panel](docs/screenshots/hero.png)
-<!-- Suggested size: 1200×750px, show the panel mid-stream with a few words appearing -->
 
 ---
 
