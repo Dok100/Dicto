@@ -1,5 +1,5 @@
+@testable import Dicto
 import XCTest
-import Dicto
 
 // MARK: – DictionaryService
 
@@ -243,19 +243,33 @@ final class WhisperModelTests: XCTestCase {
     }
 }
 
-// MARK: – AppSettings Defaults
+// MARK: – AppSettings
 
 final class AppSettingsTests: XCTestCase {
+    // Alle persistierten Keys vor jedem Test löschen
+    private let keysToClean: [String] = [
+        "llmProvider", "ollamaBaseURL", "ollamaModel", "ollamaPrompt",
+        "whisperModel", "whisperLanguage", "previewEnabled", "soundFeedbackEnabled",
+        "transcriptionEngine", "openAIModel", "openAIBaseURL",
+        "ollamaEnabled",  // Legacy-Key – darf nicht mehr geschrieben werden
+    ]
+
     override func setUp() {
         super.setUp()
-        ["ollamaEnabled", "ollamaBaseURL", "ollamaModel",
-         "whisperModel", "whisperLanguage", "previewEnabled"].forEach {
-            UserDefaults.standard.removeObject(forKey: $0)
-        }
+        keysToClean.forEach { UserDefaults.standard.removeObject(forKey: $0) }
     }
 
-    func testDefaultOllamaEnabled() {
-        XCTAssertTrue(AppSettings().ollamaEnabled)
+    override func tearDown() {
+        keysToClean.forEach { UserDefaults.standard.removeObject(forKey: $0) }
+        super.tearDown()
+    }
+
+    func testDefaultLLMProvider() {
+        XCTAssertEqual(AppSettings().llmProvider, .ollama)
+    }
+
+    func testDefaultLLMEnabled() {
+        XCTAssertTrue(AppSettings().llmEnabled)
     }
 
     func testDefaultBaseURL() {
@@ -263,7 +277,7 @@ final class AppSettingsTests: XCTestCase {
     }
 
     func testDefaultOllamaModel() {
-        XCTAssertEqual(AppSettings().ollamaModel, "glm4")
+        XCTAssertEqual(AppSettings().ollamaModel, "qwen2.5:32b")
     }
 
     func testDefaultWhisperModel() {
@@ -276,5 +290,250 @@ final class AppSettingsTests: XCTestCase {
 
     func testDefaultPreviewDisabled() {
         XCTAssertFalse(AppSettings().previewEnabled)
+    }
+
+    func testDefaultSoundFeedbackEnabled() {
+        XCTAssertTrue(AppSettings().soundFeedbackEnabled)
+    }
+
+    func testDefaultOpenAIModel() {
+        XCTAssertEqual(AppSettings().openAIModel, "gpt-4o-mini")
+    }
+
+    func testDefaultOpenAIBaseURL() {
+        XCTAssertEqual(AppSettings().openAIBaseURL, "https://api.openai.com/v1")
+    }
+
+    func testLLMEnabledFalseWhenDisabled() {
+        let s = AppSettings()
+        s.llmProvider = .disabled
+        XCTAssertFalse(s.llmEnabled)
+    }
+
+    // MARK: Migration
+
+    func testMigrationOllamaEnabledFalse() {
+        // Altes Nutzer-Setup simulieren: ollamaEnabled = false gespeichert
+        UserDefaults.standard.set(false, forKey: "ollamaEnabled")
+        // llmProvider war noch nicht gesetzt → default .ollama
+        UserDefaults.standard.removeObject(forKey: "llmProvider")
+
+        let settings = AppSettings()
+
+        // Migration muss .disabled setzen
+        XCTAssertEqual(settings.llmProvider, .disabled)
+        // Legacy-Key muss danach gelöscht sein
+        XCTAssertNil(UserDefaults.standard.object(forKey: "ollamaEnabled"))
+    }
+
+    func testMigrationOllamaEnabledTrueKeepsProvider() {
+        UserDefaults.standard.set(true, forKey: "ollamaEnabled")
+        UserDefaults.standard.set("openai", forKey: "llmProvider")
+
+        let settings = AppSettings()
+
+        // ollamaEnabled=true darf llmProvider nicht überschreiben
+        XCTAssertEqual(settings.llmProvider, .openAI)
+        // Legacy-Key muss trotzdem gelöscht sein
+        XCTAssertNil(UserDefaults.standard.object(forKey: "ollamaEnabled"))
+    }
+
+    func testMigrationRunsOnlyOnce() {
+        UserDefaults.standard.set(false, forKey: "ollamaEnabled")
+        _ = AppSettings()  // erste Initialisierung: Migration läuft
+
+        // ollamaEnabled wurde gelöscht → zweite Init darf llmProvider nicht nochmal kippen
+        UserDefaults.standard.set("openai", forKey: "llmProvider")
+        let settings = AppSettings()
+        XCTAssertEqual(settings.llmProvider, .openAI)
+    }
+}
+
+// MARK: – LLMProvider
+
+final class LLMProviderTests: XCTestCase {
+    func testRawValues() {
+        XCTAssertEqual(LLMProvider.disabled.rawValue, "disabled")
+        XCTAssertEqual(LLMProvider.ollama.rawValue,   "ollama")
+        XCTAssertEqual(LLMProvider.openAI.rawValue,   "openai")
+    }
+
+    func testAllCasesHaveLabels() {
+        for provider in LLMProvider.allCases {
+            XCTAssertFalse(provider.label.isEmpty, "\(provider) hat kein Label")
+        }
+    }
+
+    func testActiveProvidersExcludesDisabled() {
+        XCTAssertFalse(LLMProvider.activeProviders.contains(.disabled))
+        XCTAssertTrue(LLMProvider.activeProviders.contains(.ollama))
+        XCTAssertTrue(LLMProvider.activeProviders.contains(.openAI))
+    }
+
+    func testUnknownRawValueFallsBackToOllama() {
+        // Verhindert Silent-Failure wenn ein alter/unbekannter rawValue in UserDefaults liegt
+        let provider = LLMProvider(rawValue: "unbekannt") ?? .ollama
+        XCTAssertEqual(provider, .ollama)
+    }
+}
+
+// MARK: – DictoError
+
+final class DictoErrorTests: XCTestCase {
+    func testAllCasesHaveNonEmptyTitles() {
+        let allErrors: [DictoError] = [
+            .whisperModelLoad, .whisperTranscription,
+            .appleSpeechDenied, .appleSpeechUnavailable,
+            .ollamaNotReachable, .ollamaTimeout, .ollamaEmptyResponse, .ollamaUnknown,
+            .openAIKeyMissing, .openAIAuthFailed, .openAINotReachable,
+            .openAITimeout, .openAIUnknown,
+        ]
+        for error in allErrors {
+            XCTAssertFalse(error.title.isEmpty, "\(error) hat keinen Titel")
+        }
+    }
+
+    func testAllCasesHaveNonEmptyDetails() {
+        let allErrors: [DictoError] = [
+            .whisperModelLoad, .whisperTranscription,
+            .appleSpeechDenied, .appleSpeechUnavailable,
+            .ollamaNotReachable, .ollamaTimeout, .ollamaEmptyResponse, .ollamaUnknown,
+            .openAIKeyMissing, .openAIAuthFailed, .openAINotReachable,
+            .openAITimeout, .openAIUnknown,
+        ]
+        for error in allErrors {
+            XCTAssertFalse(error.detail.isEmpty, "\(error) hat kein Detail")
+        }
+    }
+
+    func testDisplayMessageContainsTitleAndDetail() {
+        let error = DictoError.ollamaNotReachable
+        XCTAssertTrue(error.displayMessage.contains(error.title))
+        XCTAssertTrue(error.displayMessage.contains(error.detail))
+    }
+
+    // MARK: from(URLError) – Ollama
+
+    func testFromURLErrorTimeout() {
+        XCTAssertEqual(DictoError.from(URLError(.timedOut)), .ollamaTimeout)
+    }
+
+    func testFromURLErrorCannotConnect() {
+        XCTAssertEqual(DictoError.from(URLError(.cannotConnectToHost)), .ollamaNotReachable)
+    }
+
+    func testFromURLErrorNetworkLost() {
+        XCTAssertEqual(DictoError.from(URLError(.networkConnectionLost)), .ollamaNotReachable)
+    }
+
+    func testFromURLErrorNotConnected() {
+        XCTAssertEqual(DictoError.from(URLError(.notConnectedToInternet)), .ollamaNotReachable)
+    }
+
+    func testFromURLErrorUnknownFallback() {
+        XCTAssertEqual(DictoError.from(URLError(.badURL)), .ollamaUnknown)
+    }
+
+    // MARK: fromOpenAI(URLError)
+
+    func testFromOpenAITimeout() {
+        XCTAssertEqual(DictoError.fromOpenAI(URLError(.timedOut)), .openAITimeout)
+    }
+
+    func testFromOpenAICannotConnect() {
+        XCTAssertEqual(DictoError.fromOpenAI(URLError(.cannotConnectToHost)), .openAINotReachable)
+    }
+
+    func testFromOpenAINetworkLost() {
+        XCTAssertEqual(DictoError.fromOpenAI(URLError(.networkConnectionLost)), .openAINotReachable)
+    }
+
+    func testFromOpenAINotConnected() {
+        XCTAssertEqual(DictoError.fromOpenAI(URLError(.notConnectedToInternet)), .openAINotReachable)
+    }
+
+    func testFromOpenAIUnknownFallback() {
+        XCTAssertEqual(DictoError.fromOpenAI(URLError(.badURL)), .openAIUnknown)
+    }
+}
+
+// MARK: – StorageKey
+//
+// Diese Tests schützen vor versehentlichem Umbenennen von Keys die in
+// UserDefaults persistiert sind. Bestehende Nutzer verlieren sonst ihre Einstellungen.
+
+final class StorageKeyTests: XCTestCase {
+    func testUserDefaultsKeys() {
+        XCTAssertEqual(StorageKey.Defaults.ollamaBaseURL,        "ollamaBaseURL")
+        XCTAssertEqual(StorageKey.Defaults.ollamaModel,          "ollamaModel")
+        XCTAssertEqual(StorageKey.Defaults.ollamaPrompt,         "ollamaPrompt")
+        XCTAssertEqual(StorageKey.Defaults.transcriptionEngine,  "transcriptionEngine")
+        XCTAssertEqual(StorageKey.Defaults.whisperModel,         "whisperModel")
+        XCTAssertEqual(StorageKey.Defaults.whisperLanguage,      "whisperLanguage")
+        XCTAssertEqual(StorageKey.Defaults.previewEnabled,       "previewEnabled")
+        XCTAssertEqual(StorageKey.Defaults.soundFeedbackEnabled, "soundFeedbackEnabled")
+        XCTAssertEqual(StorageKey.Defaults.customStyles,         "customStyles")
+        XCTAssertEqual(StorageKey.Defaults.dictationShortcut,    "dictationShortcut")
+        XCTAssertEqual(StorageKey.Defaults.transformShortcut,    "transformShortcut")
+        XCTAssertEqual(StorageKey.Defaults.dictationStyle,       "dictationStyle")
+        XCTAssertEqual(StorageKey.Defaults.llmProvider,          "llmProvider")
+        XCTAssertEqual(StorageKey.Defaults.openAIModel,          "openAIModel")
+        XCTAssertEqual(StorageKey.Defaults.openAIBaseURL,        "openAIBaseURL")
+        XCTAssertEqual(StorageKey.Defaults.onboardingCompleted,  "onboardingCompleted")
+        XCTAssertEqual(StorageKey.Defaults.dictationHistory,     "dictationHistory")
+        XCTAssertEqual(StorageKey.Defaults.dictionaryEntries,    "dictionaryEntries")
+    }
+
+    func testLegacyKeyPreservedForMigration() {
+        // Wichtig: dieser String muss exakt dem alten UserDefaults-Key entsprechen
+        XCTAssertEqual(StorageKey.Defaults.ollamaEnabledLegacy, "ollamaEnabled")
+    }
+
+    func testKeychainKeys() {
+        XCTAssertEqual(StorageKey.Keychain.openAIApiKey, "openAIApiKey")
+    }
+}
+
+// MARK: – KeychainService
+
+final class KeychainServiceTests: XCTestCase {
+    private let testKey = "dicto.test.keychainKey"
+
+    override func tearDown() {
+        KeychainService.shared.delete(forKey: testKey)
+        super.tearDown()
+    }
+
+    func testSaveAndLoad() {
+        KeychainService.shared.save("mein-api-key", forKey: testKey)
+        XCTAssertEqual(KeychainService.shared.load(forKey: testKey), "mein-api-key")
+    }
+
+    func testLoadMissingKeyReturnsNil() {
+        XCTAssertNil(KeychainService.shared.load(forKey: testKey))
+    }
+
+    func testOverwriteUpdatesValue() {
+        KeychainService.shared.save("erster-wert", forKey: testKey)
+        KeychainService.shared.save("zweiter-wert", forKey: testKey)
+        XCTAssertEqual(KeychainService.shared.load(forKey: testKey), "zweiter-wert")
+    }
+
+    func testDeleteRemovesValue() {
+        KeychainService.shared.save("zu-loeschen", forKey: testKey)
+        KeychainService.shared.delete(forKey: testKey)
+        XCTAssertNil(KeychainService.shared.load(forKey: testKey))
+    }
+
+    func testDeleteNonExistentKeyDoesNotCrash() {
+        // Darf keinen Fehler werfen
+        KeychainService.shared.delete(forKey: testKey)
+    }
+
+    func testSaveEmptyString() {
+        KeychainService.shared.save("", forKey: testKey)
+        // Leerer String wird gespeichert und als leer zurückgegeben
+        let loaded = KeychainService.shared.load(forKey: testKey)
+        XCTAssertTrue(loaded == nil || loaded == "")
     }
 }
