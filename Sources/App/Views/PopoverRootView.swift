@@ -389,13 +389,27 @@ struct PopoverRootView: View {
     private var idleView: some View {
         VStack(alignment: .leading, spacing: 12) {
             shortcutRow(keys: ["Fn"],       description: "Diktieren",           icon: "mic.fill")
-            shortcutRow(keys: ["⌥", "Fn"], description: "Transformieren",      icon: "wand.and.sparkles")
+            transformRow
             Divider().padding(.vertical, 2)
             shortcutRow(keys: ["⌘", "↩"],  description: "Einfügen / Kopieren", icon: "return")
             shortcutRow(keys: ["⎋"],       description: "Schließen",           icon: "xmark")
             shortcutRow(keys: ["⌘", "Q"],  description: "Beenden",             icon: "xmark.circle")
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+    }
+
+    private var transformRow: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            shortcutRow(keys: ["⌥", "Fn"], description: "Transform", icon: "wand.and.sparkles")
+            HStack(spacing: 6) {
+                // Einrückung passend zum Icon + Abstand der shortcutRow
+                Color.clear.frame(width: 20 + 10, height: 1)
+                Text("Text markieren → Shortcut halten → Befehl sprechen")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.tertiary)
+                Spacer()
+            }
+        }
     }
 
     private func shortcutRow(keys: [String], description: String, icon: String) -> some View {
