@@ -98,8 +98,7 @@ final class AppState: ObservableObject {
                 guard let self, self.isRecording else { return }
                 // Nur anzeigen wenn kein Ollama danach folgt – sonst würde der
                 // Rohtext und der geglättete Text nacheinander streamen (doppelt).
-                let useOllama = self.settings.ollamaEnabled || self.selectedCustomStyle != nil
-                if !useOllama {
+                if self.settings.llmProvider == .disabled {
                     self.transcriptionState = .streaming(text)
                 }
             }
@@ -183,7 +182,7 @@ final class AppState: ObservableObject {
 
         // Settings-Änderungen an AppState.objectWillChange weiterleiten,
         // damit alle Views (z.B. PopoverRootView) neu rendern wenn sich
-        // customStyles, ollamaEnabled etc. ändern.
+        // customStyles, llmProvider etc. ändern.
         settings.objectWillChange
             .sink { [weak self] _ in self?.objectWillChange.send() }
             .store(in: &cancellables)
@@ -230,13 +229,15 @@ final class AppState: ObservableObject {
         } else {
             effectivePrompt = dictationStyle.systemPrompt ?? settings.ollamaPrompt
         }
-        let useOllama = settings.ollamaEnabled || selectedCustomStyle != nil
-
         let raw: String
-        if useOllama {
+        if settings.llmProvider != .disabled {
             let stream: AsyncThrowingStream<String, Error>
             do {
                 switch settings.llmProvider {
+                case .disabled:
+                    // Nicht erreichbar – äußere Bedingung schließt .disabled aus
+                    raw = text
+                    return
                 case .ollama:
                     stream = try OllamaPostProcessor(
                         baseURL: settings.ollamaBaseURL,
@@ -308,10 +309,14 @@ final class AppState: ObservableObject {
         selectedTextForTransform = nil
 
         let result: String
-        if settings.ollamaEnabled, !original.isEmpty {
+        if settings.llmProvider != .disabled, !original.isEmpty {
             let stream: AsyncThrowingStream<String, Error>
             do {
                 switch settings.llmProvider {
+                case .disabled:
+                    // Nicht erreichbar – äußere Bedingung schließt .disabled aus
+                    result = original
+                    return
                 case .ollama:
                     stream = try OllamaTransformProcessor(
                         baseURL: settings.ollamaBaseURL,

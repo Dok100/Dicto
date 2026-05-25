@@ -1,9 +1,6 @@
 import Foundation
 
 public final class AppSettings: ObservableObject {
-    @Published public var ollamaEnabled: Bool {
-        didSet { UserDefaults.standard.set(ollamaEnabled, forKey: StorageKey.Defaults.ollamaEnabled) }
-    }
     @Published public var ollamaBaseURL: String {
         didSet { UserDefaults.standard.set(ollamaBaseURL, forKey: StorageKey.Defaults.ollamaBaseURL) }
     }
@@ -65,9 +62,11 @@ public final class AppSettings: ObservableObject {
         set { KeychainService.shared.save(newValue.trimmingCharacters(in: .whitespacesAndNewlines), forKey: StorageKey.Keychain.openAIApiKey) }
     }
 
+    /// Ob KI-Verarbeitung aktiv ist. Kurzform für `llmProvider != .disabled`.
+    public var llmEnabled: Bool { llmProvider != .disabled }
+
     public init() {
         let d = UserDefaults.standard
-        ollamaEnabled    = d.object(forKey: StorageKey.Defaults.ollamaEnabled)   as? Bool ?? true
         ollamaBaseURL    = d.string(forKey: StorageKey.Defaults.ollamaBaseURL)   ?? "http://localhost:11434"
         ollamaModel      = d.string(forKey: StorageKey.Defaults.ollamaModel)     ?? "qwen2.5:32b"
         ollamaPrompt     = d.string(forKey: StorageKey.Defaults.ollamaPrompt)    ?? AppSettings.defaultPrompt
@@ -88,6 +87,14 @@ public final class AppSettings: ObservableObject {
         llmProvider   = LLMProvider(rawValue: d.string(forKey: StorageKey.Defaults.llmProvider) ?? "") ?? .ollama
         openAIModel   = d.string(forKey: StorageKey.Defaults.openAIModel)   ?? "gpt-4o-mini"
         openAIBaseURL = d.string(forKey: StorageKey.Defaults.openAIBaseURL) ?? "https://api.openai.com/v1"
+
+        // ── Migration: ollamaEnabled (Bool) → llmProvider (.disabled) ──────────
+        // Einmalig beim Update von älteren Versionen. Sobald der Legacy-Key nicht
+        // mehr vorhanden ist, läuft dieser Block nie wieder.
+        if let legacyEnabled = d.object(forKey: StorageKey.Defaults.ollamaEnabledLegacy) as? Bool {
+            if !legacyEnabled { llmProvider = .disabled }
+            d.removeObject(forKey: StorageKey.Defaults.ollamaEnabledLegacy)
+        }
     }
 
     static let defaultPrompt = """

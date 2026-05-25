@@ -282,7 +282,6 @@ struct OnboardingView: View {
                 ) {
                     selectedAIOption = .ollama
                     settings.llmProvider = .ollama
-                    settings.ollamaEnabled = true
                 }
 
                 AIOptionCard(
@@ -294,7 +293,6 @@ struct OnboardingView: View {
                 ) {
                     selectedAIOption = .openAI
                     settings.llmProvider = .openAI
-                    settings.ollamaEnabled = true
                 }
 
                 // API-Key Feld erscheint wenn OpenAI gewaehlt
@@ -325,7 +323,7 @@ struct OnboardingView: View {
                     subtitle: "Rohtext wird direkt eingefuegt. KI kann spaeter in den Einstellungen aktiviert werden."
                 ) {
                     selectedAIOption = .none
-                    settings.ollamaEnabled = false
+                    settings.llmProvider = .disabled
                 }
             }
 
@@ -343,10 +341,10 @@ struct OnboardingView: View {
         .animation(.spring(response: 0.3), value: selectedAIOption == .openAI)
         .onAppear {
             // Vorauswahl basierend auf bestehenden Einstellungen
-            if !settings.ollamaEnabled {
-                selectedAIOption = .none
-            } else {
-                selectedAIOption = settings.llmProvider == .openAI ? .openAI : .ollama
+            switch settings.llmProvider {
+            case .disabled: selectedAIOption = .none
+            case .ollama:   selectedAIOption = .ollama
+            case .openAI:   selectedAIOption = .openAI
             }
             openAIApiKeyDraft = settings.openAIApiKey
         }

@@ -496,11 +496,11 @@ struct PopoverRootView: View {
 
             if appState.dictationStyle == .translate
                 && appState.selectedCustomStyle == nil
-                && !appState.settings.ollamaEnabled {
-                ollamaWarning("Ollama muss aktiviert sein für die Übersetzung.")
+                && !appState.settings.llmEnabled {
+                ollamaWarning("KI muss aktiviert sein für die Übersetzung.")
             }
-            if appState.selectedCustomStyle != nil && !appState.settings.ollamaEnabled {
-                ollamaWarning("Ollama muss aktiviert sein für eigene Stile.")
+            if appState.selectedCustomStyle != nil && !appState.settings.llmEnabled {
+                ollamaWarning("KI muss aktiviert sein für eigene Stile.")
             }
         }
         .animation(.spring(response: 0.25), value: appState.settings.customStyles.count)

@@ -7,7 +7,8 @@ enum StorageKey {
     /// UserDefaults-Keys (Einstellungen, Zustand, Historie)
     enum Defaults {
         // MARK: Ollama
-        static let ollamaEnabled   = "ollamaEnabled"
+        /// Legacy-Key – nur noch für einmalige Migration zu `llmProvider` genutzt.
+        static let ollamaEnabledLegacy = "ollamaEnabled"
         static let ollamaBaseURL   = "ollamaBaseURL"
         static let ollamaModel     = "ollamaModel"
         static let ollamaPrompt    = "ollamaPrompt"

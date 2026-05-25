@@ -11,37 +11,54 @@ struct AISettingsView: View {
     @State private var openAIApiKey: String = ""
     @State private var showApiKey: Bool = false
 
+    // Merkt sich den zuletzt aktiven Provider damit beim Reaktivieren wiederhergestellt wird
+    @State private var lastActiveProvider: LLMProvider = .ollama
+
+    /// Binding für den KI-aktiv-Toggle: schaltet zwischen .disabled und lastActiveProvider um
+    private var llmEnabledBinding: Binding<Bool> {
+        Binding(
+            get: { settings.llmProvider != .disabled },
+            set: { enabled in
+                if enabled {
+                    settings.llmProvider = lastActiveProvider
+                } else {
+                    lastActiveProvider = settings.llmProvider  // vor dem Deaktivieren merken
+                    settings.llmProvider = .disabled
+                }
+            }
+        )
+    }
+
     var body: some View {
         Form {
             // ── Sektion 1: KI-Verarbeitung ────────────────────────────────────
             Section {
                 HStack {
-                    Toggle("Textglättung via KI", isOn: $settings.ollamaEnabled)
-                    if settings.ollamaEnabled {
+                    Toggle("Textglättung via KI", isOn: llmEnabledBinding)
+                    if settings.llmEnabled {
                         Spacer()
                         llmStatusDot
                     }
                 }
-                .task(id: "\(settings.ollamaEnabled)-\(settings.llmProvider)") {
-                    guard settings.ollamaEnabled else { ollamaReachable = nil; return }
+                .task(id: settings.llmProvider) {
+                    guard settings.llmEnabled else { ollamaReachable = nil; return }
                     if settings.llmProvider == .ollama { await checkOllama() }
                     else { ollamaReachable = nil }
                 }
 
-                if settings.ollamaEnabled {
-                    // ── Anbieter-Picker ───────────────────────────────────────
+                if settings.llmEnabled {
+                    // ── Anbieter-Picker (.disabled wird nicht angeboten) ──────
                     Picker("Anbieter", selection: $settings.llmProvider) {
-                        ForEach(LLMProvider.allCases, id: \.self) { provider in
+                        ForEach(LLMProvider.activeProviders, id: \.self) { provider in
                             Text(provider.label).tag(provider)
                         }
                     }
 
                     // ── Anbieter-spezifische Einstellungen ────────────────────
                     switch settings.llmProvider {
-                    case .ollama:
-                        ollamaSettings
-                    case .openAI:
-                        openAISettings
+                    case .disabled: EmptyView()  // nie sichtbar – llmEnabled-Guard oben
+                    case .ollama:   ollamaSettings
+                    case .openAI:   openAISettings
                     }
 
                     // ── System-Prompt (geteilt) ───────────────────────────────
@@ -120,6 +137,7 @@ struct AISettingsView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onAppear {
             openAIApiKey = settings.openAIApiKey
+            if settings.llmEnabled { lastActiveProvider = settings.llmProvider }
         }
         .sheet(item: $editingStyle) { style in
             CustomStyleEditView(style: style) { saved in
