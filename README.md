@@ -1,64 +1,144 @@
 # Dicto
 
-Native macOS-Menübar-App für Push-to-Talk-Diktat – vollständig lokal auf Apple Silicon.
+**Push-to-talk dictation for macOS — local, private, instant.**
 
-## Funktionsweise
+Hold a key, speak, release. Your words appear at the cursor — in any app, in under a second.
 
-Fn-Taste gedrückt halten → Aufnahme läuft → loslassen → Transkription via WhisperKit → optional Glättung via Ollama → Text wird an der Cursor-Position eingefügt.
+<!-- SCREENSHOT: Hero image — Dicto panel open with streaming text, over a Mail or Notion window -->
+<!-- Suggested size: 1200×750px, show the panel mid-stream with a few words appearing -->
 
-## Stack
+---
 
-- Swift / SwiftUI, macOS 14+
-- [WhisperKit](https://github.com/argmaxinc/WhisperKit) – lokale Spracherkennung (Modell wählbar: `base` oder `large-v3`, Sprache: Deutsch)
-- [Ollama](https://ollama.ai) – optionale Textglättung (`glm4`, `http://localhost:11434`)
-- XcodeGen, swiftformat
+## Download
 
-## Voraussetzungen
+> **Apple Developer Account in progress — release coming soon.**
+> 
+> [⭐ Star this repo](../../stargazers) to get notified when it launches.
 
-- macOS 14.0+, Apple Silicon
-- Xcode 15+
-- `xcodegen` und `swiftformat` (`brew install xcodegen swiftformat`)
-- Ollama mit `glm4` (optional, für Textglättung): `ollama pull glm4`
+---
 
-## Schnellstart
+## What it does
+
+Dicto sits quietly in your menu bar. Press and hold your dictation key, speak naturally, release — the text is inserted exactly where your cursor is. No switching apps, no clicking, no copy-paste.
+
+**It works everywhere:** Mail, Notion, Slack, Notes, Terminal, any text field on macOS.
+
+<!-- SCREENSHOT: Three-panel collage — panel idle / panel recording (red dot) / panel streaming KI result -->
+
+---
+
+## Features
+
+### 🎤 Two transcription engines
+
+| | Apple Speech | Whisper |
+|---|---|---|
+| Download required | None | ~800 MB (one-time) |
+| Transcription | Live, word by word | After recording ends |
+| Quality | Good for everyday speech | Excellent, handles jargon |
+| Works offline | Yes | Yes |
+
+### 🧠 AI text smoothing (optional)
+
+Raw dictation gets cleaned up automatically — filler words removed, grammar corrected, tone adjusted. Choose your provider:
+
+- **Ollama (local)** — fully private, runs on your Mac, no cost
+- **OpenAI API** — cloud-fast, ~€0.01/day at normal usage
+
+Your API key is stored encrypted in the **macOS Keychain** — never in plain text.
+
+### ✨ Transform mode
+
+Select text in any app → hold `⌥ Fn` → speak your instruction.
+
+> *"Make this more formal"*  
+> *"Translate to English"*  
+> *"Shorten to two sentences"*
+
+The result appears in Dicto for review before replacing the original.
+
+### 🎨 Styles
+
+Switch styles before dictating — the AI adjusts accordingly:
+
+| Style | Best for |
+|-------|----------|
+| Neutral | General use, clean and direct |
+| Formal | Emails, reports, business writing |
+| Casual | Slack, WhatsApp, quick notes |
+| Empathetic | Feedback, sensitive topics |
+| → EN | Dictate in German, output in English |
+
+Custom styles with your own prompt are also supported.
+
+<!-- SCREENSHOT: Style picker in the panel with "Formal" selected -->
+
+### 👁 Preview mode
+
+See the result before it's inserted. Edit inline, then confirm with `⌘ ↩`. Corrections are remembered in a personal dictionary.
+
+### 🔒 Privacy first
+
+- Audio **never leaves your device**
+- Whisper and Apple Speech run fully on-device
+- Ollama runs locally — no internet required
+- OpenAI is opt-in and clearly labeled
+
+---
+
+## Requirements
+
+- macOS 14.0 (Sonoma) or later
+- Apple Silicon (M1 or newer)
+- Microphone access
+- Accessibility permission (for text insertion)
+
+---
+
+## How to build from source
 
 ```bash
-make install    # xcodegen + swiftformat installieren (einmalig)
-make generate   # Xcode-Projekt aus project.yml erzeugen
-make build      # App bauen
+# Dependencies
+brew install xcodegen swiftformat
+
+# Clone and build
+git clone https://github.com/Dok100/Dicto.git
+cd Dicto
+make generate   # Generate Xcode project
+make build      # Build the app
+make install-app # Install to /Applications
 ```
 
-## Berechtigungen
+Ollama is optional. If you want local AI smoothing:
+```bash
+brew install ollama
+ollama pull qwen2.5:32b   # recommended (~20 GB, needs 24 GB RAM)
+ollama pull qwen2.5:14b   # lighter option (~8 GB)
+```
 
-Beim ersten Start fordert Dicto drei Berechtigungen an:
+---
 
-| Berechtigung | Zweck |
-|---|---|
-| Mikrofon | Aufnahme |
-| Eingabehilfen | Text automatisch einfügen (Cmd+V-Simulation) |
-| Eingabe-Überwachung | Globalen Fn-Hotkey erkennen |
+## Privacy Policy
 
-## Phasenplan
+Dicto does not collect, transmit, or store any personal data. All processing happens locally unless you explicitly configure OpenAI API (opt-in). See [PRIVACY.md](docs/PRIVACY.md).
 
-| Phase | Beschreibung | Status |
-|-------|-------------|--------|
-| PROJ-1 | Menübar-App-Gerüst (Icon, Popover, Projekt-Setup) | Abgeschlossen |
-| PROJ-2 | Globaler Fn-Hotkey + Audio-Aufnahme | Abgeschlossen |
-| PROJ-3 | WhisperKit-Transkription | Abgeschlossen |
-| PROJ-4 | Text-Einfügung via Pasteboard + CGEvent | Abgeschlossen |
-| PROJ-5 | TextPostProcessor-Protokoll + PassthroughPostProcessor | Abgeschlossen |
-| PROJ-6 | OllamaPostProcessor mit Fallback | Abgeschlossen |
-| PROJ-7 | Einstellungsfenster (Toggle, Prompt-Editor, Modell/Endpoint) | Abgeschlossen |
-| PROJ-8 | Stil-Auswahl im Popover (Neutral / Formell / Locker / Empathisch) | Abgeschlossen |
-| PROJ-9 | Whisper-Modellauswahl (Base / Large v3) | Abgeschlossen |
-| PROJ-10 | Preview-Modus (Text vor Einfügen editierbar, opt-in) | Abgeschlossen |
-| PROJ-11 | Wörterbuch (statisch + lernend via Preview) | Abgeschlossen |
-| PROJ-12 | Transform-Modus (Alt+Fn: Selektion + Befehl) | Abgeschlossen |
-| PROJ-13 | Launch at Login | Abgeschlossen |
-| PROJ-14 | Sprachauswahl für WhisperKit (Deutsch / Englisch / Auto) | Abgeschlossen |
-| PROJ-15 | Diktat-Verlauf (letzte 20 Einträge) | Abgeschlossen |
-| PROJ-16 | Wörterbuch Export/Import | Abgeschlossen |
+---
 
-## Datenschutz
+## License
 
-Audio-Daten verlassen das Gerät nie. Transkription und optionale Glättung laufen vollständig lokal.
+MIT — free to use, modify, and distribute.
+
+---
+
+## Support the project
+
+Dicto is free. If it saves you time, consider supporting development:
+
+<!-- GUMROAD BADGE PLACEHOLDER -->
+> 💛 [Pay what you want on Gumroad](#) *(link coming soon)*
+
+This helps cover API costs and keeps development going.
+
+---
+
+*Built with [WhisperKit](https://github.com/argmaxinc/WhisperKit) · Runs on Apple Silicon · Made in Germany 🇩🇪*
