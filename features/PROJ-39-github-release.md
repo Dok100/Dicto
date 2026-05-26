@@ -15,21 +15,20 @@ signiert, notarisiert und als DMG verpackt.
 - [x] Makefile: `make archive` und `make notarize` Targets ergänzt
 - [x] `scripts/ExportOptions.plist` für Developer ID Export angelegt
 
-### Stufe 2 – Signierung & Notarisierung (wartet auf Apple Developer Account)
+### Stufe 2 – Signierung & Notarisierung ✅
 
-- [ ] Developer ID Application Zertifikat im Apple Developer Portal beantragen
-- [ ] Zertifikat in Keychain importieren
-- [ ] `make archive TEAM_ID=XXXXXXXXXX` ausführen
-- [ ] `make notarize TEAM_ID=… APPLE_ID=… APP_PASSWORD=…` ausführen
-- [ ] Notarisierungs-Ticket geprüft (`xcrun stapler validate`)
+- [x] Developer ID Application Zertifikat im Apple Developer Portal beantragen
+- [x] Zertifikat in Keychain importieren
+- [x] `make archive TEAM_ID=LXXVUJZ9QT` ausgeführt
+- [x] `make notarize` ausgeführt – Apple: Accepted
+- [x] Notarisierungs-Ticket gestempelt (`xcrun stapler staple`)
 
-### Stufe 3 – GitHub Release
+### Stufe 3 – GitHub Release ✅
 
-- [ ] Git Tag setzen: `git tag v0.1.0 && git push origin v0.1.0`
-- [ ] GitHub Release Draft anlegen (github.com/Dok100/Dicto → Releases)
-- [ ] Release Notes aus `CHANGELOG.md` einfügen
-- [ ] `Dicto-0.1.0.dmg` als Asset hochladen
-- [ ] Release veröffentlichen
+- [x] Git Tag gesetzt: `v0.1.0`
+- [x] GitHub Release veröffentlicht
+- [x] `Dicto-0.1.0.dmg` als Asset hochgeladen
+- [x] Download-Link in README eingetragen
 
 ## Befehle (Kurzreferenz)
 
