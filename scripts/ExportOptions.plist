@@ -6,18 +6,14 @@
     <key>method</key>
     <string>developer-id</string>
 
-    <!-- Hardened Runtime ist Pflicht für die Notarisierung -->
-    <key>hardcodedBuildSystemInfo</key>
-    <false/>
+    <key>teamID</key>
+    <string>LXXVUJZ9QT</string>
 
     <key>signingStyle</key>
     <string>automatic</string>
 
-    <!-- Entitlements: Mikrofon + Accessibility + Input Monitoring -->
-    <key>entitlements</key>
-    <dict>
-        <key>com.apple.security.device.audio-input</key>
-        <true/>
-    </dict>
+    <!-- Hardened Runtime ist Pflicht für die Notarisierung -->
+    <key>hardcodedBuildSystemInfo</key>
+    <false/>
 </dict>
 </plist>
