@@ -33,6 +33,9 @@ build/
 *.o
 *.d
 
+# Release-Ordner (Archiv, App, ZIP, DMG – werden als GitHub Release Assets hochgeladen)
+release/
+
 # Environment / Editor
 .env
 .env.local
