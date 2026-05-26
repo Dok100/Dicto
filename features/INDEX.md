@@ -41,4 +41,4 @@
 | [PROJ-37](PROJ-37-unit-tests.md) | Unit Tests (DictoError, Settings, PostProcessor, Keychain) | Stufe 1+2 abgeschlossen (121 Tests) |
 | [PROJ-38](PROJ-38-fehleranzeige.md) | Fehleranzeige im Popover (Auto-Open, typsicher, actionable) | Abgeschlossen |
 | [PROJ-39](PROJ-39-github-release.md) | GitHub Release v0.1.0 (CHANGELOG, Signierung, Notarisierung, DMG) | Abgeschlossen |
-| [PROJ-40](PROJ-40-sparkle-autoupdate.md) | Sparkle Auto-Update (In-App Update-Benachrichtigung) | Geplant |
+| [PROJ-40](PROJ-40-sparkle-autoupdate.md) | Sparkle Auto-Update (In-App Update-Benachrichtigung) | Abgeschlossen |

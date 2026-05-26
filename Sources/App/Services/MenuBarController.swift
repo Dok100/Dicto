@@ -1,5 +1,6 @@
 import AppKit
 import Combine
+import Sparkle
 import SwiftUI
 
 final class MenuBarController {
@@ -113,8 +114,46 @@ final class MenuBarController {
     private func setupStatusItem() {
         guard let button = statusItem.button else { return }
         button.imagePosition = .imageOnly
-        button.action = #selector(togglePanel)
+        // Linksklick → Panel; Rechtsklick → Kontextmenü (Updates suchen, Beenden)
+        button.action = #selector(handleStatusItemClick)
+        button.sendAction(on: [.leftMouseUp, .rightMouseUp])
         button.target = self
+    }
+
+    @objc private func handleStatusItemClick() {
+        guard let event = NSApp.currentEvent else { return }
+        if event.type == .rightMouseUp {
+            showContextMenu()
+        } else {
+            togglePanel()
+        }
+    }
+
+    private func showContextMenu() {
+        let menu = NSMenu()
+
+        let updateItem = NSMenuItem(
+            title: "Nach Updates suchen…",
+            action: #selector(AppDelegate.checkForUpdates(_:)),
+            keyEquivalent: ""
+        )
+        updateItem.target = NSApp.delegate
+        menu.addItem(updateItem)
+
+        menu.addItem(.separator())
+
+        menu.addItem(NSMenuItem(
+            title: "Dicto beenden",
+            action: #selector(NSApplication.terminate(_:)),
+            keyEquivalent: "q"
+        ))
+
+        statusItem.menu = menu
+        statusItem.button?.performClick(nil)
+        // Nach dem Anzeigen menu wieder entfernen, damit Linksklick weiter funktioniert
+        DispatchQueue.main.async { [weak self] in
+            self?.statusItem.menu = nil
+        }
     }
 
     private func setupPanel(appState: AppState) {

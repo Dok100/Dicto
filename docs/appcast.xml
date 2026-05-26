@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Dicto</title>
+    <link>https://dok100.github.io/Dicto/appcast.xml</link>
+    <description>Dicto update feed</description>
+    <language>de</language>
+
+    <item>
+      <title>Dicto 0.1.0</title>
+      <sparkle:version>1</sparkle:version>
+      <sparkle:shortVersionString>0.1.0</sparkle:shortVersionString>
+      <pubDate>Mon, 26 May 2026 17:00:00 +0000</pubDate>
+      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+      <sparkle:releaseNotesLink>https://github.com/Dok100/Dicto/releases/tag/v0.1.0</sparkle:releaseNotesLink>
+      <enclosure
+        url="https://github.com/Dok100/Dicto/releases/download/v0.1.0/Dicto-0.1.0.dmg"
+        sparkle:edSignature="kBvbGZUwt0kPyFoHPLSeCRn71iXOuLuIzJ/+6mblgWoVdhm/ZJmNF0e6DJ2rhX45ULm293HWEBOrG2irRYITBg=="
+        length="4620701"
+        type="application/octet-stream"/>
+    </item>
+
+  </channel>
+</rss>

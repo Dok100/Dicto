@@ -1,4 +1,4 @@
-# PROJ-40 – Sparkle Auto-Update
+# PROJ-40 – Sparkle Auto-Update ✅
 
 ## Ziel
 
@@ -12,54 +12,50 @@ Es wird von Sublime Text, Tower, Figma, BBEdit und hunderten anderen Apps genutz
 
 ## Wie es funktioniert
 
-1. Dicto prüft beim Start (und alle 24 h) eine öffentliche `appcast.xml`-Datei
+1. Dicto prüft beim Start (und alle 24 h) die öffentliche `appcast.xml`-Datei
 2. Ist eine neuere Version verfügbar, erscheint ein nativer macOS-Dialog
 3. Nutzer klicken „Aktualisieren" → Download, Installation, Neustart – automatisch
-4. `appcast.xml` wird bei jedem GitHub Release manuell (oder per Skript) aktualisiert
+4. `appcast.xml` wird bei jedem GitHub Release aktualisiert (s. Checkliste unten)
 
-## Geplante Umsetzung
+## Umgesetzt
 
 ### Integration
 
-- Sparkle via Swift Package Manager einbinden (github.com/sparkle-project/Sparkle)
-- `SUFeedURL` in `Info.plist` eintragen (GitHub Pages oder raw GitHub URL)
-- `SPUStandardUpdaterController` in `AppDelegate` initialisieren
-- „Nach Updates suchen" Menüpunkt im Menübar-Menü ergänzen
+- [x] Sparkle 2.9.2 via Swift Package Manager (`project.yml`)
+- [x] `SUFeedURL` in `Info.plist` eingetragen (`https://dok100.github.io/Dicto/appcast.xml`)
+- [x] `SUPublicEDKey` in `Info.plist` eingetragen (EdDSA-Schlüssel)
+- [x] `SPUStandardUpdaterController` in `AppDelegate` initialisiert (`startingUpdater: true`)
+- [x] Rechtsklick-Kontextmenü am Menübar-Icon: „Nach Updates suchen…" + „Dicto beenden"
+- [x] Privater EdDSA-Schlüssel sicher im macOS Keychain gespeichert (einmalig, `generate_keys`)
 
 ### Hosting der appcast.xml
 
-Die einfachste Option: die Datei direkt im GitHub-Repo unter `docs/appcast.xml`
-hosten – GitHub Pages liefert sie dann als öffentliche URL.
+- [x] `docs/appcast.xml` im Repo angelegt (v0.1.0 mit EdDSA-Signatur)
+- [ ] GitHub Pages aktiviert (Branch: `main`, Ordner: `/docs`) → Einstellungen → Pages
+- URL: `https://dok100.github.io/Dicto/appcast.xml`
 
-### appcast.xml Beispiel
+## appcast.xml – Checkliste für jeden neuen Release
 
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
-  <channel>
-    <title>Dicto</title>
-    <item>
-      <title>Version 0.2.0</title>
-      <sparkle:version>2</sparkle:version>
-      <sparkle:shortVersionString>0.2.0</sparkle:shortVersionString>
-      <pubDate>Mon, 01 Jun 2026 12:00:00 +0000</pubDate>
-      <enclosure
-        url="https://github.com/Dok100/Dicto/releases/download/v0.2.0/Dicto-0.2.0.dmg"
-        sparkle:edDSASignature="..."
-        length="12345678"
-        type="application/octet-stream"/>
-      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-    </item>
-  </channel>
-</rss>
+Bei jedem GitHub Release diese Schritte ausführen:
+
+```bash
+# 1. DMG signieren (privater Schlüssel liegt im Keychain)
+sign_update release/Dicto-X.Y.Z.dmg
+
+# 2. docs/appcast.xml: neues <item> oben einfügen (altes drin lassen!)
+#    - <sparkle:version> = CFBundleVersion (Integer, bei jedem Release +1)
+#    - <sparkle:shortVersionString> = X.Y.Z
+#    - sparkle:edSignature = Ausgabe von sign_update
+#    - length = Dateigröße in Bytes
+
+# 3. Commit + Push → GitHub Pages liefert automatisch die neue XML aus
+git add docs/appcast.xml
+git commit -m "release: appcast.xml für vX.Y.Z aktualisiert"
+git push
 ```
 
 ## Voraussetzungen
 
-- PROJ-39 abgeschlossen (Developer ID, Notarisierung läuft)
-- GitHub Pages für das Repository aktiviert
-- EdDSA-Schlüsselpaar für Sparkle generiert (einmalig, `generate_keys` Tool von Sparkle)
-
-## Abhängigkeit
-
-Wird nach PROJ-39 Stufe 2 umgesetzt.
+- [x] PROJ-39 abgeschlossen (Developer ID, Notarisierung läuft)
+- [ ] GitHub Pages für das Repository aktiviert
+- [x] EdDSA-Schlüsselpaar generiert (im Keychain gespeichert)

@@ -30,5 +30,9 @@
 	<string>Dicto benötigt Mikrofon-Zugriff für Push-to-Talk-Diktat.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Dicto nutzt Apples Spracherkennung für lokale Live-Transkription.</string>
+	<key>SUFeedURL</key>
+	<string>https://dok100.github.io/Dicto/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>0J3+Twx3WchZCJSAeRZ3/LRSRir9P0EspPZAvJUi/VY=</string>
 </dict>
 </plist>

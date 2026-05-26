@@ -10,7 +10,7 @@ Optional: Glättung via Ollama (qwen2.5:32b, http://localhost:11434).
 
 ## Aktueller Phasenstand
 
-**Stand**: PROJ-1–PROJ-23, PROJ-26–PROJ-39 abgeschlossen. PROJ-40 geplant.
+**Stand**: PROJ-1–PROJ-23, PROJ-26–PROJ-40 abgeschlossen.
 
 | Phase | Status |
 |-------|--------|
@@ -51,7 +51,7 @@ Optional: Glättung via Ollama (qwen2.5:32b, http://localhost:11434).
 | PROJ-37 Unit Tests | Abgeschlossen |
 | PROJ-38 Fehleranzeige im Popover (Auto-Open, typsicher) | Abgeschlossen |
 | PROJ-39 GitHub Release v0.1.0 (CHANGELOG, make archive/notarize) | Stufe 1 abgeschlossen, Stufe 2 wartet auf Apple Developer Account |
-| PROJ-40 Sparkle Auto-Update | Geplant (nach PROJ-39 Stufe 2) |
+| PROJ-40 Sparkle Auto-Update | Abgeschlossen |
 
 ## Nutzer-Kontext
 
