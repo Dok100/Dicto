@@ -1,0 +1,99 @@
+2026-05-26 11:55:19 +0000 [MT] Initial pipeline context: <IDEDistributionProcessingPipelineContext: 0x850b10300; archive(resolved)="<IDEArchive: 0x8514d3790>", distributionTask(resolved)="2", distributionDestination(resolved)="1", distributionMethod(resolved)="<IDEDistributionMethodDeveloperID: 0x8501f04e0>", team(resolved)="<IDEProvisioningBasicTeam: 0x850adb200; teamID='LXXVUJZ9QT', teamName='(null)'>">
+	Chain (12, self inclusive):
+	<IDEDistributionProcessingPipelineContext: 0x850b10300; archive = "<IDEArchive: 0x8514d3790>", distributionMethod="<IDEDistributionMethodDeveloperID: 0x8501f04e0>", team="<IDEProvisioningBasicTeam: 0x850adb200; teamID='LXXVUJZ9QT', teamName='(null)'>">
+	<IDEDistributionProcessingPipelineContext: 0x850b10600; archive = "<IDEArchive: 0x8514d3790>", distributionMethod="<IDEDistributionMethodDeveloperID: 0x8501f04e0>", team="<IDEProvisioningBasicTeam: 0x850adb200; teamID='LXXVUJZ9QT', teamName='(null)'>">
+	<IDEDistributionContext: 0x851615e00; archive = "<IDEArchive: 0x8514d3790>", distributionMethod="<IDEDistributionMethodDeveloperID: 0x8501f04e0>", team="<IDEProvisioningBasicTeam: 0x850adb200; teamID='LXXVUJZ9QT', teamName='(null)'>">
+	<IDEDistributionContext: 0x851615b80; archive = "<IDEArchive: 0x8514d3790>", distributionMethod="<IDEDistributionMethodDeveloperID: 0x8501f04e0>", team="<IDEProvisioningBasicTeam: 0x850adb200; teamID='LXXVUJZ9QT', teamName='(null)'>">
+	<IDEDistributionContext: 0x851615900; archive = "<IDEArchive: 0x8514d3790>", distributionMethod="<IDEDistributionMethodDeveloperID: 0x8501f04e0>", team="<IDEProvisioningBasicTeam: 0x850adb200; teamID='LXXVUJZ9QT', teamName='(null)'>">
+	<IDEDistributionContext: 0x851615680; archive = "<IDEArchive: 0x8514d3790>", distributionMethod="<IDEDistributionMethodDeveloperID: 0x8501f04e0>", team="<IDEProvisioningBasicTeam: 0x850adb200; teamID='LXXVUJZ9QT', teamName='(null)'>">
+	<IDEDistributionContext: 0x851614780; archive = "<IDEArchive: 0x8514d3790>", distributionMethod="<IDEDistributionMethodDeveloperID: 0x8501f04e0>", team="<IDEProvisioningBasicTeam: 0x850adb200; teamID='LXXVUJZ9QT', teamName='(null)'>">
+	<IDEDistributionContext: 0x851614500; archive = "<IDEArchive: 0x8514d3790>", distributionMethod="<IDEDistributionMethodDeveloperID: 0x8501f04e0>", team="<IDEProvisioningBasicTeam: 0x850adb200; teamID='LXXVUJZ9QT', teamName='(null)'>">
+	<IDEDistributionContext: 0x851614280; archive = "<IDEArchive: 0x8514d3790>", distributionMethod="<IDEDistributionMethodDeveloperID: 0x8501f04e0>", team="<IDEProvisioningBasicTeam: 0x850adb200; teamID='LXXVUJZ9QT', teamName='(null)'>">
+	<IDEDistributionContext: 0x851614000; archive = "<IDEArchive: 0x8514d3790>", distributionMethod="<IDEDistributionMethodDeveloperID: 0x8501f04e0>", team="(null)">
+	<IDEDistributionContext: 0x1051f3df0; archive = "<IDEArchive: 0x8514d3790>", distributionMethod="<IDEDistributionMethodDeveloperID: 0x8501f04e0>", team="(null)">
+	<IDEDistributionContext: 0x1051f27f0; archive = "<IDEArchive: 0x8514d3790>", distributionMethod="(null)", team="(null)">
+</IDEDistributionProcessingPipelineContext: 0x850b10300>
+2026-05-26 11:55:19 +0000 [MT] Processing step: IDEDistributionCreateDestRootStep
+2026-05-26 11:55:19 +0000 [MT] Processing step: IDEDistributionCopyItemStep
+2026-05-26 11:55:19 +0000 [MT] Running /usr/bin/ditto '-V' '/Users/oliverkern/Documents/Projekte/Dicto/release/Dicto.xcarchive/Products/Applications/Dicto.app' '/var/folders/n9/ny_sfhkj5sgb4r4ksg3bj50r0000gn/T/XcodeDistPipeline.~~~cpbKxT/Root/Applications/Dicto.app'
+2026-05-26 11:55:19 +0000  >>> Copying /Users/oliverkern/Documents/Projekte/Dicto/release/Dicto.xcarchive/Products/Applications/Dicto.app 
+2026-05-26 11:55:19 +0000  copying file ./Contents/_CodeSignature/CodeResources ... 
+2026-05-26 11:55:19 +0000  4322 bytes for ./Contents/_CodeSignature/CodeResources
+2026-05-26 11:55:19 +0000  copying file ./Contents/MacOS/Dicto ... 
+2026-05-26 11:55:19 +0000  17139952 bytes for ./Contents/MacOS/Dicto
+2026-05-26 11:55:19 +0000  copying file ./Contents/Resources/swift-transformers_Hub.bundle/Contents/Resources/gpt2_tokenizer_config.json ... 
+2026-05-26 11:55:19 +0000  234 bytes for ./Contents/Resources/swift-transformers_Hub.bundle/Contents/Resources/gpt2_tokenizer_config.json
+2026-05-26 11:55:19 +0000  copying file ./Contents/Resources/swift-transformers_Hub.bundle/Contents/Resources/t5_tokenizer_config.json ... 
+2026-05-26 11:55:19 +0000  20746 bytes for ./Contents/Resources/swift-transformers_Hub.bundle/Contents/Resources/t5_tokenizer_config.json
+2026-05-26 11:55:19 +0000  copying file ./Contents/Resources/swift-transformers_Hub.bundle/Contents/Info.plist ... 
+2026-05-26 11:55:19 +0000  1135 bytes for ./Contents/Resources/swift-transformers_Hub.bundle/Contents/Info.plist
+2026-05-26 11:55:19 +0000  copying file ./Contents/Resources/swift-crypto_Crypto.bundle/Contents/Resources/PrivacyInfo.xcprivacy ... 
+2026-05-26 11:55:19 +0000  398 bytes for ./Contents/Resources/swift-crypto_Crypto.bundle/Contents/Resources/PrivacyInfo.xcprivacy
+2026-05-26 11:55:19 +0000  copying file ./Contents/Resources/swift-crypto_Crypto.bundle/Contents/Info.plist ... 
+2026-05-26 11:55:19 +0000  1130 bytes for ./Contents/Resources/swift-crypto_Crypto.bundle/Contents/Info.plist
+2026-05-26 11:55:19 +0000  copying file ./Contents/Resources/AppIcon.icns ... 
+2026-05-26 11:55:19 +0000  16398 bytes for ./Contents/Resources/AppIcon.icns
+2026-05-26 11:55:19 +0000  copying file ./Contents/Resources/Assets.car ... 
+2026-05-26 11:55:19 +0000  98952 bytes for ./Contents/Resources/Assets.car
+2026-05-26 11:55:19 +0000  copying file ./Contents/Info.plist ... 
+2026-05-26 11:55:19 +0000  1796 bytes for ./Contents/Info.plist
+2026-05-26 11:55:19 +0000  copying file ./Contents/PkgInfo ... 
+2026-05-26 11:55:19 +0000  8 bytes for ./Contents/PkgInfo
+2026-05-26 11:55:19 +0000 [MT] /usr/bin/ditto exited with 0
+2026-05-26 11:55:19 +0000 [MT] Processing step: IDEDistributionEmbedProfileStep
+2026-05-26 11:55:19 +0000 [MT] Skipping profile for item: <IDEDistributionItem: 0x850ac5260; bundleID='de.oliverkern.dicto', path='<DVTFilePath:0x8509f2f40:'/Users/oliverkern/Documents/Projekte/Dicto/release/Dicto.xcarchive/Products/Applications/Dicto.app'>', codeSigningInfo='<_DVTCodeSigningInformation_Path: 0x850ac5200; isSigned='1', isAdHocSigned='1', signingCertificate='(null)', entitlements='{
+    "com.apple.security.device.audio-input" = 1;
+}', teamID='(null)', identifier='de.oliverkern.dicto', executablePath='<DVTFilePath:0x850ac4240:'/Users/oliverkern/Documents/Projekte/Dicto/release/Dicto.xcarchive/Products/Applications/Dicto.app/Contents/MacOS/Dicto'>', hardenedRuntime='0'>'>
+2026-05-26 11:55:19 +0000 [MT] Processing step: IDEDistributionInfoPlistStep
+2026-05-26 11:55:19 +0000 [MT] Skipping step: IDEDistributionInfoPlistStep because it said so
+2026-05-26 11:55:19 +0000 [MT] Processing step: IDEDistributionAppThinningPlistStep
+2026-05-26 11:55:19 +0000 [MT] Processing step: IDEDistributionSymbolsStep
+2026-05-26 11:55:19 +0000 [MT] Skipping step: IDEDistributionSymbolsStep because it said so
+2026-05-26 11:55:19 +0000 [MT] Processing step: IDEDistributionAppThinningStep
+2026-05-26 11:55:19 +0000 [MT] Skipping step: IDEDistributionAppThinningStep because it said so
+2026-05-26 11:55:19 +0000 [MT] Processing step: IDEDistributionArchThinningStep
+2026-05-26 11:55:19 +0000 [MT] Archs to thin for item /Users/oliverkern/Documents/Projekte/Dicto/release/Dicto.xcarchive/Products/Applications/Dicto.app are []
+2026-05-26 11:55:19 +0000 [MT] Processing step: IDEDistributionODRStep
+2026-05-26 11:55:19 +0000 [MT] Processing step: IDEDistributionStripXattrsStep
+2026-05-26 11:55:19 +0000 [MT] Skipping stripping extended attributes because the codesign step will strip them.
+2026-05-26 11:55:19 +0000 [MT] Processing step: IDEDistributionCodesignStep
+2026-05-26 11:55:19 +0000 [MT] Entitlements for <IDEDistributionItem: 0x850ac5260; bundleID='de.oliverkern.dicto', path='<DVTFilePath:0x8509f2f40:'/Users/oliverkern/Documents/Projekte/Dicto/release/Dicto.xcarchive/Products/Applications/Dicto.app'>', codeSigningInfo='<_DVTCodeSigningInformation_Path: 0x850ac5200; isSigned='1', isAdHocSigned='1', signingCertificate='(null)', entitlements='{
+    "com.apple.security.device.audio-input" = 1;
+}', teamID='(null)', identifier='de.oliverkern.dicto', executablePath='<DVTFilePath:0x850ac4240:'/Users/oliverkern/Documents/Projekte/Dicto/release/Dicto.xcarchive/Products/Applications/Dicto.app/Contents/MacOS/Dicto'>', hardenedRuntime='0'>'>: {
+    "com.apple.security.device.audio-input" = 1;
+}
+2026-05-26 11:55:19 +0000 [MT] Associated App Clip Identifiers Filter: Skipping because "com.apple.developer.associated-appclip-app-identifiers" is not present
+2026-05-26 11:55:19 +0000 [MT] Entitlements for <IDEDistributionItem: 0x850ac5260; bundleID='de.oliverkern.dicto', path='<DVTFilePath:0x8509f2f40:'/Users/oliverkern/Documents/Projekte/Dicto/release/Dicto.xcarchive/Products/Applications/Dicto.app'>', codeSigningInfo='<_DVTCodeSigningInformation_Path: 0x850ac5200; isSigned='1', isAdHocSigned='1', signingCertificate='(null)', entitlements='{
+    "com.apple.security.device.audio-input" = 1;
+}', teamID='(null)', identifier='de.oliverkern.dicto', executablePath='<DVTFilePath:0x850ac4240:'/Users/oliverkern/Documents/Projekte/Dicto/release/Dicto.xcarchive/Products/Applications/Dicto.app/Contents/MacOS/Dicto'>', hardenedRuntime='0'>'> are: {
+    "com.apple.security.device.audio-input" = 1;
+}
+2026-05-26 11:55:19 +0000 [MT] Writing entitlements for <IDEDistributionItem: 0x850ac5260; bundleID='de.oliverkern.dicto', path='<DVTFilePath:0x8509f2f40:'/Users/oliverkern/Documents/Projekte/Dicto/release/Dicto.xcarchive/Products/Applications/Dicto.app'>', codeSigningInfo='<_DVTCodeSigningInformation_Path: 0x850ac5200; isSigned='1', isAdHocSigned='1', signingCertificate='(null)', entitlements='{
+    "com.apple.security.device.audio-input" = 1;
+}', teamID='(null)', identifier='de.oliverkern.dicto', executablePath='<DVTFilePath:0x850ac4240:'/Users/oliverkern/Documents/Projekte/Dicto/release/Dicto.xcarchive/Products/Applications/Dicto.app/Contents/MacOS/Dicto'>', hardenedRuntime='0'>'> to: /var/folders/n9/ny_sfhkj5sgb4r4ksg3bj50r0000gn/T/XcodeDistPipeline.~~~cpbKxT/entitlements~~~WgEsZ1
+2026-05-26 11:55:19 +0000 [MT] invoking codesign: <NSConcreteTask: 0x85205e580; launchPath='/usr/bin/codesign', arguments='(
+    "-f",
+    "-s",
+    7E3175B6E9DF739E7575C90EF5B5A79BC6F297AD,
+    "--entitlements",
+    "/var/folders/n9/ny_sfhkj5sgb4r4ksg3bj50r0000gn/T/XcodeDistPipeline.~~~cpbKxT/entitlements~~~WgEsZ1",
+    "--requirements",
+    "=designated => anchor apple generic  and identifier \"$self.identifier\" and ((cert leaf[field.1.2.840.113635.100.6.1.9] exists) or ( certificate 1[field.1.2.840.113635.100.6.2.6] exists and certificate leaf[field.1.2.840.113635.100.6.1.13] exists  and certificate leaf[subject.OU] = \"LXXVUJZ9QT\" ))",
+    "--preserve-metadata=identifier,flags,runtime,launch-constraints,library-constraints",
+    "--generate-entitlement-der",
+    "--strip-disallowed-xattrs",
+    "-vvv",
+    "/var/folders/n9/ny_sfhkj5sgb4r4ksg3bj50r0000gn/T/XcodeDistPipeline.~~~cpbKxT/Root/Applications/Dicto.app"
+)'>
+2026-05-26 11:55:40 +0000 [MT] codesign output: /var/folders/n9/ny_sfhkj5sgb4r4ksg3bj50r0000gn/T/XcodeDistPipeline.~~~cpbKxT/Root/Applications/Dicto.app: replacing existing signature
+/var/folders/n9/ny_sfhkj5sgb4r4ksg3bj50r0000gn/T/XcodeDistPipeline.~~~cpbKxT/Root/Applications/Dicto.app: signed app bundle with Mach-O universal (x86_64 arm64) [de.oliverkern.dicto]
+2026-05-26 11:55:40 +0000 [MT] Processing step: IDEDistributionZipODRItemStep
+2026-05-26 11:55:40 +0000 [MT] Skipping step: IDEDistributionZipODRItemStep because it said so
+2026-05-26 11:55:40 +0000 [MT] Processing step: IDEDistributionSkipPackagingStep
+2026-05-26 11:55:40 +0000 [MT] Processing step: IDEDistributionAppStoreInformationStep
+2026-05-26 11:55:40 +0000 [MT] Skipping step: IDEDistributionAppStoreInformationStep because it said so
+2026-05-26 11:55:40 +0000 [MT] Processing step: IDEDistributionGenerateProcessedDistributionItems
+2026-05-26 11:55:40 +0000 [MT] IDEDistributionItem init <DVTFilePath:0x84f080180:'/var/folders/n9/ny_sfhkj5sgb4r4ksg3bj50r0000gn/T/XcodeDistPipeline.~~~cpbKxT/Root/Applications/Dicto.app'>
+2026-05-26 11:55:40 +0000 [MT] [OPTIONAL] Didn't find embedded provisioning profile for <DVTFilePath:0x84f080180:'/var/folders/n9/ny_sfhkj5sgb4r4ksg3bj50r0000gn/T/XcodeDistPipeline.~~~cpbKxT/Root/Applications/Dicto.app'>: Error Domain=NSCocoaErrorDomain Code=4 "No file at <DVTFilePath:0x852145650:'/var/folders/n9/ny_sfhkj5sgb4r4ksg3bj50r0000gn/T/XcodeDistPipeline.~~~cpbKxT/Root/Applications/Dicto.app/Contents/embedded.provisionprofile'>" UserInfo={NSLocalizedDescription=No file at <DVTFilePath:0x852145650:'/var/folders/n9/ny_sfhkj5sgb4r4ksg3bj50r0000gn/T/XcodeDistPipeline.~~~cpbKxT/Root/Applications/Dicto.app/Contents/embedded.provisionprofile'>}
+2026-05-26 11:55:40 +0000 [MT] Processing step: IDEDistributionCreateManifestStep
+2026-05-26 11:55:40 +0000 [MT] Skipping step: IDEDistributionCreateManifestStep because it said so

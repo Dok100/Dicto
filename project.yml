@@ -19,8 +19,9 @@ settings:
     PRODUCT_NAME: Dicto
     PRODUCT_BUNDLE_IDENTIFIER: de.oliverkern.dicto
     CODE_SIGN_STYLE: Automatic
-    DEVELOPMENT_TEAM: ""
+    DEVELOPMENT_TEAM: LXXVUJZ9QT
     ENABLE_APP_SANDBOX: NO
+    ENABLE_HARDENED_RUNTIME: YES
 
 schemes:
   Dicto:
