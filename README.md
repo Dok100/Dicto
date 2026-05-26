@@ -49,7 +49,7 @@ Dicto is built for people who care about **what happens to their data**:
 
 Dicto sits in your menu bar. Works in any app — Mail, Notion, Slack, Notes, VS Code, Terminal, MS-Office.
 
-![Dicto -> Diktieren in jeder Anwendung](docs/screenshots/diktieren in jeder Anwendung.png)
+![Dicto diktieren in jeder Anwendung](docs/screenshots/dicto.png)
 
 
 
