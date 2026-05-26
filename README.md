@@ -11,9 +11,11 @@ Hold a key, speak, release — your words appear at the cursor, processed entire
 
 ## Download
 
-> **Apple Developer Account in progress — release coming soon.**
->
-> [⭐ Star this repo](../../stargazers) to get notified when it launches.
+**[⬇ Download Dicto 0.1.0](https://github.com/Dok100/Dicto/releases/download/v0.1.0/Dicto-0.1.0.dmg)** — macOS 14.0+, Apple Silicon
+
+Open the DMG, drag Dicto to Applications, launch it. That's it.
+
+> [All releases](https://github.com/Dok100/Dicto/releases) · [⭐ Star this repo](../../stargazers)
 
 ---
 
