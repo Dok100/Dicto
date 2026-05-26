@@ -47,7 +47,7 @@ Dicto is built for people who care about **what happens to their data**:
 
 ## How it works
 
-Dicto sits in your menu bar. Works in any app — Mail, Notion, Slack, Notes, VS Code, Terminal.
+Dicto sits in your menu bar. Works in any app — Mail, Notion, Slack, Notes, VS Code, Terminal, MS-Office.
 
 <!-- SCREENSHOT: Three-panel collage — panel idle / panel recording / panel streaming AI result -->
 
@@ -66,7 +66,9 @@ Select text in any app → hold `⌥ Fn` → speak your instruction.
 > *"Fix the grammar"*
 
 **No other dictation app on macOS does this.**
-![Dicto Panel](docs/screenshots/transform.png)
+
+
+![Dicto Panel](docs/screenshots/transformliste.png)
 
 ### 👁 Preview
 See the result before it's inserted. Edit inline, confirm with `⌘ ↩`.  
