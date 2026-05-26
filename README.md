@@ -5,7 +5,7 @@
 Most dictation apps send your voice to a server. Dicto doesn't.  
 Hold a key, speak, release — your words appear at the cursor, processed entirely on your Mac.
 
-![Dicto Panel](docs/screenshots/hero.png)
+![Dicto in der Menübar mit der Hilfe-Seite](docs/screenshots/hero.png)
 
 ---
 
@@ -49,7 +49,9 @@ Dicto is built for people who care about **what happens to their data**:
 
 Dicto sits in your menu bar. Works in any app — Mail, Notion, Slack, Notes, VS Code, Terminal, MS-Office.
 
-<!-- SCREENSHOT: Three-panel collage — panel idle / panel recording / panel streaming AI result -->
+![Dicto -> Diktieren in jeder Anwendung](docs/screenshots/diktieren in jeder Anwendung.png)
+
+
 
 **Three modes:**
 
@@ -68,7 +70,7 @@ Select text in any app → hold `⌥ Fn` → speak your instruction.
 **No other dictation app on macOS does this.**
 
 
-![Dicto Panel](docs/screenshots/transformliste.png)
+![Transform-Modus: Fließtext wird in Aufzählung umgewandelt](docs/screenshots/transformliste.png)
 
 ### 👁 Preview
 See the result before it's inserted. Edit inline, confirm with `⌘ ↩`.  
