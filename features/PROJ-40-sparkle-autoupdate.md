@@ -31,7 +31,7 @@ Es wird von Sublime Text, Tower, Figma, BBEdit und hunderten anderen Apps genutz
 ### Hosting der appcast.xml
 
 - [x] `docs/appcast.xml` im Repo angelegt (v0.1.0 mit EdDSA-Signatur)
-- [ ] GitHub Pages aktiviert (Branch: `main`, Ordner: `/docs`) → Einstellungen → Pages
+- [x] GitHub Pages aktiviert (Branch: `main`, Ordner: `/docs`) → URL live ✅
 - URL: `https://dok100.github.io/Dicto/appcast.xml`
 
 ## appcast.xml – Checkliste für jeden neuen Release
@@ -57,5 +57,5 @@ git push
 ## Voraussetzungen
 
 - [x] PROJ-39 abgeschlossen (Developer ID, Notarisierung läuft)
-- [ ] GitHub Pages für das Repository aktiviert
+- [x] GitHub Pages für das Repository aktiviert
 - [x] EdDSA-Schlüsselpaar generiert (im Keychain gespeichert)
