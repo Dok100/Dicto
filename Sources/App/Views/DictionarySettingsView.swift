@@ -1,17 +1,18 @@
-import SwiftUI
 import AppKit
+import SwiftUI
 import UniformTypeIdentifiers
 
 struct DictionarySettingsView: View {
     @ObservedObject var dictionaryService: DictionaryService
 
-    @State private var newWrong   = ""
+    @State private var newWrong = ""
     @State private var newCorrect = ""
 
     var body: some View {
         Form {
             Section {
-                Text("Falsch erkannte Wörter automatisch ersetzen. Korrekturen im Vorschau-Modus werden automatisch gelernt.")
+                Text(
+                    "Falsch erkannte Wörter automatisch ersetzen. Korrekturen im Vorschau-Modus werden automatisch gelernt.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
 
@@ -48,13 +49,12 @@ struct DictionarySettingsView: View {
                         .textFieldStyle(.roundedBorder)
                     Button("Hinzufügen") {
                         dictionaryService.add(wrong: newWrong, correct: newCorrect)
-                        newWrong   = ""
+                        newWrong = ""
                         newCorrect = ""
                     }
                     .disabled(
                         newWrong.trimmingCharacters(in: .whitespaces).isEmpty ||
-                        newCorrect.trimmingCharacters(in: .whitespaces).isEmpty
-                    )
+                            newCorrect.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
 
                 HStack(spacing: 8) {
@@ -91,8 +91,7 @@ struct DictionarySettingsView: View {
         panel.begin { response in
             guard response == .OK, let url = panel.url,
                   let data = try? Data(contentsOf: url),
-                  let entries = try? JSONDecoder().decode([WordEntry].self, from: data)
-            else { return }
+                  let entries = try? JSONDecoder().decode([WordEntry].self, from: data) else { return }
             for entry in entries {
                 dictionaryService.add(wrong: entry.wrong, correct: entry.correct)
             }

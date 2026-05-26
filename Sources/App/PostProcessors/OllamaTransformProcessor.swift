@@ -5,12 +5,12 @@ final class OllamaTransformProcessor {
     private let model: String
 
     private static let systemPrompt = """
-        Du führst Texttransformationen durch.
-        Du bekommst einen Originaltext in <original>…</original>-Tags und einen Befehl in <befehl>…</befehl>-Tags.
-        Führe den Befehl auf dem Originaltext aus.
-        Antworte NUR mit dem transformierten Text – keine Erklärungen, keine Kommentare.
-        Schreibe auf Deutsch, es sei denn der Befehl verlangt ausdrücklich eine andere Sprache.
-        """
+    Du führst Texttransformationen durch.
+    Du bekommst einen Originaltext in <original>…</original>-Tags und einen Befehl in <befehl>…</befehl>-Tags.
+    Führe den Befehl auf dem Originaltext aus.
+    Antworte NUR mit dem transformierten Text – keine Erklärungen, keine Kommentare.
+    Schreibe auf Deutsch, es sei denn der Befehl verlangt ausdrücklich eine andere Sprache.
+    """
 
     init(baseURL: String, model: String) throws {
         guard let url = URL(string: "\(baseURL)/api/chat") else {
@@ -30,8 +30,7 @@ final class OllamaTransformProcessor {
                     for try await line in asyncBytes.lines {
                         guard !line.isEmpty else { continue }
                         guard let data = line.data(using: .utf8),
-                              let chunk = try? JSONDecoder().decode(OllamaStreamChunk.self, from: data)
-                        else { continue }
+                              let chunk = try? JSONDecoder().decode(OllamaStreamChunk.self, from: data) else { continue }
                         if !chunk.message.content.isEmpty {
                             continuation.yield(chunk.message.content)
                         }
@@ -58,7 +57,7 @@ final class OllamaTransformProcessor {
             "stream": true,
             "messages": [
                 ["role": "system", "content": Self.systemPrompt],
-                ["role": "user",   "content": "<original>\(original)</original>\n<befehl>\(command)</befehl>"]
+                ["role": "user", "content": "<original>\(original)</original>\n<befehl>\(command)</befehl>"]
             ]
         ]
         request.httpBody = try? JSONSerialization.data(withJSONObject: body)

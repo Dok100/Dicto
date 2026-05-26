@@ -5,11 +5,11 @@ import SwiftUI
 // MARK: – Onboarding-Schritte
 
 private enum OnboardingStep: Int, CaseIterable {
-    case microphone         = 0
-    case accessibility      = 1
+    case microphone = 0
+    case accessibility = 1
     case transcriptionEngine = 2
-    case aiSetup            = 3
-    case done               = 4
+    case aiSetup = 3
+    case done = 4
 }
 
 // MARK: – Haupt-View
@@ -18,11 +18,11 @@ struct OnboardingView: View {
     @ObservedObject var settings: AppSettings
     @State private var step: OnboardingStep = .microphone
 
-    // Schritt 1
+    /// Schritt 1
     @State private var micGranted = false
     // Schritt 2
-    @State private var axGranted  = false
-    @State private var axPolling  = false
+    @State private var axGranted = false
+    @State private var axPolling = false
     @State private var axTimer: Timer? = nil
     // Schritt 4
     @State private var openAIApiKeyDraft = ""
@@ -52,11 +52,11 @@ struct OnboardingView: View {
             // ── Schritt-Inhalt ────────────────────────────────────────────────
             Group {
                 switch step {
-                case .microphone:          microphoneStep
-                case .accessibility:       accessibilityStep
+                case .microphone: microphoneStep
+                case .accessibility: accessibilityStep
                 case .transcriptionEngine: engineStep
-                case .aiSetup:             aiStep
-                case .done:                doneStep
+                case .aiSetup: aiStep
+                case .done: doneStep
                 }
             }
             .frame(maxWidth: .infinity)
@@ -118,7 +118,8 @@ struct OnboardingView: View {
             VStack(spacing: 6) {
                 Text("Mikrofon-Zugriff")
                     .font(.headline)
-                Text("Dicto nimmt deine Sprache auf und wandelt sie lokal in Text um. Deine Aufnahmen verlassen nie das Gerät.")
+                Text(
+                    "Dicto nimmt deine Sprache auf und wandelt sie lokal in Text um. Deine Aufnahmen verlassen nie das Gerät.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -159,7 +160,8 @@ struct OnboardingView: View {
             VStack(spacing: 6) {
                 Text("Bedienungshilfen-Zugriff")
                     .font(.headline)
-                Text("Damit Dicto Text direkt an der Cursor-Position einfuegen kann, benoetigt es Zugriff auf die Bedienungshilfen.\n\nKlicke auf 'Einstellungen oeffnen' und aktiviere Dicto in der Liste.")
+                Text(
+                    "Damit Dicto Text direkt an der Cursor-Position einfuegen kann, benoetigt es Zugriff auf die Bedienungshilfen.\n\nKlicke auf 'Einstellungen oeffnen' und aktiviere Dicto in der Liste.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -230,8 +232,8 @@ struct OnboardingView: View {
                     icon: "apple.logo",
                     iconColor: .primary,
                     title: "Apple (live, kein Download)",
-                    subtitle: "Text erscheint live waehrend der Aufnahme. Sofort verfuegbar."
-                ) {
+                    subtitle: "Text erscheint live waehrend der Aufnahme. Sofort verfuegbar.")
+                {
                     settings.transcriptionEngine = .apple
                 }
 
@@ -240,8 +242,8 @@ struct OnboardingView: View {
                     icon: "waveform",
                     iconColor: .blue,
                     title: "Whisper (praeziser, offline)",
-                    subtitle: "Sehr hohe Genauigkeit, Fachvokabular, Umlaute. Einmaliger Download ~800 MB."
-                ) {
+                    subtitle: "Sehr hohe Genauigkeit, Fachvokabular, Umlaute. Einmaliger Download ~800 MB.")
+                {
                     settings.transcriptionEngine = .whisper
                 }
             }
@@ -278,8 +280,8 @@ struct OnboardingView: View {
                     icon: "desktopcomputer",
                     iconColor: .green,
                     title: "Ollama (lokal)",
-                    subtitle: "Kostenlos, laeuft auf deinem Mac. Erfordert Ollama + Modell (z.B. qwen2.5:32b)."
-                ) {
+                    subtitle: "Kostenlos, laeuft auf deinem Mac. Erfordert Ollama + Modell (z.B. qwen2.5:32b).")
+                {
                     selectedAIOption = .ollama
                     settings.llmProvider = .ollama
                 }
@@ -289,8 +291,8 @@ struct OnboardingView: View {
                     icon: "cloud.fill",
                     iconColor: .blue,
                     title: "OpenAI API",
-                    subtitle: "Sehr schnell, geringe Kosten. API-Key erforderlich (platform.openai.com)."
-                ) {
+                    subtitle: "Sehr schnell, geringe Kosten. API-Key erforderlich (platform.openai.com).")
+                {
                     selectedAIOption = .openAI
                     settings.llmProvider = .openAI
                 }
@@ -320,8 +322,8 @@ struct OnboardingView: View {
                     icon: "xmark.circle",
                     iconColor: .secondary,
                     title: "Ohne KI",
-                    subtitle: "Rohtext wird direkt eingefuegt. KI kann spaeter in den Einstellungen aktiviert werden."
-                ) {
+                    subtitle: "Rohtext wird direkt eingefuegt. KI kann spaeter in den Einstellungen aktiviert werden.")
+                {
                     selectedAIOption = .none
                     settings.llmProvider = .disabled
                 }
@@ -336,15 +338,16 @@ struct OnboardingView: View {
             }
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
-            .disabled(selectedAIOption == .openAI && openAIApiKeyDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            .disabled(selectedAIOption == .openAI && openAIApiKeyDraft.trimmingCharacters(in: .whitespacesAndNewlines)
+                .isEmpty)
         }
         .animation(.spring(response: 0.3), value: selectedAIOption == .openAI)
         .onAppear {
             // Vorauswahl basierend auf bestehenden Einstellungen
             switch settings.llmProvider {
             case .disabled: selectedAIOption = .none
-            case .ollama:   selectedAIOption = .ollama
-            case .openAI:   selectedAIOption = .openAI
+            case .ollama: selectedAIOption = .ollama
+            case .openAI: selectedAIOption = .openAI
             }
             openAIApiKeyDraft = settings.openAIApiKey
         }
@@ -369,14 +372,26 @@ struct OnboardingView: View {
 
             // Feature-Uebersicht
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-                FeatureTile(icon: "mic.fill",          color: .red,    title: "Diktat",
-                            desc: "Fn halten, sprechen, loslegen")
-                FeatureTile(icon: "paintpalette.fill", color: .pink,   title: "Stile",
-                            desc: "Neutral, Formell, Locker, Empathisch, EN")
-                FeatureTile(icon: "wand.and.sparkles", color: .indigo, title: "Transform",
-                            desc: "Text markieren + Sprachbefehl")
-                FeatureTile(icon: "eye.fill",          color: .blue,   title: "Preview",
-                            desc: "Text pruefen bevor er eingefuegt wird")
+                FeatureTile(
+                    icon: "mic.fill",
+                    color: .red,
+                    title: "Diktat",
+                    desc: "Fn halten, sprechen, loslegen")
+                FeatureTile(
+                    icon: "paintpalette.fill",
+                    color: .pink,
+                    title: "Stile",
+                    desc: "Neutral, Formell, Locker, Empathisch, EN")
+                FeatureTile(
+                    icon: "wand.and.sparkles",
+                    color: .indigo,
+                    title: "Transform",
+                    desc: "Text markieren + Sprachbefehl")
+                FeatureTile(
+                    icon: "eye.fill",
+                    color: .blue,
+                    title: "Preview",
+                    desc: "Text pruefen bevor er eingefuegt wird")
             }
 
             Button("Loslegen") { onComplete() }
@@ -398,7 +413,6 @@ struct OnboardingView: View {
         }
     }
 
-    @ViewBuilder
     private func permissionIcon(systemName: String, color: Color, granted: Bool) -> some View {
         ZStack {
             Circle()
@@ -448,8 +462,7 @@ private struct EngineCard: View {
             .background(
                 RoundedRectangle(cornerRadius: 10)
                     .fill(isSelected ? Color.accentColor.opacity(0.08) : Color.secondary.opacity(0.06))
-                    .strokeBorder(isSelected ? Color.accentColor.opacity(0.4) : Color.clear, lineWidth: 1.5)
-            )
+                    .strokeBorder(isSelected ? Color.accentColor.opacity(0.4) : Color.clear, lineWidth: 1.5))
         }
         .buttonStyle(.plain)
         .animation(.spring(response: 0.25), value: isSelected)
@@ -493,8 +506,7 @@ private struct AIOptionCard: View {
             .background(
                 RoundedRectangle(cornerRadius: 10)
                     .fill(isSelected ? Color.accentColor.opacity(0.08) : Color.secondary.opacity(0.06))
-                    .strokeBorder(isSelected ? Color.accentColor.opacity(0.4) : Color.clear, lineWidth: 1.5)
-            )
+                    .strokeBorder(isSelected ? Color.accentColor.opacity(0.4) : Color.clear, lineWidth: 1.5))
         }
         .buttonStyle(.plain)
         .animation(.spring(response: 0.25), value: isSelected)

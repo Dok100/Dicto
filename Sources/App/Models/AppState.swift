@@ -18,7 +18,9 @@ final class AppState: ObservableObject {
         return .none
     }
 
-    var isAccessibilityAuthorized: Bool { pasteService.isAccessibilityAuthorized }
+    var isAccessibilityAuthorized: Bool {
+        pasteService.isAccessibilityAuthorized
+    }
 
     @Published var dictationStyle: DictationStyle = {
         let raw = UserDefaults.standard.string(forKey: StorageKey.Defaults.dictationStyle) ?? ""
@@ -59,16 +61,17 @@ final class AppState: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
 
     init() {
-        let audio   = AudioService()
-        let hotkey  = HotkeyService(dictation: settings.dictationShortcut,
-                                    transform: settings.transformShortcut)
+        let audio = AudioService()
+        let hotkey = HotkeyService(
+            dictation: settings.dictationShortcut,
+            transform: settings.transformShortcut)
         let whisper = WhisperService()
-        let paste   = PasteService()
-        audioService   = audio
-        hotkeyService  = hotkey
-        whisperService = whisper
-        pasteService   = paste
-        hasMicrophonePermission = audio.isMicrophoneAuthorized
+        let paste = PasteService()
+        self.audioService = audio
+        self.hotkeyService = hotkey
+        self.whisperService = whisper
+        self.pasteService = paste
+        self.hasMicrophonePermission = audio.isMicrophoneAuthorized
 
         setupWhisperBinding()
         audio.requestPermissionIfNeeded { [weak self] granted in
@@ -134,7 +137,6 @@ final class AppState: ObservableObject {
 // MARK: – Init-Hilfsmethoden (Wiring)
 
 private extension AppState {
-
     func setupWhisperBinding() {
         whisperService.$state
             .receive(on: RunLoop.main)
@@ -145,7 +147,7 @@ private extension AppState {
                         await self?.handleTranscriptionDone(text: text)
                     }
                 } else {
-                    self.transcriptionState = state
+                    transcriptionState = state
                 }
             }
             .store(in: &cancellables)
@@ -154,26 +156,26 @@ private extension AppState {
     func setupAppleSpeechCallbacks() {
         appleSpeechService.onPartialResult = { [weak self] text in
             Task { @MainActor [weak self] in
-                guard let self, self.isRecording else { return }
-                if self.settings.llmProvider == .disabled {
-                    self.transcriptionState = .streaming(text)
+                guard let self, isRecording else { return }
+                if settings.llmProvider == .disabled {
+                    transcriptionState = .streaming(text)
                 }
             }
         }
         appleSpeechService.onFinalResult = { [weak self] text in
             Task { @MainActor [weak self] in
                 guard let self else { return }
-                self.isRecording = false
-                self.isTransformRecording = false
-                await self.handleTranscriptionDone(text: text)
+                isRecording = false
+                isTransformRecording = false
+                await handleTranscriptionDone(text: text)
             }
         }
         appleSpeechService.onError = { [weak self] _ in
             Task { @MainActor [weak self] in
                 guard let self else { return }
-                self.isRecording = false
-                self.isTransformRecording = false
-                self.transcriptionState = .error(.appleSpeechUnavailable)
+                isRecording = false
+                isTransformRecording = false
+                transcriptionState = .error(.appleSpeechUnavailable)
             }
         }
     }
@@ -198,7 +200,7 @@ private extension AppState {
                 // isRecording wird in onFinalResult zurückgesetzt
             } else {
                 isRecording = false
-                let model    = settings.whisperModel
+                let model = settings.whisperModel
                 let language = settings.whisperLanguage
                 if let url = audioService.stopRecording() {
                     Task { await self.whisperService.transcribe(fileURL: url, model: model, language: language) }
@@ -208,8 +210,8 @@ private extension AppState {
         hotkeyService.onTransformKeyDown = { [weak self] in
             guard let self else { return }
             targetApp = NSWorkspace.shared.frontmostApplication
-            isTransformMode     = true
-            isRecording         = true
+            isTransformMode = true
+            isRecording = true
             isTransformRecording = true
             if settings.soundFeedbackEnabled { SoundFeedback.playStart() }
             Task { @MainActor [weak self] in
@@ -228,9 +230,9 @@ private extension AppState {
                 appleSpeechService.stopRecording()
                 // isRecording/isTransformRecording werden in onFinalResult zurückgesetzt
             } else {
-                isRecording          = false
+                isRecording = false
                 isTransformRecording = false
-                let model    = settings.whisperModel
+                let model = settings.whisperModel
                 let language = settings.whisperLanguage
                 if let url = audioService.stopRecording() {
                     Task { await self.whisperService.transcribe(fileURL: url, model: model, language: language) }
@@ -262,7 +264,6 @@ private extension AppState {
 // MARK: – Transkriptions-Pipeline
 
 private extension AppState {
-
     @MainActor
     func handleTranscriptionDone(text: String) async {
         if isTransformMode {
@@ -271,11 +272,10 @@ private extension AppState {
             return
         }
 
-        let effectivePrompt: String
-        if let custom = selectedCustomStyle {
-            effectivePrompt = custom.prompt
+        let effectivePrompt: String = if let custom = selectedCustomStyle {
+            custom.prompt
         } else {
-            effectivePrompt = dictationStyle.systemPrompt ?? settings.ollamaPrompt
+            dictationStyle.systemPrompt ?? settings.ollamaPrompt
         }
 
         let raw: String
@@ -285,8 +285,7 @@ private extension AppState {
                 stream = try LLMProcessorFactory.dictationStream(
                     settings: settings,
                     systemPrompt: effectivePrompt,
-                    text: text
-                )
+                    text: text)
             } catch let e as DictoError {
                 transcriptionState = .error(e)
                 return
@@ -301,8 +300,7 @@ private extension AppState {
         }
 
         let processed = dictionaryService.apply(
-            to: raw.trimmingCharacters(in: .whitespacesAndNewlines)
-        )
+            to: raw.trimmingCharacters(in: .whitespacesAndNewlines))
 
         if settings.previewEnabled {
             transcriptionState = .done(processed)
@@ -337,8 +335,7 @@ private extension AppState {
                 stream = try LLMProcessorFactory.transformStream(
                     settings: settings,
                     original: original,
-                    command: command
-                )
+                    command: command)
             } catch let e as DictoError {
                 transcriptionState = .error(e)
                 return

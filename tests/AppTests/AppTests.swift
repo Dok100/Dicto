@@ -1,5 +1,5 @@
-@testable import Dicto
 import XCTest
+@testable import Dicto
 
 // MARK: – DictionaryService
 
@@ -66,7 +66,7 @@ final class DictionaryServiceTests: XCTestCase {
 
     func testApplyNFCNormalization() {
         // NFC: ö = U+00F6 / NFD: o + combining diaeresis = U+006F + U+0308
-        let nfc = "\u{00F6}dheim"  // wie User es eintippt
+        let nfc = "\u{00F6}dheim" // wie User es eintippt
         let nfd = "o\u{0308}dheim" // wie WhisperKit es manchmal liefert
         service.add(wrong: nfc, correct: "Oedheim")
         let result = service.apply(to: "Ich wohne in \(nfd).")
@@ -154,7 +154,9 @@ final class HistoryServiceTests: XCTestCase {
     }
 
     func testMaxTwentyEntries() {
-        for i in 1...25 { service.add(text: "Eintrag \(i)") }
+        for i in 1...25 {
+            service.add(text: "Eintrag \(i)")
+        }
         XCTAssertEqual(service.entries.count, 20)
         XCTAssertEqual(service.entries[0].text, "Eintrag 25")
         XCTAssertEqual(service.entries[19].text, "Eintrag 6")
@@ -246,12 +248,12 @@ final class WhisperModelTests: XCTestCase {
 // MARK: – AppSettings
 
 final class AppSettingsTests: XCTestCase {
-    // Alle persistierten Keys vor jedem Test löschen
+    /// Alle persistierten Keys vor jedem Test löschen
     private let keysToClean: [String] = [
         "llmProvider", "ollamaBaseURL", "ollamaModel", "ollamaPrompt",
         "whisperModel", "whisperLanguage", "previewEnabled", "soundFeedbackEnabled",
         "transcriptionEngine", "openAIModel", "openAIBaseURL",
-        "ollamaEnabled",  // Legacy-Key – darf nicht mehr geschrieben werden
+        "ollamaEnabled" // Legacy-Key – darf nicht mehr geschrieben werden
     ]
 
     override func setUp() {
@@ -340,7 +342,7 @@ final class AppSettingsTests: XCTestCase {
 
     func testMigrationRunsOnlyOnce() {
         UserDefaults.standard.set(false, forKey: "ollamaEnabled")
-        _ = AppSettings()  // erste Initialisierung: Migration läuft
+        _ = AppSettings() // erste Initialisierung: Migration läuft
 
         // ollamaEnabled wurde gelöscht → zweite Init darf llmProvider nicht nochmal kippen
         UserDefaults.standard.set("openai", forKey: "llmProvider")
@@ -354,8 +356,8 @@ final class AppSettingsTests: XCTestCase {
 final class LLMProviderTests: XCTestCase {
     func testRawValues() {
         XCTAssertEqual(LLMProvider.disabled.rawValue, "disabled")
-        XCTAssertEqual(LLMProvider.ollama.rawValue,   "ollama")
-        XCTAssertEqual(LLMProvider.openAI.rawValue,   "openai")
+        XCTAssertEqual(LLMProvider.ollama.rawValue, "ollama")
+        XCTAssertEqual(LLMProvider.openAI.rawValue, "openai")
     }
 
     func testAllCasesHaveLabels() {
@@ -386,7 +388,7 @@ final class DictoErrorTests: XCTestCase {
             .appleSpeechDenied, .appleSpeechUnavailable,
             .ollamaNotReachable, .ollamaTimeout, .ollamaEmptyResponse, .ollamaUnknown,
             .openAIKeyMissing, .openAIAuthFailed, .openAINotReachable,
-            .openAITimeout, .openAIUnknown,
+            .openAITimeout, .openAIUnknown
         ]
         for error in allErrors {
             XCTAssertFalse(error.title.isEmpty, "\(error) hat keinen Titel")
@@ -399,7 +401,7 @@ final class DictoErrorTests: XCTestCase {
             .appleSpeechDenied, .appleSpeechUnavailable,
             .ollamaNotReachable, .ollamaTimeout, .ollamaEmptyResponse, .ollamaUnknown,
             .openAIKeyMissing, .openAIAuthFailed, .openAINotReachable,
-            .openAITimeout, .openAIUnknown,
+            .openAITimeout, .openAIUnknown
         ]
         for error in allErrors {
             XCTAssertFalse(error.detail.isEmpty, "\(error) hat kein Detail")
@@ -458,30 +460,31 @@ final class DictoErrorTests: XCTestCase {
 }
 
 // MARK: – StorageKey
+
 //
 // Diese Tests schützen vor versehentlichem Umbenennen von Keys die in
 // UserDefaults persistiert sind. Bestehende Nutzer verlieren sonst ihre Einstellungen.
 
 final class StorageKeyTests: XCTestCase {
     func testUserDefaultsKeys() {
-        XCTAssertEqual(StorageKey.Defaults.ollamaBaseURL,        "ollamaBaseURL")
-        XCTAssertEqual(StorageKey.Defaults.ollamaModel,          "ollamaModel")
-        XCTAssertEqual(StorageKey.Defaults.ollamaPrompt,         "ollamaPrompt")
-        XCTAssertEqual(StorageKey.Defaults.transcriptionEngine,  "transcriptionEngine")
-        XCTAssertEqual(StorageKey.Defaults.whisperModel,         "whisperModel")
-        XCTAssertEqual(StorageKey.Defaults.whisperLanguage,      "whisperLanguage")
-        XCTAssertEqual(StorageKey.Defaults.previewEnabled,       "previewEnabled")
+        XCTAssertEqual(StorageKey.Defaults.ollamaBaseURL, "ollamaBaseURL")
+        XCTAssertEqual(StorageKey.Defaults.ollamaModel, "ollamaModel")
+        XCTAssertEqual(StorageKey.Defaults.ollamaPrompt, "ollamaPrompt")
+        XCTAssertEqual(StorageKey.Defaults.transcriptionEngine, "transcriptionEngine")
+        XCTAssertEqual(StorageKey.Defaults.whisperModel, "whisperModel")
+        XCTAssertEqual(StorageKey.Defaults.whisperLanguage, "whisperLanguage")
+        XCTAssertEqual(StorageKey.Defaults.previewEnabled, "previewEnabled")
         XCTAssertEqual(StorageKey.Defaults.soundFeedbackEnabled, "soundFeedbackEnabled")
-        XCTAssertEqual(StorageKey.Defaults.customStyles,         "customStyles")
-        XCTAssertEqual(StorageKey.Defaults.dictationShortcut,    "dictationShortcut")
-        XCTAssertEqual(StorageKey.Defaults.transformShortcut,    "transformShortcut")
-        XCTAssertEqual(StorageKey.Defaults.dictationStyle,       "dictationStyle")
-        XCTAssertEqual(StorageKey.Defaults.llmProvider,          "llmProvider")
-        XCTAssertEqual(StorageKey.Defaults.openAIModel,          "openAIModel")
-        XCTAssertEqual(StorageKey.Defaults.openAIBaseURL,        "openAIBaseURL")
-        XCTAssertEqual(StorageKey.Defaults.onboardingCompleted,  "onboardingCompleted")
-        XCTAssertEqual(StorageKey.Defaults.dictationHistory,     "dictationHistory")
-        XCTAssertEqual(StorageKey.Defaults.dictionaryEntries,    "dictionaryEntries")
+        XCTAssertEqual(StorageKey.Defaults.customStyles, "customStyles")
+        XCTAssertEqual(StorageKey.Defaults.dictationShortcut, "dictationShortcut")
+        XCTAssertEqual(StorageKey.Defaults.transformShortcut, "transformShortcut")
+        XCTAssertEqual(StorageKey.Defaults.dictationStyle, "dictationStyle")
+        XCTAssertEqual(StorageKey.Defaults.llmProvider, "llmProvider")
+        XCTAssertEqual(StorageKey.Defaults.openAIModel, "openAIModel")
+        XCTAssertEqual(StorageKey.Defaults.openAIBaseURL, "openAIBaseURL")
+        XCTAssertEqual(StorageKey.Defaults.onboardingCompleted, "onboardingCompleted")
+        XCTAssertEqual(StorageKey.Defaults.dictationHistory, "dictationHistory")
+        XCTAssertEqual(StorageKey.Defaults.dictionaryEntries, "dictionaryEntries")
     }
 
     func testLegacyKeyPreservedForMigration() {
@@ -545,7 +548,7 @@ final class StatsServiceTests: XCTestCase {
 
     private let keys = [
         "stats.totalDictations", "stats.totalWords",
-        "stats.transformCount", "stats.styleUsage", "stats.dailyCounts",
+        "stats.transformCount", "stats.styleUsage", "stats.dailyCounts"
     ]
 
     override func setUp() {
@@ -580,14 +583,14 @@ final class StatsServiceTests: XCTestCase {
     }
 
     func testRecordAccumulatesAcrossMultipleCalls() {
-        service.record(text: "Hallo Welt", style: "neutral", isTransform: false)         // 2 Wörter
+        service.record(text: "Hallo Welt", style: "neutral", isTransform: false) // 2 Wörter
         service.record(text: "Noch drei Wörter hier", style: "neutral", isTransform: false) // 4 Wörter
         XCTAssertEqual(service.totalDictations, 2)
         XCTAssertEqual(service.totalWords, 6)
     }
 
     func testAverageWordsCalculation() {
-        service.record(text: "Hallo Welt", style: "neutral", isTransform: false)          // 2
+        service.record(text: "Hallo Welt", style: "neutral", isTransform: false) // 2
         service.record(text: "Noch drei Wörter hier", style: "neutral", isTransform: false) // 4
         XCTAssertEqual(service.averageWords, 3) // (2+4)/2
     }
@@ -652,6 +655,7 @@ final class PassthroughPostProcessorTests: XCTestCase {
 }
 
 // MARK: – LLMProcessorFactory (Stufe 2)
+
 //
 // Testet ausschließlich Fehler die bei der Initialisierung geworfen werden
 // (ungültige Konfiguration) – kein Netzwerkaufruf nötig.
@@ -659,7 +663,7 @@ final class PassthroughPostProcessorTests: XCTestCase {
 final class LLMProcessorFactoryTests: XCTestCase {
     private let defaultsKeys = [
         "llmProvider", "openAIBaseURL", "openAIModel",
-        "ollamaBaseURL", "ollamaModel",
+        "ollamaBaseURL", "ollamaModel"
     ]
 
     override func setUp() {
@@ -681,8 +685,10 @@ final class LLMProcessorFactoryTests: XCTestCase {
         s.llmProvider = .openAI
         // Kein Key in Keychain → openAIApiKey == ""
         XCTAssertThrowsError(
-            try LLMProcessorFactory.dictationStream(settings: s, systemPrompt: "test", text: "hallo")
-        ) { XCTAssertEqual($0 as? DictoError, .openAIKeyMissing) }
+            try LLMProcessorFactory.dictationStream(settings: s, systemPrompt: "test", text: "hallo"))
+        { XCTAssertEqual(
+            $0 as? DictoError,
+            .openAIKeyMissing) }
     }
 
     func testDictationStreamThrowsOpenAINotReachableForNonHTTPURL() {
@@ -691,8 +697,10 @@ final class LLMProcessorFactoryTests: XCTestCase {
         s.openAIApiKey = "sk-test"
         s.openAIBaseURL = "ftp://example.com" // kein http/https → ungültig
         XCTAssertThrowsError(
-            try LLMProcessorFactory.dictationStream(settings: s, systemPrompt: "test", text: "hallo")
-        ) { XCTAssertEqual($0 as? DictoError, .openAINotReachable) }
+            try LLMProcessorFactory.dictationStream(settings: s, systemPrompt: "test", text: "hallo"))
+        { XCTAssertEqual(
+            $0 as? DictoError,
+            .openAINotReachable) }
     }
 
     func testDictationStreamSucceedsWithValidOpenAIConfig() {
@@ -701,8 +709,7 @@ final class LLMProcessorFactoryTests: XCTestCase {
         s.openAIApiKey = "sk-test"
         s.openAIBaseURL = "https://api.openai.com/v1"
         XCTAssertNoThrow(
-            try LLMProcessorFactory.dictationStream(settings: s, systemPrompt: "test", text: "hallo")
-        )
+            try LLMProcessorFactory.dictationStream(settings: s, systemPrompt: "test", text: "hallo"))
     }
 
     // MARK: dictationStream – Ollama
@@ -712,8 +719,7 @@ final class LLMProcessorFactoryTests: XCTestCase {
         s.llmProvider = .ollama
         s.ollamaBaseURL = "http://localhost:11434"
         XCTAssertNoThrow(
-            try LLMProcessorFactory.dictationStream(settings: s, systemPrompt: "test", text: "hallo")
-        )
+            try LLMProcessorFactory.dictationStream(settings: s, systemPrompt: "test", text: "hallo"))
     }
 
     // MARK: transformStream – OpenAI
@@ -722,8 +728,10 @@ final class LLMProcessorFactoryTests: XCTestCase {
         let s = AppSettings()
         s.llmProvider = .openAI
         XCTAssertThrowsError(
-            try LLMProcessorFactory.transformStream(settings: s, original: "text", command: "befehl")
-        ) { XCTAssertEqual($0 as? DictoError, .openAIKeyMissing) }
+            try LLMProcessorFactory.transformStream(settings: s, original: "text", command: "befehl"))
+        { XCTAssertEqual(
+            $0 as? DictoError,
+            .openAIKeyMissing) }
     }
 
     func testTransformStreamThrowsOpenAINotReachableForNonHTTPURL() {
@@ -732,8 +740,10 @@ final class LLMProcessorFactoryTests: XCTestCase {
         s.openAIApiKey = "sk-test"
         s.openAIBaseURL = "ftp://example.com"
         XCTAssertThrowsError(
-            try LLMProcessorFactory.transformStream(settings: s, original: "text", command: "befehl")
-        ) { XCTAssertEqual($0 as? DictoError, .openAINotReachable) }
+            try LLMProcessorFactory.transformStream(settings: s, original: "text", command: "befehl"))
+        { XCTAssertEqual(
+            $0 as? DictoError,
+            .openAINotReachable) }
     }
 }
 
@@ -805,8 +815,7 @@ final class TranscriptionStateTests: XCTestCase {
     func testErrorInequalityForDifferentErrors() {
         XCTAssertNotEqual(
             TranscriptionState.error(.ollamaNotReachable),
-            TranscriptionState.error(.openAIKeyMissing)
-        )
+            TranscriptionState.error(.openAIKeyMissing))
     }
 
     func testDifferentStatesAreNotEqual() {

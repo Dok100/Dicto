@@ -1,7 +1,6 @@
 import AppKit
 
 final class HotkeyService {
-
     // MARK: – Callbacks
 
     var onKeyDown: (() -> Void)?
@@ -16,6 +15,7 @@ final class HotkeyService {
     var dictationShortcut: ShortcutConfig {
         didSet { reinstallMonitors() }
     }
+
     var transformShortcut: ShortcutConfig {
         didSet { reinstallMonitors() }
     }
@@ -23,17 +23,19 @@ final class HotkeyService {
     // MARK: – Interna
 
     private var flagsMonitorGlobal: Any?
-    private var flagsMonitorLocal:  Any?
+    private var flagsMonitorLocal: Any?
     private var keyDownMonitor: Any?
-    private var keyUpMonitor:   Any?
+    private var keyUpMonitor: Any?
 
     private enum ActiveMode { case none, dictation, transform }
     private var activeMode: ActiveMode = .none
 
     // MARK: – Init
 
-    init(dictation: ShortcutConfig = .defaultDictation,
-         transform: ShortcutConfig = .defaultTransform) {
+    init(
+        dictation: ShortcutConfig = .defaultDictation,
+        transform: ShortcutConfig = .defaultTransform)
+    {
         self.dictationShortcut = dictation
         self.transformShortcut = transform
         tryInstallMonitor()
@@ -79,9 +81,9 @@ final class HotkeyService {
             if let m { NSEvent.removeMonitor(m) }
         }
         flagsMonitorGlobal = nil
-        flagsMonitorLocal  = nil
-        keyDownMonitor     = nil
-        keyUpMonitor       = nil
+        flagsMonitorLocal = nil
+        keyDownMonitor = nil
+        keyUpMonitor = nil
     }
 
     // MARK: – flagsChanged (Fn-Taste)
@@ -111,7 +113,7 @@ final class HotkeyService {
     }
 
     private func fnModifiersMatch(event: NSEvent, config: ShortcutConfig) -> Bool {
-        let want = config.modifierFlags   // Nur die vom Nutzer konfigurierten Modifier
+        let want = config.modifierFlags // Nur die vom Nutzer konfigurierten Modifier
         let have = event.modifierFlags.intersection([.command, .option, .control, .shift])
         return want == have
     }
@@ -125,12 +127,14 @@ final class HotkeyService {
         // Transform zuerst (spezifischer)
         if !transformShortcut.isFlagsBased,
            event.keyCode == transformShortcut.keyCode,
-           mods == transformShortcut.modifierFlags {
+           mods == transformShortcut.modifierFlags
+        {
             activeMode = .transform
             onTransformKeyDown?()
         } else if !dictationShortcut.isFlagsBased,
                   event.keyCode == dictationShortcut.keyCode,
-                  mods == dictationShortcut.modifierFlags {
+                  mods == dictationShortcut.modifierFlags
+        {
             activeMode = .dictation
             onKeyDown?()
         }

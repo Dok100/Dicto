@@ -24,8 +24,7 @@ final class OllamaPostProcessor {
                     for try await line in asyncBytes.lines {
                         guard !line.isEmpty else { continue }
                         guard let data = line.data(using: .utf8),
-                              let chunk = try? JSONDecoder().decode(OllamaStreamChunk.self, from: data)
-                        else { continue }
+                              let chunk = try? JSONDecoder().decode(OllamaStreamChunk.self, from: data) else { continue }
                         if !chunk.message.content.isEmpty {
                             continuation.yield(chunk.message.content)
                         }
@@ -52,7 +51,7 @@ final class OllamaPostProcessor {
             "stream": true,
             "messages": [
                 ["role": "system", "content": systemPrompt],
-                ["role": "user",   "content": "<diktat>\(text)</diktat>"]
+                ["role": "user", "content": "<diktat>\(text)</diktat>"]
             ]
         ]
         request.httpBody = try? JSONSerialization.data(withJSONObject: body)

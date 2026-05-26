@@ -2,7 +2,6 @@ import AppKit
 import SwiftUI
 
 final class OnboardingWindowController: NSWindowController {
-
     static var isNeeded: Bool {
         !UserDefaults.standard.bool(forKey: StorageKey.Defaults.onboardingCompleted)
     }
@@ -16,8 +15,7 @@ final class OnboardingWindowController: NSWindowController {
             contentRect: NSRect(x: 0, y: 0, width: 480, height: 560),
             styleMask: [.titled, .closable, .fullSizeContentView],
             backing: .buffered,
-            defer: false
-        )
+            defer: false)
         window.title = ""
         window.titleVisibility = .hidden
         window.titlebarAppearsTransparent = true
@@ -35,7 +33,10 @@ final class OnboardingWindowController: NSWindowController {
         super.init(window: window)
     }
 
-    required init?(coder: NSCoder) { fatalError() }
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError()
+    }
 
     func show() {
         // Größe explizit setzen – NSHostingController meldet beim ersten Rendern oft (0,0)

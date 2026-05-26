@@ -1,7 +1,6 @@
 import Foundation
 
 final class StatsService: ObservableObject {
-
     // MARK: – Persistierte Werte
 
     @Published private(set) var totalDictations: Int = 0
@@ -13,13 +12,15 @@ final class StatsService: ObservableObject {
     private let defaults = UserDefaults.standard
     private enum Key {
         static let dictations = "stats.totalDictations"
-        static let words      = "stats.totalWords"
-        static let transform  = "stats.transformCount"
-        static let style      = "stats.styleUsage"
-        static let daily      = "stats.dailyCounts"
+        static let words = "stats.totalWords"
+        static let transform = "stats.transformCount"
+        static let style = "stats.styleUsage"
+        static let daily = "stats.dailyCounts"
     }
 
-    init() { load() }
+    init() {
+        load()
+    }
 
     // MARK: – Aufzeichnen
 
@@ -36,7 +37,9 @@ final class StatsService: ObservableObject {
 
     // MARK: – Berechnete Kennzahlen
 
-    var todayCount: Int { dailyCounts[todayKey()] ?? 0 }
+    var todayCount: Int {
+        dailyCounts[todayKey()] ?? 0
+    }
 
     var thisWeekCount: Int {
         let fmt = isoFormatter()
@@ -63,14 +66,17 @@ final class StatsService: ObservableObject {
 
         return (0..<7).reversed().map { offset in
             let date = Calendar.current.date(byAdding: .day, value: -offset, to: Date())!
-            return (label: day.string(from: date),
-                    count: dailyCounts[iso.string(from: date)] ?? 0)
+            return (
+                label: day.string(from: date),
+                count: dailyCounts[iso.string(from: date)] ?? 0)
         }
     }
 
     // MARK: – Hilfsmethoden
 
-    private func todayKey() -> String { isoFormatter().string(from: Date()) }
+    private func todayKey() -> String {
+        isoFormatter().string(from: Date())
+    }
 
     private func isoFormatter() -> DateFormatter {
         let f = DateFormatter()
@@ -87,16 +93,16 @@ final class StatsService: ObservableObject {
 
     private func save() {
         defaults.set(totalDictations, forKey: Key.dictations)
-        defaults.set(totalWords,      forKey: Key.words)
-        defaults.set(transformCount,  forKey: Key.transform)
-        if let d = try? JSONEncoder().encode(styleUsage)  { defaults.set(d, forKey: Key.style) }
+        defaults.set(totalWords, forKey: Key.words)
+        defaults.set(transformCount, forKey: Key.transform)
+        if let d = try? JSONEncoder().encode(styleUsage) { defaults.set(d, forKey: Key.style) }
         if let d = try? JSONEncoder().encode(dailyCounts) { defaults.set(d, forKey: Key.daily) }
     }
 
     private func load() {
         totalDictations = defaults.integer(forKey: Key.dictations)
-        totalWords      = defaults.integer(forKey: Key.words)
-        transformCount  = defaults.integer(forKey: Key.transform)
+        totalWords = defaults.integer(forKey: Key.words)
+        transformCount = defaults.integer(forKey: Key.transform)
         if let d = defaults.data(forKey: Key.style),
            let v = try? JSONDecoder().decode([String: Int].self, from: d) { styleUsage = v }
         if let d = defaults.data(forKey: Key.daily),

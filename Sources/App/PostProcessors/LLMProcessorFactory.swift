@@ -4,7 +4,6 @@
 /// gebaut wird, entscheidet allein die Factory. Neuen Provider ergänzen:
 /// nur diese Datei ändern, AppState bleibt unberührt.
 enum LLMProcessorFactory {
-
     // MARK: – Diktat-Glättung
 
     /// Erstellt einen Stream der `text` mit dem konfigurierten Provider glättet.
@@ -13,24 +12,22 @@ enum LLMProcessorFactory {
     static func dictationStream(
         settings: AppSettings,
         systemPrompt: String,
-        text: String
-    ) throws -> AsyncThrowingStream<String, Error> {
+        text: String) throws -> AsyncThrowingStream<String, Error>
+    {
         switch settings.llmProvider {
         case .disabled:
             preconditionFailure("dictationStream darf nicht mit .disabled aufgerufen werden")
         case .ollama:
-            return try OllamaPostProcessor(
+            try OllamaPostProcessor(
                 baseURL: settings.ollamaBaseURL,
                 model: settings.ollamaModel,
-                systemPrompt: systemPrompt
-            ).streamProcess(text: text)
+                systemPrompt: systemPrompt).streamProcess(text: text)
         case .openAI:
-            return try OpenAIPostProcessor(
+            try OpenAIPostProcessor(
                 baseURL: settings.openAIBaseURL,
                 apiKey: settings.openAIApiKey,
                 model: settings.openAIModel,
-                systemPrompt: systemPrompt
-            ).streamProcess(text: text)
+                systemPrompt: systemPrompt).streamProcess(text: text)
         }
     }
 
@@ -42,22 +39,20 @@ enum LLMProcessorFactory {
     static func transformStream(
         settings: AppSettings,
         original: String,
-        command: String
-    ) throws -> AsyncThrowingStream<String, Error> {
+        command: String) throws -> AsyncThrowingStream<String, Error>
+    {
         switch settings.llmProvider {
         case .disabled:
             preconditionFailure("transformStream darf nicht mit .disabled aufgerufen werden")
         case .ollama:
-            return try OllamaTransformProcessor(
+            try OllamaTransformProcessor(
                 baseURL: settings.ollamaBaseURL,
-                model: settings.ollamaModel
-            ).streamProcess(original: original, command: command)
+                model: settings.ollamaModel).streamProcess(original: original, command: command)
         case .openAI:
-            return try OpenAITransformProcessor(
+            try OpenAITransformProcessor(
                 baseURL: settings.openAIBaseURL,
                 apiKey: settings.openAIApiKey,
-                model: settings.openAIModel
-            ).streamProcess(original: original, command: command)
+                model: settings.openAIModel).streamProcess(original: original, command: command)
         }
     }
 }

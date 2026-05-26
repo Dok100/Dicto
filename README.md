@@ -114,8 +114,6 @@ Choose your AI backend:
 
 ### Styles
 
-<!-- SCREENSHOT: Style picker in the panel -->
-
 | Style | Use case |
 |-------|----------|
 | Neutral | Clean, direct — general purpose |
@@ -171,7 +169,7 @@ Dicto is free and open source. If it saves you time or protects your privacy, co
 <!-- GUMROAD BADGE PLACEHOLDER -->
 > 💛 [Pay what you want](#) *(link coming soon)*
 
-This covers API costs (Claude + OpenAI) and keeps the project going.
+This covers OpenAI API costs and keeps the project going.
 
 ---
 

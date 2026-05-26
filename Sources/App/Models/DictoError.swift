@@ -26,19 +26,19 @@ enum DictoError: Error, Equatable {
     /// Kurze Überschrift (1 Zeile)
     var title: String {
         switch self {
-        case .whisperModelLoad:         return "Sprachmodell nicht geladen"
-        case .whisperTranscription:     return "Transkription fehlgeschlagen"
-        case .appleSpeechDenied:        return "Spracherkennung nicht erlaubt"
-        case .appleSpeechUnavailable:   return "Spracherkennung nicht verfügbar"
-        case .ollamaNotReachable:       return "Ollama nicht erreichbar"
-        case .ollamaTimeout:         return "Ollama antwortet nicht"
-        case .ollamaEmptyResponse:   return "Leere Antwort von Ollama"
-        case .ollamaUnknown:         return "Ollama-Fehler"
-        case .openAIKeyMissing:      return "Kein API-Key"
-        case .openAIAuthFailed:      return "API-Key ungültig"
-        case .openAINotReachable:    return "OpenAI nicht erreichbar"
-        case .openAITimeout:         return "OpenAI antwortet nicht"
-        case .openAIUnknown:         return "OpenAI-Fehler"
+        case .whisperModelLoad: "Sprachmodell nicht geladen"
+        case .whisperTranscription: "Transkription fehlgeschlagen"
+        case .appleSpeechDenied: "Spracherkennung nicht erlaubt"
+        case .appleSpeechUnavailable: "Spracherkennung nicht verfügbar"
+        case .ollamaNotReachable: "Ollama nicht erreichbar"
+        case .ollamaTimeout: "Ollama antwortet nicht"
+        case .ollamaEmptyResponse: "Leere Antwort von Ollama"
+        case .ollamaUnknown: "Ollama-Fehler"
+        case .openAIKeyMissing: "Kein API-Key"
+        case .openAIAuthFailed: "API-Key ungültig"
+        case .openAINotReachable: "OpenAI nicht erreichbar"
+        case .openAITimeout: "OpenAI antwortet nicht"
+        case .openAIUnknown: "OpenAI-Fehler"
         }
     }
 
@@ -46,56 +46,58 @@ enum DictoError: Error, Equatable {
     var detail: String {
         switch self {
         case .whisperModelLoad:
-            return "Das Whisper-Modell konnte nicht geladen werden. Prüfe deine Internetverbindung (erster Download) oder starte Dicto neu."
+            "Das Whisper-Modell konnte nicht geladen werden. Prüfe deine Internetverbindung (erster Download) oder starte Dicto neu."
         case .whisperTranscription:
-            return "Die Spracherkennung ist fehlgeschlagen. Bitte versuche es erneut."
+            "Die Spracherkennung ist fehlgeschlagen. Bitte versuche es erneut."
         case .appleSpeechDenied:
-            return "Bitte erlaube die Spracherkennung unter Systemeinstellungen → Datenschutz → Spracherkennung."
+            "Bitte erlaube die Spracherkennung unter Systemeinstellungen → Datenschutz → Spracherkennung."
         case .appleSpeechUnavailable:
-            return "Die Apple-Spracherkennung ist auf diesem Gerät nicht verfügbar. Wechsle zu Whisper in den Einstellungen."
+            "Die Apple-Spracherkennung ist auf diesem Gerät nicht verfügbar. Wechsle zu Whisper in den Einstellungen."
         case .ollamaNotReachable:
-            return "Ollama läuft nicht oder ist unter einer anderen Adresse erreichbar. Prüfe unter Einstellungen → KI ob der Server läuft."
+            "Ollama läuft nicht oder ist unter einer anderen Adresse erreichbar. Prüfe unter Einstellungen → KI ob der Server läuft."
         case .ollamaTimeout:
-            return "Ollama hat zu lange nicht geantwortet (>120 s). Das Modell ist möglicherweise noch am Laden – bitte kurz warten und erneut versuchen."
+            "Ollama hat zu lange nicht geantwortet (>120 s). Das Modell ist möglicherweise noch am Laden – bitte kurz warten und erneut versuchen."
         case .ollamaEmptyResponse:
-            return "Ollama hat eine leere Antwort zurückgegeben. Bitte versuche es erneut."
+            "Ollama hat eine leere Antwort zurückgegeben. Bitte versuche es erneut."
         case .ollamaUnknown:
-            return "Ein unbekannter Fehler ist bei der KI-Verarbeitung aufgetreten. Bitte versuche es erneut."
+            "Ein unbekannter Fehler ist bei der KI-Verarbeitung aufgetreten. Bitte versuche es erneut."
         case .openAIKeyMissing:
-            return "Bitte trage deinen OpenAI API-Key unter Einstellungen → KI ein."
+            "Bitte trage deinen OpenAI API-Key unter Einstellungen → KI ein."
         case .openAIAuthFailed:
-            return "Der API-Key wurde abgelehnt (401). Prüfe ob der Key unter Einstellungen → KI korrekt eingetragen ist."
+            "Der API-Key wurde abgelehnt (401). Prüfe ob der Key unter Einstellungen → KI korrekt eingetragen ist."
         case .openAINotReachable:
-            return "Die OpenAI API ist nicht erreichbar. Prüfe deine Internetverbindung oder den konfigurierten Basis-URL."
+            "Die OpenAI API ist nicht erreichbar. Prüfe deine Internetverbindung oder den konfigurierten Basis-URL."
         case .openAITimeout:
-            return "OpenAI hat zu lange nicht geantwortet (>120 s). Bitte versuche es erneut."
+            "OpenAI hat zu lange nicht geantwortet (>120 s). Bitte versuche es erneut."
         case .openAIUnknown:
-            return "Ein unbekannter Fehler ist bei der OpenAI-Verarbeitung aufgetreten. Bitte versuche es erneut."
+            "Ein unbekannter Fehler ist bei der OpenAI-Verarbeitung aufgetreten. Bitte versuche es erneut."
         }
     }
 
     /// Vollständige Anzeige: Titel + Detail
-    var displayMessage: String { "\(title)\n\(detail)" }
+    var displayMessage: String {
+        "\(title)\n\(detail)"
+    }
 
     /// Aus URLError ableiten (Ollama)
     static func from(_ urlError: URLError) -> DictoError {
         switch urlError.code {
-        case .timedOut:                    return .ollamaTimeout
+        case .timedOut: .ollamaTimeout
         case .cannotConnectToHost,
              .networkConnectionLost,
-             .notConnectedToInternet:      return .ollamaNotReachable
-        default:                           return .ollamaUnknown
+             .notConnectedToInternet: .ollamaNotReachable
+        default: .ollamaUnknown
         }
     }
 
     /// Aus URLError ableiten (OpenAI)
     static func fromOpenAI(_ urlError: URLError) -> DictoError {
         switch urlError.code {
-        case .timedOut:                    return .openAITimeout
+        case .timedOut: .openAITimeout
         case .cannotConnectToHost,
              .networkConnectionLost,
-             .notConnectedToInternet:      return .openAINotReachable
-        default:                           return .openAIUnknown
+             .notConnectedToInternet: .openAINotReachable
+        default: .openAIUnknown
         }
     }
 
@@ -105,9 +107,9 @@ enum DictoError: Error, Equatable {
     var systemSettingsURL: URL? {
         switch self {
         case .appleSpeechDenied:
-            return URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_SpeechRecognition")
+            URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_SpeechRecognition")
         default:
-            return nil
+            nil
         }
     }
 
@@ -116,9 +118,9 @@ enum DictoError: Error, Equatable {
         switch self {
         case .openAIKeyMissing, .openAIAuthFailed,
              .ollamaNotReachable, .ollamaTimeout:
-            return true
+            true
         default:
-            return false
+            false
         }
     }
 }

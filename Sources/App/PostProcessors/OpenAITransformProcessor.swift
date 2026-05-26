@@ -7,12 +7,12 @@ final class OpenAITransformProcessor {
     private let model: String
 
     private static let systemPrompt = """
-        Du führst Texttransformationen durch.
-        Du bekommst einen Originaltext in <original>…</original>-Tags und einen Befehl in <befehl>…</befehl>-Tags.
-        Führe den Befehl auf dem Originaltext aus.
-        Antworte NUR mit dem transformierten Text – keine Erklärungen, keine Kommentare.
-        Schreibe auf Deutsch, es sei denn der Befehl verlangt ausdrücklich eine andere Sprache.
-        """
+    Du führst Texttransformationen durch.
+    Du bekommst einen Originaltext in <original>…</original>-Tags und einen Befehl in <befehl>…</befehl>-Tags.
+    Führe den Befehl auf dem Originaltext aus.
+    Antworte NUR mit dem transformierten Text – keine Erklärungen, keine Kommentare.
+    Schreibe auf Deutsch, es sei denn der Befehl verlangt ausdrücklich eine andere Sprache.
+    """
 
     init(baseURL: String, apiKey: String, model: String) throws {
         let trimmedKey = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -20,7 +20,8 @@ final class OpenAITransformProcessor {
             throw DictoError.openAIKeyMissing
         }
         guard let url = URL(string: "\(baseURL)/chat/completions"),
-              let scheme = url.scheme, scheme == "http" || scheme == "https" else {
+              let scheme = url.scheme, scheme == "http" || scheme == "https" else
+        {
             throw DictoError.openAINotReachable
         }
         self.url = url
@@ -68,13 +69,13 @@ final class OpenAITransformProcessor {
         var request = URLRequest(url: url, timeoutInterval: 120)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(apiKey)",  forHTTPHeaderField: "Authorization")
+        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         let body: [String: Any] = [
             "model": model,
             "stream": true,
             "messages": [
                 ["role": "system", "content": Self.systemPrompt],
-                ["role": "user",   "content": "<original>\(original)</original>\n<befehl>\(command)</befehl>"]
+                ["role": "user", "content": "<original>\(original)</original>\n<befehl>\(command)</befehl>"]
             ]
         ]
         request.httpBody = try? JSONSerialization.data(withJSONObject: body)
@@ -89,5 +90,6 @@ private struct OpenAIStreamChunk: Decodable {
         struct Delta: Decodable { let content: String? }
         let delta: Delta
     }
+
     let choices: [Choice]
 }

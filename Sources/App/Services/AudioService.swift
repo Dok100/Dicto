@@ -17,15 +17,15 @@ final class AudioService {
 
     private let recordingSettings: [String: Any] = [
         AVFormatIDKey: kAudioFormatLinearPCM,
-        AVSampleRateKey: 16_000.0,
+        AVSampleRateKey: 16000.0,
         AVNumberOfChannelsKey: 1,
         AVLinearPCMBitDepthKey: 16,
         AVLinearPCMIsFloatKey: false,
-        AVLinearPCMIsBigEndianKey: false,
+        AVLinearPCMIsBigEndianKey: false
     ]
 
-    // Mikrofon-Permission anfragen – beim ersten App-Start aufrufen,
-    // nicht erst beim ersten Record-Versuch.
+    /// Mikrofon-Permission anfragen – beim ersten App-Start aufrufen,
+    /// nicht erst beim ersten Record-Versuch.
     func requestPermissionIfNeeded(completion: @escaping (Bool) -> Void) {
         switch AVCaptureDevice.authorizationStatus(for: .audio) {
         case .authorized:

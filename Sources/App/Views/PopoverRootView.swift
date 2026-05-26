@@ -5,18 +5,18 @@ struct PopoverRootView: View {
     @State private var editableText = ""
     @State private var showHistory = false
 
-    // Treibt die State-Transition-Animation: SwiftUI erkennt durch die neue ID,
-    // dass der Inhalt neu gerendert werden soll, und wendet .transition() an.
+    /// Treibt die State-Transition-Animation: SwiftUI erkennt durch die neue ID,
+    /// dass der Inhalt neu gerendert werden soll, und wendet .transition() an.
     private var stateTag: String {
         if appState.isTransformRecording { return "transform-recording" }
-        if appState.isRecording          { return "recording" }
+        if appState.isRecording { return "recording" }
         switch appState.transcriptionState {
-        case .idle:         return "idle"
+        case .idle: return "idle"
         case .loadingModel: return "loading"
         case .transcribing: return "transcribing"
-        case .streaming:    return "streaming"
-        case .done:         return "done"
-        case .error:        return "error"
+        case .streaming: return "streaming"
+        case .done: return "done"
+        case .error: return "error"
         }
     }
 
@@ -86,8 +86,7 @@ struct PopoverRootView: View {
                         appState.isRecording
                             ? .easeInOut(duration: 0.65).repeatForever(autoreverses: true)
                             : .spring(response: 0.3),
-                        value: appState.isRecording
-                    )
+                        value: appState.isRecording)
 
                 Image(systemName: iconName)
                     .font(.system(size: 17, weight: .medium))
@@ -119,20 +118,20 @@ struct PopoverRootView: View {
         if appState.isRecording { return .red }
         switch appState.transcriptionState {
         case .error: return .red
-        default:     return .accentColor
+        default: return .accentColor
         }
     }
 
     private var statusLabel: String {
         if appState.isTransformRecording { return "Transform läuft …" }
-        if appState.isRecording          { return "Aufnahme läuft …" }
+        if appState.isRecording { return "Aufnahme läuft …" }
         switch appState.transcriptionState {
-        case .idle:                return "Bereit"
-        case .loadingModel:        return "Modell wird geladen …"
-        case .transcribing:        return "Transkribiere …"
-        case .streaming:           return "KI schreibt …"
-        case .done:                return "Fertig"
-        case .error:               return "Fehler"
+        case .idle: return "Bereit"
+        case .loadingModel: return "Modell wird geladen …"
+        case .transcribing: return "Transkribiere …"
+        case .streaming: return "KI schreibt …"
+        case .done: return "Fertig"
+        case .error: return "Fehler"
         }
     }
 
@@ -181,7 +180,8 @@ struct PopoverRootView: View {
     @ViewBuilder
     private var previewActions: some View {
         if case .done(let text) = appState.transcriptionState,
-           appState.settings.previewEnabled || appState.isTransformResult {
+           appState.settings.previewEnabled || appState.isTransformResult
+        {
             VStack(spacing: 6) {
                 if appState.isTransformResult {
                     HStack(spacing: 8) {
@@ -213,8 +213,7 @@ struct PopoverRootView: View {
                     PermissionHint(
                         message: "Eingabehilfen fehlt – Text nicht eingefügt.",
                         settingsURL: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility",
-                        appState: appState
-                    )
+                        appState: appState)
                 }
             }
         }
@@ -270,14 +269,12 @@ struct PopoverRootView: View {
             PermissionHint(
                 message: "Eingabe-Überwachung fehlt.",
                 settingsURL: "x-apple.systempreferences:com.apple.preference.security?Privacy_ListenEvent",
-                appState: appState
-            )
+                appState: appState)
         case .microphone:
             PermissionHint(
                 message: "Mikrofon-Zugriff fehlt.",
                 settingsURL: "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone",
-                appState: appState
-            )
+                appState: appState)
         case .none:
             transcriptionArea
         }
@@ -402,15 +399,15 @@ struct PopoverRootView: View {
 
     private var idleView: some View {
         VStack(alignment: .leading, spacing: 12) {
-            shortcutRow(keys: ["Fn"],       description: "Diktieren",           icon: "mic.fill")
+            shortcutRow(keys: ["Fn"], description: "Diktieren", icon: "mic.fill")
             transformRow
             Divider().padding(.vertical, 2)
             // ⌘↩ funktioniert nur im Preview-Modus (Panel muss offen sein)
             if appState.settings.previewEnabled {
-                shortcutRow(keys: ["⌘", "↩"],  description: "Einfügen",        icon: "return")
+                shortcutRow(keys: ["⌘", "↩"], description: "Einfügen", icon: "return")
             }
-            shortcutRow(keys: ["⎋"],       description: "Schließen",           icon: "xmark")
-            shortcutRow(keys: ["⌘", "Q"],  description: "Beenden",             icon: "xmark.circle")
+            shortcutRow(keys: ["⎋"], description: "Schließen", icon: "xmark")
+            shortcutRow(keys: ["⌘", "Q"], description: "Beenden", icon: "xmark.circle")
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
     }
@@ -494,8 +491,8 @@ struct PopoverRootView: View {
         VStack(spacing: 6) {
             Picker("Stil", selection: Binding(
                 get: { appState.dictationStyle },
-                set: { appState.selectFixedStyle($0) }
-            )) {
+                set: { appState.selectFixedStyle($0) }))
+            {
                 ForEach(DictationStyle.allCases, id: \.self) { style in
                     Text(style.label).tag(style)
                 }
@@ -510,7 +507,8 @@ struct PopoverRootView: View {
 
             if appState.dictationStyle == .translate
                 && appState.selectedCustomStyle == nil
-                && !appState.settings.llmEnabled {
+                && !appState.settings.llmEnabled
+            {
                 ollamaWarning("KI muss aktiviert sein für die Übersetzung.")
             }
             if appState.selectedCustomStyle != nil && !appState.settings.llmEnabled {
@@ -529,8 +527,7 @@ struct PopoverRootView: View {
                     ForEach(appState.settings.customStyles) { style in
                         Button(style.name) { appState.selectCustomStyle(style) }
                             .buttonStyle(CustomStyleChipStyle(
-                                isSelected: appState.selectedCustomStyle?.id == style.id
-                            ))
+                                isSelected: appState.selectedCustomStyle?.id == style.id))
                             .disabled(appState.isRecording)
                     }
                 }
@@ -540,7 +537,6 @@ struct PopoverRootView: View {
         .transition(.opacity.combined(with: .move(edge: .bottom)))
     }
 
-    @ViewBuilder
     private func ollamaWarning(_ text: String) -> some View {
         HStack(spacing: 4) {
             Image(systemName: "exclamationmark.triangle.fill")
@@ -560,9 +556,17 @@ private struct RecordingRingsView: View {
     let isTransform: Bool
     @State private var animate = false
 
-    private var color: Color  { isTransform ? .purple : .red }
-    private var icon: String  { isTransform ? "wand.and.sparkles" : "mic.fill" }
-    private var label: String { isTransform ? "Transform-Aufnahme läuft …" : "Aufnahme läuft …" }
+    private var color: Color {
+        isTransform ? .purple : .red
+    }
+
+    private var icon: String {
+        isTransform ? "wand.and.sparkles" : "mic.fill"
+    }
+
+    private var label: String {
+        isTransform ? "Transform-Aufnahme läuft …" : "Aufnahme läuft …"
+    }
 
     var body: some View {
         VStack(spacing: 20) {
@@ -576,8 +580,7 @@ private struct RecordingRingsView: View {
                             .easeOut(duration: 1.6)
                                 .repeatForever(autoreverses: false)
                                 .delay(Double(i) * 0.52),
-                            value: animate
-                        )
+                            value: animate)
                 }
                 // Gefüllter Hintergrundkreis
                 Circle()
@@ -624,8 +627,7 @@ private struct TranscribingDotsView: View {
                             .easeInOut(duration: 0.42)
                                 .repeatForever(autoreverses: true)
                                 .delay(Double(i) * 0.14),
-                            value: animate
-                        )
+                            value: animate)
                 }
             }
             Text("Transkribiere …")
@@ -670,7 +672,7 @@ private struct StreamingTextView: View {
         }
     }
 
-    // Drei pulsierende Punkte + Label während Ollama den ersten Token berechnet
+    /// Drei pulsierende Punkte + Label während Ollama den ersten Token berechnet
     private var waitingView: some View {
         VStack(spacing: 12) {
             HStack(spacing: 9) {

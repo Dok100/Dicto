@@ -47,8 +47,9 @@ struct ShortcutRecorderView: View {
                     }
                 }
                 .offset(x: shake ? -4 : 0)
-                .animation(shake ? .interpolatingSpring(stiffness: 500, damping: 10) : .default,
-                           value: shake)
+                .animation(
+                    shake ? .interpolatingSpring(stiffness: 500, damping: 10) : .default,
+                    value: shake)
 
                 Button("Ändern") { startRecording() }
                     .font(.caption)
@@ -67,7 +68,7 @@ struct ShortcutRecorderView: View {
         // Lokaler Monitor – Settings-Fenster muss Key-Fenster sein
         monitor = NSEvent.addLocalMonitorForEvents(matching: [.keyDown, .flagsChanged]) { [self] event in
             handleCapturedEvent(event)
-            return nil   // Event konsumieren (nicht weiterleiten)
+            return nil // Event konsumieren (nicht weiterleiten)
         }
     }
 
@@ -92,8 +93,7 @@ struct ShortcutRecorderView: View {
             shortcut = ShortcutConfig(
                 isFlagsBased: true,
                 keyCode: 63,
-                modifierRaw: mods.rawValue
-            )
+                modifierRaw: mods.rawValue)
             stopRecording(save: true)
             return
         }
@@ -109,8 +109,7 @@ struct ShortcutRecorderView: View {
             shortcut = ShortcutConfig(
                 isFlagsBased: false,
                 keyCode: event.keyCode,
-                modifierRaw: mods.rawValue
-            )
+                modifierRaw: mods.rawValue)
             stopRecording(save: true)
         }
     }

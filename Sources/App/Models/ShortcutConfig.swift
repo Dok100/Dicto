@@ -5,7 +5,6 @@ import AppKit
 ///   isFlagsBased = true  → Fn-Taste (flagsChanged-Event, keyCode 63)
 ///   isFlagsBased = false → Normale Taste (keyDown/keyUp-Event)
 public struct ShortcutConfig: Codable, Equatable {
-
     public var isFlagsBased: Bool
     public var keyCode: UInt16
     /// NSEvent.ModifierFlags.rawValue nach .deviceIndependentFlagsMask maskiert
@@ -25,8 +24,7 @@ public struct ShortcutConfig: Codable, Equatable {
     static let defaultTransform = ShortcutConfig(
         isFlagsBased: true,
         keyCode: 63,
-        modifierRaw: NSEvent.ModifierFlags.option.rawValue
-    )
+        modifierRaw: NSEvent.ModifierFlags.option.rawValue)
 
     // MARK: – Anzeige
 
@@ -35,8 +33,8 @@ public struct ShortcutConfig: Codable, Equatable {
         var keys: [String] = []
         let flags = modifierFlags
         if flags.contains(.control) { keys.append("⌃") }
-        if flags.contains(.option)  { keys.append("⌥") }
-        if flags.contains(.shift)   { keys.append("⇧") }
+        if flags.contains(.option) { keys.append("⌥") }
+        if flags.contains(.shift) { keys.append("⇧") }
         if flags.contains(.command) { keys.append("⌘") }
         keys.append(isFlagsBased ? "Fn" : Self.keyName(for: keyCode))
         return keys

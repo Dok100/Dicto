@@ -3,7 +3,6 @@ import AppKit
 /// Spielt kurze akustische Rückmeldungen beim Start und Stop der Aufnahme.
 /// Lädt Systemsounds direkt via Dateipfad – zuverlässiger als NSSound(named:).
 enum SoundFeedback {
-
     /// Kurzes „Tink" → Aufnahme startet (klar, präzise).
     static func playStart() {
         play(named: "Tink")

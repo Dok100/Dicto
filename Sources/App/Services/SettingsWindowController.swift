@@ -4,26 +4,26 @@ import SwiftUI
 // MARK: – Tab-Definition
 
 private enum SettingsTab: String, CaseIterable {
-    case general    = "general"
-    case ai         = "ai"
-    case dictionary = "dictionary"
-    case stats      = "stats"
+    case general
+    case ai
+    case dictionary
+    case stats
 
     var label: String {
         switch self {
-        case .general:    return "Allgemein"
-        case .ai:         return "KI"
-        case .dictionary: return "Wörterbuch"
-        case .stats:      return "Statistiken"
+        case .general: "Allgemein"
+        case .ai: "KI"
+        case .dictionary: "Wörterbuch"
+        case .stats: "Statistiken"
         }
     }
 
     var icon: String {
         switch self {
-        case .general:    return "gearshape"
-        case .ai:         return "brain"
-        case .dictionary: return "text.book.closed"
-        case .stats:      return "chart.bar"
+        case .general: "gearshape"
+        case .ai: "brain"
+        case .dictionary: "text.book.closed"
+        case .stats: "chart.bar"
         }
     }
 
@@ -35,15 +35,14 @@ private enum SettingsTab: String, CaseIterable {
 // MARK: – WindowController
 
 final class SettingsWindowController: NSWindowController, NSToolbarDelegate {
-
     private let appState: AppState
     private var currentTab: SettingsTab = .general
 
     // Lazy ViewControllers – werden beim ersten Wechsel erstellt und gecacht
-    private lazy var vcGeneral    = makeVC(GeneralSettingsView(settings: appState.settings))
-    private lazy var vcAI         = makeVC(AISettingsView(settings: appState.settings))
+    private lazy var vcGeneral = makeVC(GeneralSettingsView(settings: appState.settings))
+    private lazy var vcAI = makeVC(AISettingsView(settings: appState.settings))
     private lazy var vcDictionary = makeVC(DictionarySettingsView(dictionaryService: appState.dictionaryService))
-    private lazy var vcStats      = makeVC(StatsSettingsView(stats: appState.statsService))
+    private lazy var vcStats = makeVC(StatsSettingsView(stats: appState.statsService))
 
     init(appState: AppState) {
         self.appState = appState
@@ -52,8 +51,7 @@ final class SettingsWindowController: NSWindowController, NSToolbarDelegate {
             contentRect: NSRect(x: 0, y: 0, width: 500, height: 520),
             styleMask: [.titled, .closable, .resizable, .unifiedTitleAndToolbar],
             backing: .buffered,
-            defer: false
-        )
+            defer: false)
         window.title = "Dicto – Einstellungen"
         window.minSize = NSSize(width: 440, height: 400)
         window.isReleasedWhenClosed = false
@@ -73,13 +71,17 @@ final class SettingsWindowController: NSWindowController, NSToolbarDelegate {
         window.contentViewController = vcGeneral
     }
 
-    required init?(coder: NSCoder) { fatalError() }
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError()
+    }
 
     func show() {
         // Beim ersten Öffnen (kein gespeicherter Frame) Mindestgröße garantieren,
         // damit NSHostingController-Views vollständig sichtbar sind.
         if let w = window, !w.isVisible,
-           UserDefaults.standard.object(forKey: "NSWindow Frame DictoSettings") == nil {
+           UserDefaults.standard.object(forKey: "NSWindow Frame DictoSettings") == nil
+        {
             w.setContentSize(NSSize(width: 500, height: 520))
             w.center()
         }
@@ -90,7 +92,8 @@ final class SettingsWindowController: NSWindowController, NSToolbarDelegate {
 
     // MARK: – Tab-Wechsel
 
-    @objc private func tabSelected(_ item: NSToolbarItem) {
+    @objc
+    private func tabSelected(_ item: NSToolbarItem) {
         guard let tab = SettingsTab(rawValue: item.itemIdentifier.rawValue),
               tab != currentTab else { return }
         currentTab = tab
@@ -104,23 +107,25 @@ final class SettingsWindowController: NSWindowController, NSToolbarDelegate {
 
     private func viewController(for tab: SettingsTab) -> NSViewController {
         switch tab {
-        case .general:    return vcGeneral
-        case .ai:         return vcAI
-        case .dictionary: return vcDictionary
-        case .stats:      return vcStats
+        case .general: vcGeneral
+        case .ai: vcAI
+        case .dictionary: vcDictionary
+        case .stats: vcStats
         }
     }
 
     // MARK: – NSToolbarDelegate
 
-    func toolbar(_ toolbar: NSToolbar,
-                 itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier,
-                 willBeInsertedIntoToolbar flag: Bool) -> NSToolbarItem? {
+    func toolbar(
+        _ toolbar: NSToolbar,
+        itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier,
+        willBeInsertedIntoToolbar flag: Bool) -> NSToolbarItem?
+    {
         guard let tab = SettingsTab(rawValue: itemIdentifier.rawValue) else { return nil }
 
         let item = NSToolbarItem(itemIdentifier: itemIdentifier)
-        item.label  = tab.label
-        item.image  = NSImage(systemSymbolName: tab.icon, accessibilityDescription: tab.label)
+        item.label = tab.label
+        item.image = NSImage(systemSymbolName: tab.icon, accessibilityDescription: tab.label)
         item.action = #selector(tabSelected(_:))
         item.target = self
         return item
@@ -140,7 +145,7 @@ final class SettingsWindowController: NSWindowController, NSToolbarDelegate {
 
     // MARK: – Hilfsfunktion
 
-    private func makeVC<V: View>(_ view: V) -> NSViewController {
+    private func makeVC(_ view: some View) -> NSViewController {
         NSHostingController(rootView: view)
     }
 }

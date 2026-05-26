@@ -16,18 +16,18 @@ final class MenuBarController {
     private var helpWindowController: HelpWindowController?
 
     init(appState: AppState) {
-        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        self.statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         self.appState = appState
         setupStatusItem()
         setupPanel(appState: appState)
 
-        settingsWindowController = SettingsWindowController(appState: appState)
+        self.settingsWindowController = SettingsWindowController(appState: appState)
         appState.onOpenSettings = { [weak self] in
             self?.hidePanel()
             self?.settingsWindowController?.show()
         }
 
-        helpWindowController = HelpWindowController()
+        self.helpWindowController = HelpWindowController()
         appState.onOpenHelp = { [weak self] in
             self?.hidePanel()
             self?.helpWindowController?.show()
@@ -35,7 +35,7 @@ final class MenuBarController {
 
         // Onboarding beim ersten Start anzeigen
         if OnboardingWindowController.isNeeded {
-            onboardingWindowController = OnboardingWindowController(settings: appState.settings) { [weak self] in
+            self.onboardingWindowController = OnboardingWindowController(settings: appState.settings) { [weak self] in
                 self?.onboardingWindowController?.close()
                 self?.onboardingWindowController = nil
             }
@@ -54,11 +54,11 @@ final class MenuBarController {
                 let needsPanel = appState.settings.previewEnabled || appState.isTransformResult
                 switch state {
                 case .streaming:
-                    if needsPanel { self.showPanel() }
+                    if needsPanel { showPanel() }
                 case .done:
-                    if needsPanel { self.showPanel() }
+                    if needsPanel { showPanel() }
                 case .error:
-                    self.showPanel()   // Fehler immer sichtbar machen
+                    showPanel() // Fehler immer sichtbar machen
                 default:
                     break
                 }
@@ -71,7 +71,7 @@ final class MenuBarController {
             .receive(on: RunLoop.main)
             .sink { [weak self, weak appState] _, _, _ in
                 guard let self, let appState else { return }
-                self.updateStatusDot(appState: appState)
+                updateStatusDot(appState: appState)
             }
             .store(in: &cancellables)
 
@@ -83,29 +83,28 @@ final class MenuBarController {
     private func updateStatusDot(appState: AppState) {
         guard let button = statusItem.button else { return }
 
-        let symbolName: String
-        if appState.isRecording {
+        let symbolName: String = if appState.isRecording {
             // Aufnahme läuft: ausgefülltes Mikrofon
-            symbolName = appState.isTransformRecording ? "wand.and.sparkles" : "mic.fill"
+            appState.isTransformRecording ? "wand.and.sparkles" : "mic.fill"
         } else if case .loadingModel = appState.transcriptionState {
             // Modell wird geladen: Wellenform
-            symbolName = "waveform"
+            "waveform"
         } else if case .transcribing = appState.transcriptionState {
-            symbolName = "waveform"
+            "waveform"
         } else if case .streaming = appState.transcriptionState {
             // KI verarbeitet – auch ohne Panel sichtbar im Menübar-Icon
-            symbolName = "waveform"
+            "waveform"
         } else if case .error = appState.transcriptionState {
-            symbolName = "exclamationmark.circle"
+            "exclamationmark.circle"
         } else {
             // Idle / Done: normales Mikrofon
-            symbolName = "mic"
+            "mic"
         }
 
         let config = NSImage.SymbolConfiguration(pointSize: 14, weight: .medium)
         button.image = NSImage(systemSymbolName: symbolName, accessibilityDescription: nil)?
             .withSymbolConfiguration(config)
-        button.image?.isTemplate = true   // macOS töngt für Dark/Light-Mode
+        button.image?.isTemplate = true // macOS töngt für Dark/Light-Mode
         button.title = ""
     }
 
@@ -127,8 +126,7 @@ final class MenuBarController {
             contentRect: NSRect(x: 0, y: 0, width: 340, height: 420),
             styleMask: [.titled, .closable, .resizable, .nonactivatingPanel, .fullSizeContentView],
             backing: .buffered,
-            defer: false
-        )
+            defer: false)
         panel.title = ""
         panel.titleVisibility = .hidden
         panel.titlebarAppearsTransparent = true
@@ -146,8 +144,7 @@ final class MenuBarController {
         panel.standardWindowButton(.closeButton)?.isHidden = true
         panel.setFrameAutosaveName("DictoPanel")
         panel.contentViewController = NSHostingController(
-            rootView: PopoverRootView().environmentObject(appState)
-        )
+            rootView: PopoverRootView().environmentObject(appState))
     }
 
     // MARK: – Panel anzeigen / verstecken
@@ -164,8 +161,8 @@ final class MenuBarController {
 
         guard clickOutsideMonitor == nil else { return }
         clickOutsideMonitor = NSEvent.addGlobalMonitorForEvents(
-            matching: [.leftMouseDown, .rightMouseDown]
-        ) { [weak self] _ in
+            matching: [.leftMouseDown, .rightMouseDown])
+        { [weak self] _ in
             self?.hidePanel()
         }
         // ⌘+Return: globaler Monitor für den Fall dass das Panel NICHT Key ist
@@ -181,11 +178,11 @@ final class MenuBarController {
             guard event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command,
                   event.keyCode == 36 else { return event }
             NotificationCenter.default.post(name: .dictoCmdReturn, object: nil)
-            return nil  // Ereignis konsumieren
+            return nil // Ereignis konsumieren
         }
         // ⎋ Escape: Ergebnis/Fehler schließen oder Panel ausblenden
         escapeMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [weak self, weak appState] event in
-            guard event.keyCode == 53,  // Escape
+            guard event.keyCode == 53, // Escape
                   event.modifierFlags.intersection(.deviceIndependentFlagsMask).isEmpty else { return }
             guard let appState else { return }
             switch appState.transcriptionState {
@@ -201,14 +198,14 @@ final class MenuBarController {
 
     private func hidePanel() {
         panel.orderOut(nil)
-        if let m = clickOutsideMonitor   { NSEvent.removeMonitor(m) }
-        if let m = cmdReturnMonitor      { NSEvent.removeMonitor(m) }
+        if let m = clickOutsideMonitor { NSEvent.removeMonitor(m) }
+        if let m = cmdReturnMonitor { NSEvent.removeMonitor(m) }
         if let m = cmdReturnLocalMonitor { NSEvent.removeMonitor(m) }
-        if let m = escapeMonitor         { NSEvent.removeMonitor(m) }
-        clickOutsideMonitor   = nil
-        cmdReturnMonitor      = nil
+        if let m = escapeMonitor { NSEvent.removeMonitor(m) }
+        clickOutsideMonitor = nil
+        cmdReturnMonitor = nil
         cmdReturnLocalMonitor = nil
-        escapeMonitor         = nil
+        escapeMonitor = nil
     }
 
     private func positionPanel() {
@@ -233,7 +230,8 @@ final class MenuBarController {
         panel.setFrameOrigin(NSPoint(x: x, y: y))
     }
 
-    @objc private func togglePanel() {
+    @objc
+    private func togglePanel() {
         if panel.isVisible {
             hidePanel()
         } else {

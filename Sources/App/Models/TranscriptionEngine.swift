@@ -1,11 +1,11 @@
 public enum TranscriptionEngine: String, CaseIterable {
-    case apple  = "apple"
-    case whisper = "whisper"
+    case apple
+    case whisper
 
     public var label: String {
         switch self {
-        case .apple:  return "Apple (live, kein Download)"
-        case .whisper: return "Whisper (präziser, offline)"
+        case .apple: "Apple (live, kein Download)"
+        case .whisper: "Whisper (präziser, offline)"
         }
     }
 }

@@ -6,7 +6,9 @@ public final class HistoryService: ObservableObject {
     private let maxEntries = 20
     private let storageKey = StorageKey.Defaults.dictationHistory
 
-    public init() { load() }
+    public init() {
+        load()
+    }
 
     public func add(text: String) {
         guard !text.isEmpty else { return }

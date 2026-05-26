@@ -11,7 +11,7 @@ struct AISettingsView: View {
     @State private var openAIApiKey: String = ""
     @State private var showApiKey: Bool = false
 
-    // Merkt sich den zuletzt aktiven Provider damit beim Reaktivieren wiederhergestellt wird
+    /// Merkt sich den zuletzt aktiven Provider damit beim Reaktivieren wiederhergestellt wird
     @State private var lastActiveProvider: LLMProvider = .ollama
 
     /// Binding für den KI-aktiv-Toggle: schaltet zwischen .disabled und lastActiveProvider um
@@ -22,11 +22,10 @@ struct AISettingsView: View {
                 if enabled {
                     settings.llmProvider = lastActiveProvider
                 } else {
-                    lastActiveProvider = settings.llmProvider  // vor dem Deaktivieren merken
+                    lastActiveProvider = settings.llmProvider // vor dem Deaktivieren merken
                     settings.llmProvider = .disabled
                 }
-            }
-        )
+            })
     }
 
     var body: some View {
@@ -56,9 +55,9 @@ struct AISettingsView: View {
 
                     // ── Anbieter-spezifische Einstellungen ────────────────────
                     switch settings.llmProvider {
-                    case .disabled: EmptyView()  // nie sichtbar – llmEnabled-Guard oben
-                    case .ollama:   ollamaSettings
-                    case .openAI:   openAISettings
+                    case .disabled: EmptyView() // nie sichtbar – llmEnabled-Guard oben
+                    case .ollama: ollamaSettings
+                    case .openAI: openAISettings
                     }
 
                     // ── System-Prompt (geteilt) ───────────────────────────────
@@ -130,7 +129,8 @@ struct AISettingsView: View {
             } header: {
                 Text("Eigene Stile")
             } footer: {
-                Text("Eigene Stile erscheinen im Panel unterhalb der festen Stile und verwenden immer den konfigurierten KI-Anbieter.")
+                Text(
+                    "Eigene Stile erscheinen im Panel unterhalb der festen Stile und verwenden immer den konfigurierten KI-Anbieter.")
             }
         }
         .formStyle(.grouped)
@@ -188,7 +188,9 @@ struct AISettingsView: View {
                     .textFieldStyle(.roundedBorder)
             }
             if !isValidOllamaURL {
-                Label("Ungültige URL – bitte http:// oder https:// verwenden.", systemImage: "exclamationmark.triangle.fill")
+                Label(
+                    "Ungültige URL – bitte http:// oder https:// verwenden.",
+                    systemImage: "exclamationmark.triangle.fill")
                     .font(.caption)
                     .foregroundStyle(.orange)
             }
@@ -218,7 +220,7 @@ struct AISettingsView: View {
                 .help(showApiKey ? "API-Key verbergen" : "API-Key anzeigen")
             }
             .onChange(of: openAIApiKey) { _, new in
-                settings.openAIApiKey = new   // sofort in Keychain schreiben
+                settings.openAIApiKey = new // sofort in Keychain schreiben
             }
         }
         LabeledContent("Modell") {
@@ -234,7 +236,9 @@ struct AISettingsView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
             if !isValidOpenAIURL {
-                Label("Ungültige URL – bitte http:// oder https:// verwenden.", systemImage: "exclamationmark.triangle.fill")
+                Label(
+                    "Ungültige URL – bitte http:// oder https:// verwenden.",
+                    systemImage: "exclamationmark.triangle.fill")
                     .font(.caption)
                     .foregroundStyle(.orange)
             }
@@ -289,10 +293,9 @@ struct AISettingsView: View {
         defer { loadingModels = false }
         do {
             let (data, _) = try await URLSession.shared.data(
-                for: URLRequest(url: url, timeoutInterval: 4)
-            )
+                for: URLRequest(url: url, timeoutInterval: 4))
             let response = try JSONDecoder().decode(OllamaTagsResponse.self, from: data)
-            let names = response.models.map { $0.name }.sorted()
+            let names = response.models.map(\.name).sorted()
             availableModels = names
             if !names.isEmpty && !names.contains(settings.ollamaModel) {
                 settings.ollamaModel = names[0]
@@ -307,8 +310,7 @@ struct AISettingsView: View {
         guard let url = URL(string: settings.ollamaBaseURL) else { ollamaReachable = false; return }
         do {
             let (_, response) = try await URLSession.shared.data(
-                for: URLRequest(url: url, timeoutInterval: 3)
-            )
+                for: URLRequest(url: url, timeoutInterval: 3))
             ollamaReachable = (response as? HTTPURLResponse)?.statusCode == 200
         } catch {
             ollamaReachable = false
@@ -336,8 +338,13 @@ struct CustomStyleEditView: View {
         self.onCancel = onCancel
     }
 
-    private var isNew: Bool { draft.name.isEmpty && draft.prompt == AppSettings.defaultPrompt }
-    private var canSave: Bool { !draft.name.trimmingCharacters(in: .whitespaces).isEmpty }
+    private var isNew: Bool {
+        draft.name.isEmpty && draft.prompt == AppSettings.defaultPrompt
+    }
+
+    private var canSave: Bool {
+        !draft.name.trimmingCharacters(in: .whitespaces).isEmpty
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -369,7 +376,8 @@ struct CustomStyleEditView: View {
                 } header: {
                     Text("System-Prompt")
                 } footer: {
-                    Text("Schreibe hier, wie der Text umgeformt werden soll. Der Diktat-Text wird automatisch in <diktat>…</diktat>-Tags eingebettet.")
+                    Text(
+                        "Schreibe hier, wie der Text umgeformt werden soll. Der Diktat-Text wird automatisch in <diktat>…</diktat>-Tags eingebettet.")
                 }
             }
             .formStyle(.grouped)

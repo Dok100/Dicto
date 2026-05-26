@@ -2,15 +2,15 @@ import AppKit
 import CoreGraphics
 
 final class PasteService {
-    private static let vKeyCode: CGKeyCode = 0x09  // kVK_ANSI_V
-    private static let cKeyCode: CGKeyCode = 0x08  // kVK_ANSI_C
+    private static let vKeyCode: CGKeyCode = 0x09 // kVK_ANSI_V
+    private static let cKeyCode: CGKeyCode = 0x08 // kVK_ANSI_C
 
     var isAccessibilityAuthorized: Bool {
         AXIsProcessTrusted()
     }
 
-    // Zeigt den macOS-System-Dialog "Dicto möchte Ihren Computer steuern"
-    // und trägt die App korrekt in Eingabehilfen ein.
+    /// Zeigt den macOS-System-Dialog "Dicto möchte Ihren Computer steuern"
+    /// und trägt die App korrekt in Eingabehilfen ein.
     func requestAccessibilityIfNeeded() {
         guard !isAccessibilityAuthorized else { return }
         let key = kAXTrustedCheckOptionPrompt.takeRetainedValue() as String
@@ -18,8 +18,8 @@ final class PasteService {
         _ = AXIsProcessTrustedWithOptions(options)
     }
 
-    // Simuliert Cmd+C und gibt den kopierten Text zurück.
-    // Stellt den vorherigen Clipboard-Inhalt danach wieder her.
+    /// Simuliert Cmd+C und gibt den kopierten Text zurück.
+    /// Stellt den vorherigen Clipboard-Inhalt danach wieder her.
     func captureSelectedText() async -> String {
         guard isAccessibilityAuthorized else { return "" }
         let pasteboard = NSPasteboard.general

@@ -15,7 +15,8 @@ final class OpenAIPostProcessor {
             throw DictoError.openAIKeyMissing
         }
         guard let url = URL(string: "\(baseURL)/chat/completions"),
-              let scheme = url.scheme, scheme == "http" || scheme == "https" else {
+              let scheme = url.scheme, scheme == "http" || scheme == "https" else
+        {
             throw DictoError.openAINotReachable
         }
         self.url = url
@@ -28,7 +29,7 @@ final class OpenAIPostProcessor {
     func streamProcess(text: String) -> AsyncThrowingStream<String, Error> {
         let request = makeRequest(messages: [
             ["role": "system", "content": systemPrompt],
-            ["role": "user",   "content": "<diktat>\(text)</diktat>"]
+            ["role": "user", "content": "<diktat>\(text)</diktat>"]
         ])
         return parseSSEStream(request: request)
     }
@@ -38,8 +39,8 @@ final class OpenAIPostProcessor {
     private func makeRequest(messages: [[String: String]]) -> URLRequest {
         var request = URLRequest(url: url, timeoutInterval: 120)
         request.httpMethod = "POST"
-        request.setValue("application/json",    forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(apiKey)",    forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         let body: [String: Any] = [
             "model": model,
             "stream": true,
@@ -92,5 +93,6 @@ private struct OpenAIStreamChunk: Decodable {
         struct Delta: Decodable { let content: String? }
         let delta: Delta
     }
+
     let choices: [Choice]
 }

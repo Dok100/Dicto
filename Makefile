@@ -57,6 +57,62 @@ install-app: build
 	echo "✓ Dicto.app aktualisiert – Accessibility-Berechtigung bleibt erhalten."; \
 	open /Applications/Dicto.app
 
+# ── Release Archive ───────────────────────────────────────────────────────────
+# Baut ein signiertes Release-Archiv für die GitHub-Veröffentlichung.
+# Voraussetzung: Apple Developer ID Application Zertifikat im Keychain.
+# Aufruf: make archive TEAM_ID=XXXXXXXXXX
+TEAM_ID ?= UNSET
+VERSION := $(shell /usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" \
+	"Sources/App/Info.plist" 2>/dev/null || grep CFBundleShortVersionString project.yml \
+	| awk -F'"' '{print $$2}')
+
+.PHONY: archive
+archive: generate
+	@echo "→ Building Release Archive v$(VERSION)..."
+	@mkdir -p release
+	xcodebuild archive \
+		-scheme $(SCHEME) \
+		-archivePath release/Dicto.xcarchive \
+		-destination 'generic/platform=macOS' \
+		CODE_SIGN_IDENTITY="Developer ID Application" \
+		DEVELOPMENT_TEAM=$(TEAM_ID) \
+		| xcpretty || xcodebuild archive \
+			-scheme $(SCHEME) \
+			-archivePath release/Dicto.xcarchive \
+			-destination 'generic/platform=macOS'
+	@echo "→ Exporting .app from archive..."
+	@xcodebuild -exportArchive \
+		-archivePath release/Dicto.xcarchive \
+		-exportOptionsPlist scripts/ExportOptions.plist \
+		-exportPath release/export
+	@echo "→ Creating zip for notarization..."
+	@ditto -c -k --keepParent release/export/Dicto.app release/Dicto-v$(VERSION).zip
+	@echo "✓ release/Dicto-v$(VERSION).zip bereit für Notarisierung."
+	@echo ""
+	@echo "Nächster Schritt: make notarize TEAM_ID=$(TEAM_ID) APPLE_ID=deine@email.com"
+
+.PHONY: notarize
+notarize:
+	@echo "→ Notarisierung bei Apple einreichen..."
+	xcrun notarytool submit release/Dicto-v$(VERSION).zip \
+		--apple-id $(APPLE_ID) \
+		--team-id $(TEAM_ID) \
+		--password $(APP_PASSWORD) \
+		--wait
+	@echo "→ Notarization-Ticket stempeln..."
+	xcrun stapler staple release/export/Dicto.app
+	@echo "→ Finales DMG erstellen..."
+	@which create-dmg > /dev/null || brew install create-dmg
+	create-dmg \
+		--volname "Dicto $(VERSION)" \
+		--window-size 660 400 \
+		--icon-size 128 \
+		--icon "Dicto.app" 180 170 \
+		--app-drop-link 480 170 \
+		"release/Dicto-$(VERSION).dmg" \
+		"release/export/Dicto.app"
+	@echo "✓ release/Dicto-$(VERSION).dmg ist fertig für den GitHub Release."
+
 # ── Clean ─────────────────────────────────────────────────────────────────────
 .PHONY: clean
 clean:

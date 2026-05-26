@@ -1,5 +1,5 @@
-import SwiftUI
 import ServiceManagement
+import SwiftUI
 
 struct GeneralSettingsView: View {
     @ObservedObject var settings: AppSettings
@@ -9,8 +9,7 @@ struct GeneralSettingsView: View {
             get: { SMAppService.mainApp.status == .enabled },
             set: { enable in
                 try? enable ? SMAppService.mainApp.register() : SMAppService.mainApp.unregister()
-            }
-        )
+            })
     }
 
     var body: some View {
@@ -40,7 +39,9 @@ struct GeneralSettingsView: View {
                 .pickerStyle(.radioGroup)
 
                 if settings.transcriptionEngine == .apple {
-                    Label("Text erscheint live während du sprichst. Vollständig lokal – kein Download nötig.", systemImage: "info.circle")
+                    Label(
+                        "Text erscheint live während du sprichst. Vollständig lokal – kein Download nötig.",
+                        systemImage: "info.circle")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -90,10 +91,11 @@ struct GeneralSettingsView: View {
 
             // ── Sektion 4: Tastaturkürzel ─────────────────────────────────────
             Section {
-                ShortcutRecorderView(label: "Diktieren",       shortcut: $settings.dictationShortcut)
-                ShortcutRecorderView(label: "Transformieren",  shortcut: $settings.transformShortcut)
+                ShortcutRecorderView(label: "Diktieren", shortcut: $settings.dictationShortcut)
+                ShortcutRecorderView(label: "Transformieren", shortcut: $settings.transformShortcut)
 
-                Text("Fn-Taste allein oder mit Modifier: halten zum Aufnehmen, loslassen zum Stoppen. Normale Tasten: mindestens einen Modifier (⌘ ⌥ ⌃ ⇧) halten.")
+                Text(
+                    "Fn-Taste allein oder mit Modifier: halten zum Aufnehmen, loslassen zum Stoppen. Normale Tasten: mindestens einen Modifier (⌘ ⌥ ⌃ ⇧) halten.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
 

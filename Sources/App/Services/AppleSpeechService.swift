@@ -5,17 +5,16 @@ import Speech
 /// Liefert Zwischenergebnisse während der Aufnahme läuft und ein
 /// finales Ergebnis nach stopRecording().
 final class AppleSpeechService {
-
     // Callbacks – werden auf beliebigem Thread gerufen, Dispatch liegt beim Aufrufer
     var onPartialResult: ((String) -> Void)?
-    var onFinalResult:   ((String) -> Void)?
-    var onError:         ((String) -> Void)?
+    var onFinalResult: ((String) -> Void)?
+    var onError: ((String) -> Void)?
 
-    private var audioEngine          = AVAudioEngine()
-    private var recognizer:          SFSpeechRecognizer?
-    private var request:             SFSpeechAudioBufferRecognitionRequest?
-    private var task:                SFSpeechRecognitionTask?
-    private var didFireFinalResult   = false
+    private var audioEngine = AVAudioEngine()
+    private var recognizer: SFSpeechRecognizer?
+    private var request: SFSpeechAudioBufferRecognitionRequest?
+    private var task: SFSpeechRecognitionTask?
+    private var didFireFinalResult = false
 
     var isAuthorized: Bool {
         SFSpeechRecognizer.authorizationStatus() == .authorized
@@ -38,17 +37,17 @@ final class AppleSpeechService {
 
         let rec = SFSpeechRecognizer(locale: locale)
         rec?.defaultTaskHint = .dictation
-        self.recognizer = rec
+        recognizer = rec
 
         let req = SFSpeechAudioBufferRecognitionRequest()
-        req.shouldReportPartialResults  = true
-        req.requiresOnDeviceRecognition = true   // vollständig lokal, kein Apple-Server
-        self.request = req
+        req.shouldReportPartialResults = true
+        req.requiresOnDeviceRecognition = true // vollständig lokal, kein Apple-Server
+        request = req
 
         // Mikrofon-Tap auf den Input-Node
         audioEngine = AVAudioEngine()
         let inputNode = audioEngine.inputNode
-        let format    = inputNode.outputFormat(forBus: 0)
+        let format = inputNode.outputFormat(forBus: 0)
         inputNode.installTap(onBus: 0, bufferSize: 1024, format: format) { [weak self] buffer, _ in
             self?.request?.append(buffer)
         }
@@ -66,17 +65,17 @@ final class AppleSpeechService {
             if let result {
                 let text = result.bestTranscription.formattedString
                 if result.isFinal {
-                    guard !self.didFireFinalResult else { return }
-                    self.didFireFinalResult = true
-                    self.onFinalResult?(text)
+                    guard !didFireFinalResult else { return }
+                    didFireFinalResult = true
+                    onFinalResult?(text)
                 } else {
-                    self.onPartialResult?(text)
+                    onPartialResult?(text)
                 }
             } else if let error {
                 // Fehler-Code 1110 = kein Audio-Input (normal nach endAudio)
                 let nsErr = error as NSError
                 if nsErr.code != 1110 {
-                    self.onError?(error.localizedDescription)
+                    onError?(error.localizedDescription)
                 }
             }
         }
@@ -99,9 +98,9 @@ final class AppleSpeechService {
 extension WhisperLanguage {
     var appleLocale: Locale {
         switch self {
-        case .german:  return Locale(identifier: "de-DE")
-        case .english: return Locale(identifier: "en-US")
-        case .auto:    return Locale.current
+        case .german: Locale(identifier: "de-DE")
+        case .english: Locale(identifier: "en-US")
+        case .auto: Locale.current
         }
     }
 }

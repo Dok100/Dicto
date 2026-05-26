@@ -6,36 +6,41 @@ struct StatsSettingsView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-
                 // ── Kennzahlen-Karten ──────────────────────────────────────────
                 HStack(spacing: 12) {
-                    statCard(value: stats.totalDictations,
-                             label: "Diktate gesamt",
-                             icon: "mic.fill",
-                             color: .accentColor)
-                    statCard(value: stats.todayCount,
-                             label: "Heute",
-                             icon: "sun.max.fill",
-                             color: .orange)
-                    statCard(value: stats.thisWeekCount,
-                             label: "Diese Woche",
-                             icon: "calendar",
-                             color: .green)
+                    statCard(
+                        value: stats.totalDictations,
+                        label: "Diktate gesamt",
+                        icon: "mic.fill",
+                        color: .accentColor)
+                    statCard(
+                        value: stats.todayCount,
+                        label: "Heute",
+                        icon: "sun.max.fill",
+                        color: .orange)
+                    statCard(
+                        value: stats.thisWeekCount,
+                        label: "Diese Woche",
+                        icon: "calendar",
+                        color: .green)
                 }
 
                 HStack(spacing: 12) {
-                    statCard(value: stats.totalWords,
-                             label: "Wörter gesamt",
-                             icon: "text.alignleft",
-                             color: .purple)
-                    statCard(value: stats.averageWords,
-                             label: "Ø Wörter/Diktat",
-                             icon: "chart.bar.fill",
-                             color: .teal)
-                    statCard(value: stats.transformCount,
-                             label: "Transforms",
-                             icon: "wand.and.sparkles",
-                             color: .pink)
+                    statCard(
+                        value: stats.totalWords,
+                        label: "Wörter gesamt",
+                        icon: "text.alignleft",
+                        color: .purple)
+                    statCard(
+                        value: stats.averageWords,
+                        label: "Ø Wörter/Diktat",
+                        icon: "chart.bar.fill",
+                        color: .teal)
+                    statCard(
+                        value: stats.transformCount,
+                        label: "Transforms",
+                        icon: "wand.and.sparkles",
+                        color: .pink)
                 }
 
                 // ── 7-Tage-Balkendiagramm ─────────────────────────────────────
@@ -73,8 +78,9 @@ struct StatsSettingsView: View {
                                         .fill(Color.accentColor.opacity(0.7))
                                         .frame(width: geo.size.width * CGFloat(count) / CGFloat(total))
                                         .frame(maxWidth: .infinity, alignment: .leading)
-                                        .background(Color.accentColor.opacity(0.15),
-                                                    in: RoundedRectangle(cornerRadius: 3))
+                                        .background(
+                                            Color.accentColor.opacity(0.15),
+                                            in: RoundedRectangle(cornerRadius: 3))
                                 }
                                 .frame(height: 6)
                             }
@@ -89,9 +95,8 @@ struct StatsSettingsView: View {
                     ContentUnavailableView(
                         "Noch keine Daten",
                         systemImage: "chart.bar",
-                        description: Text("Starte dein erstes Diktat, um Statistiken zu sehen.")
-                    )
-                    .frame(maxHeight: .infinity)
+                        description: Text("Starte dein erstes Diktat, um Statistiken zu sehen."))
+                        .frame(maxHeight: .infinity)
                 }
             }
             .padding(20)
@@ -126,7 +131,9 @@ struct StatsSettingsView: View {
 private struct BarChartView: View {
     let data: [(label: String, count: Int)]
 
-    private var maxCount: Int { max(data.map(\.count).max() ?? 1, 1) }
+    private var maxCount: Int {
+        max(data.map(\.count).max() ?? 1, 1)
+    }
 
     var body: some View {
         HStack(alignment: .bottom, spacing: 6) {

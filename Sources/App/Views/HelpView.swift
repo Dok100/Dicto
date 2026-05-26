@@ -3,40 +3,42 @@ import SwiftUI
 // MARK: – Hilfe-Themen
 
 private enum HelpTopic: String, CaseIterable, Identifiable {
-    case quickstart    = "Schnellstart"
-    case dictation     = "Diktat"
-    case aiSmoothing   = "Textglättung (KI)"
-    case styles        = "Stile"
-    case transform     = "Transform-Modus"
-    case preview       = "Preview-Modus"
-    case settings      = "Einstellungen"
-    case troubleshoot  = "Fehlerbehebung"
+    case quickstart = "Schnellstart"
+    case dictation = "Diktat"
+    case aiSmoothing = "Textglättung (KI)"
+    case styles = "Stile"
+    case transform = "Transform-Modus"
+    case preview = "Preview-Modus"
+    case settings = "Einstellungen"
+    case troubleshoot = "Fehlerbehebung"
 
-    var id: String { rawValue }
+    var id: String {
+        rawValue
+    }
 
     var icon: String {
         switch self {
-        case .quickstart:   return "bolt.fill"
-        case .dictation:    return "mic.fill"
-        case .aiSmoothing:  return "brain"
-        case .styles:       return "paintpalette.fill"
-        case .transform:    return "wand.and.sparkles"
-        case .preview:      return "eye.fill"
-        case .settings:     return "gearshape.fill"
-        case .troubleshoot: return "wrench.and.screwdriver.fill"
+        case .quickstart: "bolt.fill"
+        case .dictation: "mic.fill"
+        case .aiSmoothing: "brain"
+        case .styles: "paintpalette.fill"
+        case .transform: "wand.and.sparkles"
+        case .preview: "eye.fill"
+        case .settings: "gearshape.fill"
+        case .troubleshoot: "wrench.and.screwdriver.fill"
         }
     }
 
     var color: Color {
         switch self {
-        case .quickstart:   return .orange
-        case .dictation:    return .red
-        case .aiSmoothing:  return .purple
-        case .styles:       return .pink
-        case .transform:    return .indigo
-        case .preview:      return .blue
-        case .settings:     return .gray
-        case .troubleshoot: return .brown
+        case .quickstart: .orange
+        case .dictation: .red
+        case .aiSmoothing: .purple
+        case .styles: .pink
+        case .transform: .indigo
+        case .preview: .blue
+        case .settings: .gray
+        case .troubleshoot: .brown
         }
     }
 }
@@ -72,7 +74,6 @@ struct HelpView: View {
         .frame(minWidth: 680, minHeight: 480)
     }
 
-    @ViewBuilder
     private func detailView(for topic: HelpTopic) -> some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
@@ -89,13 +90,13 @@ struct HelpView: View {
 
                 // Inhalt
                 switch topic {
-                case .quickstart:   QuickstartContent()
-                case .dictation:    DictationContent()
-                case .aiSmoothing:  AISmoothingContent()
-                case .styles:       StylesContent()
-                case .transform:    TransformContent()
-                case .preview:      PreviewContent()
-                case .settings:     SettingsContent()
+                case .quickstart: QuickstartContent()
+                case .dictation: DictationContent()
+                case .aiSmoothing: AISmoothingContent()
+                case .styles: StylesContent()
+                case .transform: TransformContent()
+                case .preview: PreviewContent()
+                case .settings: SettingsContent()
                 case .troubleshoot: TroubleshootContent()
                 }
             }
@@ -166,12 +167,18 @@ private struct QuickstartContent: View {
         SectionTitle(text: "In 3 Schritten loslegen")
 
         VStack(alignment: .leading, spacing: 12) {
-            StepRow(number: "1", title: "Cursor setzen",
-                    detail: "Klicke in ein Textfeld – egal ob Mail, Slack, Word oder Terminal.")
-            StepRow(number: "2", title: "Fn gedrückt halten und sprechen",
-                    detail: "Sprich deinen Text. Dicto nimmt auf solange du die Taste hältst.")
-            StepRow(number: "3", title: "Taste loslassen",
-                    detail: "Der Text wird transkribiert und automatisch eingefügt.")
+            StepRow(
+                number: "1",
+                title: "Cursor setzen",
+                detail: "Klicke in ein Textfeld – egal ob Mail, Slack, Word oder Terminal.")
+            StepRow(
+                number: "2",
+                title: "Fn gedrückt halten und sprechen",
+                detail: "Sprich deinen Text. Dicto nimmt auf solange du die Taste hältst.")
+            StepRow(
+                number: "3",
+                title: "Taste loslassen",
+                detail: "Der Text wird transkribiert und automatisch eingefügt.")
         }
         .padding(.bottom, 8)
 
@@ -189,7 +196,10 @@ private struct QuickstartContent: View {
         .background(.quinary, in: RoundedRectangle(cornerRadius: 8))
         .padding(.bottom, 8)
 
-        InfoBox(icon: "info.circle", text: "Der Diktat-Shortcut ist in Einstellungen → Allgemein → Tastenkürzel frei konfigurierbar.", color: .blue)
+        InfoBox(
+            icon: "info.circle",
+            text: "Der Diktat-Shortcut ist in Einstellungen → Allgemein → Tastenkürzel frei konfigurierbar.",
+            color: .blue)
     }
 }
 
@@ -229,26 +239,29 @@ private struct DictationContent: View {
                 name: "Apple (live, kein Download)",
                 icon: "apple.logo",
                 pros: ["Sofort verfügbar, kein Download", "Text erscheint live während der Aufnahme"],
-                cons: ["Weniger präzise bei Fachbegriffen", "Interpunktion unzuverlässiger"]
-            )
+                cons: ["Weniger präzise bei Fachbegriffen", "Interpunktion unzuverlässiger"])
             EngineRow(
                 name: "Whisper (präziser, offline)",
                 icon: "waveform",
                 pros: ["Sehr hohe Genauigkeit", "Fachvokabular, Eigennamen, Umlaute"],
-                cons: ["Einmaliger Download (800 MB – 3 GB)", "Text erscheint erst nach Aufnahme"]
-            )
+                cons: ["Einmaliger Download (800 MB – 3 GB)", "Text erscheint erst nach Aufnahme"])
         }
         .padding(.bottom, 4)
 
-        InfoBox(icon: "arrow.down.circle", text: "Whisper lädt das Modell beim ersten Einsatz automatisch herunter. Danach funktioniert es vollständig offline.", color: .orange)
+        InfoBox(
+            icon: "arrow.down.circle",
+            text: "Whisper lädt das Modell beim ersten Einsatz automatisch herunter. Danach funktioniert es vollständig offline.",
+            color: .orange)
 
         SectionTitle(text: "Sprachauswahl")
-        Text("Unter Einstellungen → Allgemein → Sprache wählst du zwischen **Deutsch**, **Englisch** oder **Automatisch** (erkennt die Sprache selbst).")
+        Text(
+            "Unter Einstellungen → Allgemein → Sprache wählst du zwischen **Deutsch**, **Englisch** oder **Automatisch** (erkennt die Sprache selbst).")
             .font(.callout)
             .padding(.bottom, 8)
 
         SectionTitle(text: "Sound-Feedback")
-        Text("Dicto spielt beim Start und Stopp der Aufnahme einen kurzen Ton. Abschaltbar unter Einstellungen → Allgemein.")
+        Text(
+            "Dicto spielt beim Start und Stopp der Aufnahme einen kurzen Ton. Abschaltbar unter Einstellungen → Allgemein.")
             .font(.callout)
     }
 }
@@ -283,14 +296,16 @@ private struct EngineRow: View {
 
 private struct AISmoothingContent: View {
     var body: some View {
-        Text("Die KI glättet deinen Diktat-Text: entfernt Füllwörter, korrigiert Satzbau und macht den Text schreibfertig.")
+        Text(
+            "Die KI glättet deinen Diktat-Text: entfernt Füllwörter, korrigiert Satzbau und macht den Text schreibfertig.")
             .font(.callout)
             .foregroundStyle(.secondary)
             .padding(.bottom, 8)
 
-        InfoBox(icon: "bolt.fill",
-                text: "Die Textglättung ist optional. Ohne KI wird der Rohtext direkt eingefügt.",
-                color: .orange)
+        InfoBox(
+            icon: "bolt.fill",
+            text: "Die Textglättung ist optional. Ohne KI wird der Rohtext direkt eingefügt.",
+            color: .orange)
 
         SectionTitle(text: "Anbieter")
 
@@ -299,25 +314,25 @@ private struct AISmoothingContent: View {
                 name: "Ollama (lokal)",
                 icon: "desktopcomputer",
                 description: "Läuft komplett auf deinem Mac. Kein Internet nötig, keine Kosten. Empfohlen: qwen2.5:32b (braucht ~20 GB RAM).",
-                color: .green
-            )
+                color: .green)
             ProviderRow(
                 name: "OpenAI API",
                 icon: "cloud.fill",
                 description: "Nutzt GPT-4o-mini oder GPT-4o. Sehr schnell, geringe Kosten (~0,01 €/Tag bei normalem Einsatz). API-Key erforderlich.",
-                color: .blue
-            )
+                color: .blue)
         }
         .padding(.bottom, 4)
 
         SectionTitle(text: "System-Prompt anpassen")
-        Text("Unter Einstellungen → KI → System-Prompt (Neutral) kannst du das Verhalten der KI steuern. Der Standard-Prompt ist für deutsches Diktat optimiert.")
+        Text(
+            "Unter Einstellungen → KI → System-Prompt (Neutral) kannst du das Verhalten der KI steuern. Der Standard-Prompt ist für deutsches Diktat optimiert.")
             .font(.callout)
             .padding(.bottom, 6)
 
-        InfoBox(icon: "key.fill",
-                text: "Der OpenAI API-Key wird verschlüsselt im macOS Keychain gespeichert – nicht im Klartext auf der Festplatte.",
-                color: .green)
+        InfoBox(
+            icon: "key.fill",
+            text: "Der OpenAI API-Key wird verschlüsselt im macOS Keychain gespeichert – nicht im Klartext auf der Festplatte.",
+            color: .green)
     }
 }
 
@@ -354,27 +369,44 @@ private struct StylesContent: View {
         SectionTitle(text: "Eingebaute Stile")
 
         VStack(spacing: 6) {
-            StyleRow(name: "Neutral",    icon: "minus.circle.fill", color: .blue,
-                     desc: "Glättet Füllwörter und Satzbau, behält Ton und Inhalt unverändert.")
-            StyleRow(name: "Formell",    icon: "briefcase.fill",    color: .brown,
-                     desc: "Schreibt in sachlicher, professioneller Sprache. Gut für E-Mails und Berichte.")
-            StyleRow(name: "Locker",     icon: "bubble.left.fill",  color: .green,
-                     desc: "Entspannter, umgangssprachlicher Ton. Gut für Slack, WhatsApp, Notizen.")
-            StyleRow(name: "Empathisch", icon: "heart.fill",        color: .pink,
-                     desc: "Einfühlsamer, wertschätzender Ton. Gut für Feedback und heikle Themen.")
-            StyleRow(name: "→ EN",       icon: "globe",             color: .orange,
-                     desc: "Übersetzt den Text ins Englische und glättet dabei gleichzeitig.")
+            StyleRow(
+                name: "Neutral",
+                icon: "minus.circle.fill",
+                color: .blue,
+                desc: "Glättet Füllwörter und Satzbau, behält Ton und Inhalt unverändert.")
+            StyleRow(
+                name: "Formell",
+                icon: "briefcase.fill",
+                color: .brown,
+                desc: "Schreibt in sachlicher, professioneller Sprache. Gut für E-Mails und Berichte.")
+            StyleRow(
+                name: "Locker",
+                icon: "bubble.left.fill",
+                color: .green,
+                desc: "Entspannter, umgangssprachlicher Ton. Gut für Slack, WhatsApp, Notizen.")
+            StyleRow(
+                name: "Empathisch",
+                icon: "heart.fill",
+                color: .pink,
+                desc: "Einfühlsamer, wertschätzender Ton. Gut für Feedback und heikle Themen.")
+            StyleRow(
+                name: "→ EN",
+                icon: "globe",
+                color: .orange,
+                desc: "Übersetzt den Text ins Englische und glättet dabei gleichzeitig.")
         }
         .padding(.bottom, 8)
 
         SectionTitle(text: "Eigene Stile")
-        Text("Unter Einstellungen → KI → Eigene Stile kannst du beliebig viele eigene Stile mit eigenem System-Prompt erstellen (z.B. Arztbrief, Protokoll, Twitterpost).")
+        Text(
+            "Unter Einstellungen → KI → Eigene Stile kannst du beliebig viele eigene Stile mit eigenem System-Prompt erstellen (z.B. Arztbrief, Protokoll, Twitterpost).")
             .font(.callout)
             .padding(.bottom, 6)
 
-        InfoBox(icon: "info.circle",
-                text: "Eigene Stile erscheinen im Panel unterhalb der eingebauten Stile und nutzen immer die konfigurierte KI.",
-                color: .blue)
+        InfoBox(
+            icon: "info.circle",
+            text: "Eigene Stile erscheinen im Panel unterhalb der eingebauten Stile und nutzen immer die konfigurierte KI.",
+            color: .blue)
     }
 }
 
@@ -399,7 +431,8 @@ private struct StyleRow: View {
 
 private struct TransformContent: View {
     var body: some View {
-        Text("Mit Transform kannst du bestehenden Text in einer anderen App markieren und per Sprachbefehl umformulieren lassen.")
+        Text(
+            "Mit Transform kannst du bestehenden Text in einer anderen App markieren und per Sprachbefehl umformulieren lassen.")
             .font(.callout)
             .foregroundStyle(.secondary)
             .padding(.bottom, 8)
@@ -407,14 +440,22 @@ private struct TransformContent: View {
         SectionTitle(text: "So funktioniert es")
 
         VStack(alignment: .leading, spacing: 12) {
-            StepRow(number: "1", title: "Text markieren",
-                    detail: "Markiere den Text, den du umformulieren möchtest (in beliebiger App).")
-            StepRow(number: "2", title: "Transform-Shortcut halten",
-                    detail: "Standard: ⌥ + Fn. Gleichzeitig sprechen was passieren soll.")
-            StepRow(number: "3", title: "Befehl sprechen",
-                    detail: "z.B. 'Mach das formeller' oder 'Uebersetze auf Englisch' oder 'Kuerze auf 2 Saetze'.")
-            StepRow(number: "4", title: "Ergebnis pruefen und einfuegen",
-                    detail: "Das Ergebnis erscheint im Dicto-Panel. Mit 'Einfuegen' wird der Originaltext ersetzt.")
+            StepRow(
+                number: "1",
+                title: "Text markieren",
+                detail: "Markiere den Text, den du umformulieren möchtest (in beliebiger App).")
+            StepRow(
+                number: "2",
+                title: "Transform-Shortcut halten",
+                detail: "Standard: ⌥ + Fn. Gleichzeitig sprechen was passieren soll.")
+            StepRow(
+                number: "3",
+                title: "Befehl sprechen",
+                detail: "z.B. 'Mach das formeller' oder 'Uebersetze auf Englisch' oder 'Kuerze auf 2 Saetze'.")
+            StepRow(
+                number: "4",
+                title: "Ergebnis pruefen und einfuegen",
+                detail: "Das Ergebnis erscheint im Dicto-Panel. Mit 'Einfuegen' wird der Originaltext ersetzt.")
         }
         .padding(.bottom, 8)
 
@@ -434,9 +475,10 @@ private struct TransformContent: View {
         .background(.quinary, in: RoundedRectangle(cornerRadius: 8))
         .padding(.bottom, 8)
 
-        InfoBox(icon: "exclamationmark.triangle",
-                text: "Transform benötigt die Eingabehilfen-Berechtigung, um den markierten Text lesen zu können. Einmal in Systemeinstellungen → Datenschutz → Eingabehilfen erlauben.",
-                color: .orange)
+        InfoBox(
+            icon: "exclamationmark.triangle",
+            text: "Transform benötigt die Eingabehilfen-Berechtigung, um den markierten Text lesen zu können. Einmal in Systemeinstellungen → Datenschutz → Eingabehilfen erlauben.",
+            color: .orange)
     }
 }
 
@@ -476,13 +518,15 @@ private struct PreviewContent: View {
         .padding(.bottom, 8)
 
         SectionTitle(text: "Text bearbeiten")
-        Text("Du kannst den Text im Panel vor dem Einfügen direkt bearbeiten. Wenn du Wörter korrigierst (z.B. falsch erkannte Eigennamen), merkt sich Dicto die Korrektur im **persönlichen Wörterbuch** und wendet sie beim nächsten Mal automatisch an.")
+        Text(
+            "Du kannst den Text im Panel vor dem Einfügen direkt bearbeiten. Wenn du Wörter korrigierst (z.B. falsch erkannte Eigennamen), merkt sich Dicto die Korrektur im **persönlichen Wörterbuch** und wendet sie beim nächsten Mal automatisch an.")
             .font(.callout)
             .padding(.bottom, 4)
 
-        InfoBox(icon: "book.fill",
-                text: "Das Wörterbuch kann unter Einstellungen → Wörterbuch eingesehen, bearbeitet und exportiert werden.",
-                color: .blue)
+        InfoBox(
+            icon: "book.fill",
+            text: "Das Wörterbuch kann unter Einstellungen → Wörterbuch eingesehen, bearbeitet und exportiert werden.",
+            color: .blue)
     }
 }
 
@@ -504,7 +548,7 @@ private struct SettingsContent: View {
             ("Sound-Feedback", "Tink/Pop bei Aufnahme-Start und -Stopp"),
             ("Diktat-Shortcut", "Taste für Push-to-Talk (Standard: Fn)"),
             ("Transform-Shortcut", "Taste für Transform-Modus (Standard: ⌥ Fn)"),
-            ("Launch at Login", "Dicto automatisch beim Mac-Start öffnen"),
+            ("Launch at Login", "Dicto automatisch beim Mac-Start öffnen")
         ])
 
         SectionTitle(text: "KI")
@@ -517,19 +561,19 @@ private struct SettingsContent: View {
             ("OpenAI-Modell", "z.B. gpt-4o-mini (schnell/günstig) oder gpt-4o (beste Qualität)"),
             ("OpenAI Basis-URL", "Für OpenAI-kompatible APIs (Groq, LM Studio etc.)"),
             ("System-Prompt", "Anweisungen für die KI beim Neutralstil"),
-            ("Eigene Stile", "Stile mit eigenem Prompt erstellen und verwalten"),
+            ("Eigene Stile", "Stile mit eigenem Prompt erstellen und verwalten")
         ])
 
         SectionTitle(text: "Wörterbuch")
         SettingsList(items: [
             ("Einträge", "Manuell Korrekturpaare hinzufügen (z.B. Dikto → Dicto)"),
-            ("Export / Import", "Wörterbuch als JSON-Datei sichern oder übertragen"),
+            ("Export / Import", "Wörterbuch als JSON-Datei sichern oder übertragen")
         ])
 
         SectionTitle(text: "Statistiken")
         SettingsList(items: [
             ("Diktat-Verlauf", "Die letzten 20 Diktate mit Text und Zeitstempel"),
-            ("Nutzungsstatistik", "Anzahl Diktate, Wörter und meistgenutzter Stil"),
+            ("Nutzungsstatistik", "Anzahl Diktate, Wörter und meistgenutzter Stil")
         ])
     }
 }
@@ -575,9 +619,8 @@ private struct TroubleshootContent: View {
             steps: [
                 "Prüfe ob Ollama läuft: Terminal → ollama serve",
                 "Prüfe die Endpoint-URL in Einstellungen → KI (Standard: http://localhost:11434)",
-                "Firewall-Einstellungen: Ollama muss auf Port 11434 erreichbar sein",
-            ]
-        )
+                "Firewall-Einstellungen: Ollama muss auf Port 11434 erreichbar sein"
+            ])
 
         ErrorBlock(
             title: "API-Key ungültig (OpenAI)",
@@ -587,9 +630,8 @@ private struct TroubleshootContent: View {
                 "Key unter Einstellungen → KI löschen und neu einfügen",
                 "Prüfe ob das OpenAI-Projekt eine aktive Zahlungsmethode hat",
                 "Prüfe ob der Key nicht abgelaufen oder widerrufen wurde",
-                "Neuen Key erstellen unter: platform.openai.com/api-keys",
-            ]
-        )
+                "Neuen Key erstellen unter: platform.openai.com/api-keys"
+            ])
 
         ErrorBlock(
             title: "Text wird nicht eingefügt",
@@ -598,9 +640,8 @@ private struct TroubleshootContent: View {
             steps: [
                 "Systemeinstellungen → Datenschutz → Eingabehilfen → Dicto erlauben",
                 "Falls Dicto dort nicht erscheint: App neu starten",
-                "Nach XcodeGen-Regenerierung muss die Berechtigung neu erteilt werden",
-            ]
-        )
+                "Nach XcodeGen-Regenerierung muss die Berechtigung neu erteilt werden"
+            ])
 
         ErrorBlock(
             title: "Whisper-Modell lädt nicht / Fehler",
@@ -610,9 +651,8 @@ private struct TroubleshootContent: View {
                 "Internetverbindung prüfen (nur beim ersten Download nötig)",
                 "Unter ~/Documents/huggingface prüfen ob der Download vollständig ist",
                 "Dicto neu starten – der Download wird automatisch fortgesetzt",
-                "Bei dauerhaften Problemen: Modell-Ordner löschen und neu herunterladen",
-            ]
-        )
+                "Bei dauerhaften Problemen: Modell-Ordner löschen und neu herunterladen"
+            ])
 
         ErrorBlock(
             title: "Mikrofon nicht erkannt",
@@ -621,9 +661,8 @@ private struct TroubleshootContent: View {
             steps: [
                 "Systemeinstellungen → Datenschutz → Mikrofon → Dicto erlauben",
                 "Prüfe ob das richtige Mikrofon als Systemstandard eingestellt ist",
-                "Dicto neu starten nach Berechtigung",
-            ]
-        )
+                "Dicto neu starten nach Berechtigung"
+            ])
 
         ErrorBlock(
             title: "Fn-Taste reagiert nicht",
@@ -632,9 +671,8 @@ private struct TroubleshootContent: View {
             steps: [
                 "Systemeinstellungen → Datenschutz → Eingabeüberwachung → Dicto erlauben",
                 "In macOS Systemeinstellungen → Tastatur: Fn als Sondertaste (nicht als Medientaste) konfigurieren",
-                "Alternativen Shortcut in Einstellungen → Allgemein → Tastenkürzel konfigurieren",
-            ]
-        )
+                "Alternativen Shortcut in Einstellungen → Allgemein → Tastenkürzel konfigurieren"
+            ])
     }
 }
 

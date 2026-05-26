@@ -1,8 +1,8 @@
-import WhisperKit
 import Foundation
+import WhisperKit
 
-// Kein @MainActor auf Klassenebene – wir updaten state manuell via MainActor.run,
-// damit AppState das Objekt ohne Actor-Kontext erstellen kann.
+/// Kein @MainActor auf Klassenebene – wir updaten state manuell via MainActor.run,
+/// damit AppState das Objekt ohne Actor-Kontext erstellen kann.
 final class WhisperService: ObservableObject {
     @Published private(set) var state: TranscriptionState = .idle
 
@@ -34,7 +34,7 @@ final class WhisperService: ObservableObject {
             let options = DecodingOptions(task: .transcribe, language: language.code)
             let results = try await pipe.transcribe(audioPath: fileURL.path, decodeOptions: options)
             let text = results
-                .map { $0.text }
+                .map(\.text)
                 .joined(separator: " ")
                 .trimmingCharacters(in: .whitespacesAndNewlines)
             let final = text.isEmpty ? "(kein Text erkannt)" : text
