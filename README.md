@@ -164,14 +164,29 @@ MIT — free to use, modify, and distribute.
 
 ---
 
-## Support
+## Dicto Pro
 
-Dicto is free and open source. If it saves you time or protects your privacy, consider supporting development:
+Dicto is free and open source. **Dicto Pro** unlocks the most powerful features:
 
-<!-- GUMROAD BADGE PLACEHOLDER -->
-> 💛 [Pay what you want](#) *(link coming soon)*
+| | Free | Pro |
+|---|---|---|
+| Apple Speech Engine | ✅ | ✅ |
+| WhisperKit Base | ✅ | ✅ |
+| WhisperKit Large v3 Turbo | ❌ | ✅ |
+| Ollama / OpenAI integration | ❌ | ✅ |
+| Custom dictation styles | ❌ | ✅ |
+| Dictation history | 10 entries | 20 entries |
 
-This covers OpenAI API costs and keeps the project going.
+**One-time purchase · No subscription · €19**
+
+> 💛 [Buy Dicto Pro](https://dicto.lemonsqueezy.com) *(coming soon)*
+
+---
+
+## Legal
+
+- [Privacy Policy](docs/privacy-policy.md)
+- [Refund Policy](docs/refund-policy.md)
 
 ---
 
