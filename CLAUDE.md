@@ -52,6 +52,7 @@ Optional: Glättung via Ollama (qwen2.5:32b, http://localhost:11434).
 | PROJ-38 Fehleranzeige im Popover (Auto-Open, typsicher) | Abgeschlossen |
 | PROJ-39 GitHub Release v0.1.0 (CHANGELOG, make archive/notarize) | Stufe 1 abgeschlossen, Stufe 2 wartet auf Apple Developer Account |
 | PROJ-40 Sparkle Auto-Update | Abgeschlossen |
+| PROJ-41 LicenseService + Dicto Pro Feature-Gates | Abgeschlossen |
 
 ## Nutzer-Kontext
 
