@@ -17,4 +17,9 @@ public enum LLMProvider: String, CaseIterable {
 
     /// Provider die im Anbieter-Picker auswählbar sind (ohne .disabled)
     public static let activeProviders: [LLMProvider] = [.ollama, .openAI]
+
+    /// Provider die Dicto Pro erfordern.
+    public var isProFeature: Bool {
+        self == .ollama || self == .openAI
+    }
 }

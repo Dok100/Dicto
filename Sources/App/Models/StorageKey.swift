@@ -37,6 +37,10 @@ enum StorageKey {
         static let openAIModel = "openAIModel"
         static let openAIBaseURL = "openAIBaseURL"
 
+        // MARK: Lizenz
+
+        static let licenseActivated = "licenseActivated"  // Bool-Cache für Offline-Nutzung
+
         // MARK: Onboarding
 
         static let onboardingCompleted = "onboardingCompleted"
@@ -50,5 +54,7 @@ enum StorageKey {
     /// Keychain-Keys (vertrauliche Zugangsdaten)
     enum Keychain {
         static let openAIApiKey = "openAIApiKey"
+        static let licenseKey   = "licenseKey"    // LemonSqueezy License Key des Nutzers
+        static let instanceId   = "lsInstanceId"  // LemonSqueezy Instance ID (für Deaktivierung)
     }
 }

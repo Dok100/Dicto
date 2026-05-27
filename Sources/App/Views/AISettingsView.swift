@@ -49,7 +49,12 @@ struct AISettingsView: View {
                     // ── Anbieter-Picker (.disabled wird nicht angeboten) ──────
                     Picker("Anbieter", selection: $settings.llmProvider) {
                         ForEach(LLMProvider.activeProviders, id: \.self) { provider in
-                            Text(provider.label).tag(provider)
+                            HStack {
+                                Text(provider.label)
+                                if provider.isProFeature && !LicenseService.shared.isPro {
+                                    Image(systemName: "lock.fill")
+                                }
+                            }.tag(provider)
                         }
                     }
 

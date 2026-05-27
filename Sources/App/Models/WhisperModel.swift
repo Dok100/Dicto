@@ -10,4 +10,9 @@ public enum WhisperModel: String, CaseIterable {
         case .largev3: "Large v3 (~3 GB, maximal präzise)"
         }
     }
+
+    /// Modelle die Dicto Pro erfordern.
+    public var isProFeature: Bool {
+        self == .largev3turbo || self == .largev3
+    }
 }

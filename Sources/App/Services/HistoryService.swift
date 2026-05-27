@@ -3,7 +3,10 @@ import Foundation
 public final class HistoryService: ObservableObject {
     @Published public private(set) var entries: [DictationEntry] = []
 
-    private let maxEntries = 20
+    private var maxEntries: Int {
+        // UserDefaults-Cache lesen – vermeidet Actor-Isolation-Konflikt mit LicenseService
+        UserDefaults.standard.bool(forKey: StorageKey.Defaults.licenseActivated) ? 20 : 10
+    }
     private let storageKey = StorageKey.Defaults.dictationHistory
 
     public init() {
