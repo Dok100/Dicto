@@ -48,3 +48,6 @@ dicto-woerterbuch.json
 
 # Icon-Set-Lieferordner (lokal, nicht im Repo)
 Dicto/
+
+# Lokaler Asset-Ordner (Icons, Bilder, Texte, Marketing – nicht auf GitHub)
+_local/
