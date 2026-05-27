@@ -20,6 +20,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             updaterDelegate: nil,
             userDriverDelegate: nil
         )
+
+        // Lizenzstatus im Hintergrund gegen LemonSqueezy validieren.
+        // isPro ist bereits aus dem UserDefaults-Cache gesetzt (offline-fähig).
+        Task { await LicenseService.shared.validateOnLaunch() }
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {

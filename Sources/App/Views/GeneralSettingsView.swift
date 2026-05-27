@@ -61,7 +61,12 @@ struct GeneralSettingsView: View {
                 if settings.transcriptionEngine == .whisper {
                     Picker("Whisper-Modell", selection: $settings.whisperModel) {
                         ForEach(WhisperModel.allCases, id: \.self) { m in
-                            Text(m.label).tag(m)
+                            HStack {
+                                Text(m.label)
+                                if m.isProFeature && !LicenseService.shared.isPro {
+                                    Image(systemName: "lock.fill")
+                                }
+                            }.tag(m)
                         }
                     }
                     .pickerStyle(.radioGroup)

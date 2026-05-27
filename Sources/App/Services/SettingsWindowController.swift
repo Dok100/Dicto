@@ -8,22 +8,25 @@ private enum SettingsTab: String, CaseIterable {
     case ai
     case dictionary
     case stats
+    case license
 
     var label: String {
         switch self {
-        case .general: "Allgemein"
-        case .ai: "KI"
+        case .general:  "Allgemein"
+        case .ai:       "KI"
         case .dictionary: "Wörterbuch"
-        case .stats: "Statistiken"
+        case .stats:    "Statistiken"
+        case .license:  "Lizenz"
         }
     }
 
     var icon: String {
         switch self {
-        case .general: "gearshape"
-        case .ai: "brain"
+        case .general:  "gearshape"
+        case .ai:       "brain"
         case .dictionary: "text.book.closed"
-        case .stats: "chart.bar"
+        case .stats:    "chart.bar"
+        case .license:  "seal"
         }
     }
 
@@ -39,10 +42,11 @@ final class SettingsWindowController: NSWindowController, NSToolbarDelegate {
     private var currentTab: SettingsTab = .general
 
     // Lazy ViewControllers – werden beim ersten Wechsel erstellt und gecacht
-    private lazy var vcGeneral = makeVC(GeneralSettingsView(settings: appState.settings))
-    private lazy var vcAI = makeVC(AISettingsView(settings: appState.settings))
+    private lazy var vcGeneral    = makeVC(GeneralSettingsView(settings: appState.settings))
+    private lazy var vcAI         = makeVC(AISettingsView(settings: appState.settings))
     private lazy var vcDictionary = makeVC(DictionarySettingsView(dictionaryService: appState.dictionaryService))
-    private lazy var vcStats = makeVC(StatsSettingsView(stats: appState.statsService))
+    private lazy var vcStats      = makeVC(StatsSettingsView(stats: appState.statsService))
+    private lazy var vcLicense    = makeVC(LicenseSettingsView())
 
     init(appState: AppState) {
         self.appState = appState
@@ -107,10 +111,11 @@ final class SettingsWindowController: NSWindowController, NSToolbarDelegate {
 
     private func viewController(for tab: SettingsTab) -> NSViewController {
         switch tab {
-        case .general: vcGeneral
-        case .ai: vcAI
+        case .general:    vcGeneral
+        case .ai:         vcAI
         case .dictionary: vcDictionary
-        case .stats: vcStats
+        case .stats:      vcStats
+        case .license:    vcLicense
         }
     }
 
