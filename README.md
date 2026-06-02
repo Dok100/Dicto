@@ -11,11 +11,33 @@ Hold a key, speak, release — your words appear at the cursor, processed entire
 
 ## Download
 
-**[⬇ Download Dicto 0.1.0](https://github.com/Dok100/Dicto/releases/download/v0.1.0/Dicto-0.1.0.dmg)** — macOS 14.0+, Apple Silicon
+**[⬇ Download Dicto 0.2.0](https://github.com/Dok100/Dicto/releases/download/v0.2.0/Dicto-0.2.0.dmg)** — macOS 14.0+, Apple Silicon
 
 Open the DMG, drag Dicto to Applications, launch it. That's it.
 
 > [All releases](https://github.com/Dok100/Dicto/releases) · [⭐ Star this repo](../../stargazers)
+
+---
+
+## Dicto Pro
+
+Dicto is free and open source. **Dicto Pro** unlocks the most powerful features:
+
+| | Free | Pro |
+|---|---|---|
+| Apple Speech Engine | ✅ | ✅ |
+| WhisperKit Base | ✅ | ✅ |
+| WhisperKit Large v3 Turbo | ❌ | ✅ |
+| WhisperKit Large v3 | ❌ | ✅ |
+| Ollama / OpenAI integration | ❌ | ✅ |
+| Custom dictation styles | ❌ | ✅ |
+| Dictation history | 10 entries | 20 entries |
+
+**One-time purchase · No subscription · €19**
+
+**[💛 Buy Dicto Pro — €19](https://dicto.lemonsqueezy.com/checkout/buy/2cb54ccd-6ccd-450a-8bb1-d5b969bf0143)**
+
+After purchase you receive a license key by email. Enter it under Settings → License.
 
 ---
 
@@ -161,25 +183,6 @@ ollama pull qwen2.5:32b   # best quality (~20 GB RAM)
 ## License
 
 MIT — free to use, modify, and distribute.
-
----
-
-## Dicto Pro
-
-Dicto is free and open source. **Dicto Pro** unlocks the most powerful features:
-
-| | Free | Pro |
-|---|---|---|
-| Apple Speech Engine | ✅ | ✅ |
-| WhisperKit Base | ✅ | ✅ |
-| WhisperKit Large v3 Turbo | ❌ | ✅ |
-| Ollama / OpenAI integration | ❌ | ✅ |
-| Custom dictation styles | ❌ | ✅ |
-| Dictation history | 10 entries | 20 entries |
-
-**One-time purchase · No subscription · €19**
-
-> 💛 [Buy Dicto Pro](https://dicto.lemonsqueezy.com) *(coming soon)*
 
 ---
 

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct AISettingsView: View {
     @ObservedObject var settings: AppSettings
+    @ObservedObject private var license = LicenseService.shared
     @State private var ollamaReachable: Bool? = nil
     @State private var availableModels: [String] = []
     @State private var loadingModels = false
@@ -34,6 +35,7 @@ struct AISettingsView: View {
             Section {
                 HStack {
                     Toggle("Textglättung via KI", isOn: llmEnabledBinding)
+                        .disabled(!license.isPro)
                     if settings.llmEnabled {
                         Spacer()
                         llmStatusDot
@@ -43,6 +45,18 @@ struct AISettingsView: View {
                     guard settings.llmEnabled else { ollamaReachable = nil; return }
                     if settings.llmProvider == .ollama { await checkOllama() }
                     else { ollamaReachable = nil }
+                }
+                .onChange(of: license.isPro) { _, isPro in
+                    if !isPro && settings.llmProvider != .disabled {
+                        lastActiveProvider = settings.llmProvider
+                        settings.llmProvider = .disabled
+                    }
+                }
+
+                if !license.isPro {
+                    Label("Erfordert Dicto Pro", systemImage: "lock.fill")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
 
                 if settings.llmEnabled {
@@ -89,7 +103,11 @@ struct AISettingsView: View {
 
             // ── Sektion 2: Eigene Stile ───────────────────────────────────────
             Section {
-                if settings.customStyles.isEmpty {
+                if !license.isPro {
+                    Label("Erfordert Dicto Pro", systemImage: "lock.fill")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else if settings.customStyles.isEmpty {
                     Text("Noch keine eigenen Stile angelegt.")
                         .foregroundStyle(.secondary)
                         .font(.callout)
@@ -131,6 +149,7 @@ struct AISettingsView: View {
                     Label("Stil hinzufügen", systemImage: "plus.circle")
                 }
                 .font(.callout)
+                .disabled(!license.isPro)
             } header: {
                 Text("Eigene Stile")
             } footer: {
@@ -143,6 +162,10 @@ struct AISettingsView: View {
         .onAppear {
             openAIApiKey = settings.openAIApiKey
             if settings.llmEnabled { lastActiveProvider = settings.llmProvider }
+            if !license.isPro && settings.llmProvider != .disabled {
+                lastActiveProvider = settings.llmProvider
+                settings.llmProvider = .disabled
+            }
         }
         .sheet(item: $editingStyle) { style in
             CustomStyleEditView(style: style) { saved in

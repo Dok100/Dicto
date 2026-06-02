@@ -90,7 +90,7 @@ struct LicenseSettingsView: View {
 
                         Button {
                             NSWorkspace.shared.open(
-                                URL(string: "https://dicto.lemonsqueezy.com")!)
+                                URL(string: "https://dicto.lemonsqueezy.com/checkout/buy/2cb54ccd-6ccd-450a-8bb1-d5b969bf0143")!)
                         } label: {
                             Label("Dicto Pro kaufen", systemImage: "arrow.up.right")
                                 .font(.callout)

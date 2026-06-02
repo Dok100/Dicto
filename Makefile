@@ -113,6 +113,24 @@ notarize:
 		"release/export/Dicto.app"
 	@echo "✓ release/Dicto-$(VERSION).dmg ist fertig für den GitHub Release."
 
+# ── DMG ohne Notarisierung (für Releases ohne Apple Developer Account) ────────
+# Voraussetzung: make archive wurde bereits ausgeführt (release/export/Dicto.app existiert)
+.PHONY: dmg
+dmg:
+	@echo "→ Erstelle DMG (ohne Notarisierung) v$(VERSION)..."
+	@which create-dmg > /dev/null || brew install create-dmg
+	@rm -f "release/Dicto-$(VERSION).dmg"
+	create-dmg \
+		--volname "Dicto $(VERSION)" \
+		--window-size 660 400 \
+		--icon-size 128 \
+		--icon "Dicto.app" 180 170 \
+		--app-drop-link 480 170 \
+		"release/Dicto-$(VERSION).dmg" \
+		"release/export/Dicto.app"
+	@echo "✓ release/Dicto-$(VERSION).dmg fertig."
+	@echo "  Hinweis: Nicht notarisiert – Nutzer müssen beim ersten Start Rechtsklick → Öffnen verwenden."
+
 # ── Clean ─────────────────────────────────────────────────────────────────────
 .PHONY: clean
 clean:

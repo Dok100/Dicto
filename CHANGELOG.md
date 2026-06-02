@@ -5,6 +5,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.2.0] – 2026-06-02 — Dicto Pro
+
+### New: Dicto Pro
+
+- **License system** — one-time purchase via Lemon Squeezy, €19, no subscription
+- License key activation directly in Settings → License
+- Offline-capable: Pro status cached locally, background validation on launch
+- Up to 3 activations per license key
+- New **License tab** in Settings with activation status, Pro feature overview and deactivation
+
+### Pro feature gates
+
+- WhisperKit Large v3 Turbo and Large v3 require Dicto Pro (Base remains free)
+- Ollama and OpenAI AI processing require Dicto Pro
+- Custom dictation styles require Dicto Pro
+- Dictation history: 10 entries (Free) vs. 20 entries (Pro)
+
+### Improvements
+
+- Settings window wider (700 px default) — all tabs visible without overflow
+- Main panel wider (420 px default) — style picker no longer clipped
+- Dictation history: trash button with confirmation dialog to clear all entries
+- In-app Help updated: Pro badges on all Pro features, clearer Preview mode documentation
+
+---
+
 ## [0.1.0] – 2026-05-26 — First public release
 
 ### Core dictation

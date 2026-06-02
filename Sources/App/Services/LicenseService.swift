@@ -16,7 +16,8 @@ final class LicenseService: ObservableObject {
     // ─── LemonSqueezy-Konfiguration ────────────────────────────────────────
     // Variant-ID aus dem LemonSqueezy-Dashboard (Produkt → Variante → ID in der URL).
     // Verhindert, dass Keys fremder Produkte akzeptiert werden.
-    private static let expectedVariantId = 1_708_450
+    // Live-Variante: 1733412 / Test-Variante: 1708450
+    private static let acceptedVariantIds: Set<Int> = [1733412, 1708450]
 
     private static let activateURL   = URL(string: "https://api.lemonsqueezy.com/v1/licenses/activate")!
     private static let validateURL   = URL(string: "https://api.lemonsqueezy.com/v1/licenses/validate")!
@@ -101,9 +102,8 @@ final class LicenseService: ObservableObject {
 
             if http.statusCode == 200 && result.activated {
                 // Variant-ID prüfen (nur wenn expectedVariantId gesetzt ist)
-                if Self.expectedVariantId != 0,
-                   let variantId = result.meta?.variantId,
-                   variantId != Self.expectedVariantId
+                if let variantId = result.meta?.variantId,
+                   !Self.acceptedVariantIds.contains(variantId)
                 {
                     activationError = "Dieser Schlüssel gehört nicht zu Dicto Pro."
                     return

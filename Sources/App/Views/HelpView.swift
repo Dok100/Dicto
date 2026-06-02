@@ -137,6 +137,17 @@ private struct InfoBox: View {
     }
 }
 
+private struct ProBadge: View {
+    var body: some View {
+        Text("Pro")
+            .font(.system(size: 10, weight: .semibold))
+            .foregroundStyle(.white)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 2)
+            .background(.orange, in: Capsule())
+    }
+}
+
 private struct ShortcutRow: View {
     let shortcut: String
     let description: String
@@ -253,6 +264,11 @@ private struct DictationContent: View {
             text: "Whisper lädt das Modell beim ersten Einsatz automatisch herunter. Danach funktioniert es vollständig offline.",
             color: .orange)
 
+        InfoBox(
+            icon: "seal.fill",
+            text: "Large v3 Turbo und Large v3 erfordern Dicto Pro. Das Base-Modell ist in der Free-Version verfügbar.",
+            color: .orange)
+
         SectionTitle(text: "Sprachauswahl")
         Text(
             "Unter Einstellungen → Allgemein → Sprache wählst du zwischen **Deutsch**, **Englisch** oder **Automatisch** (erkennt die Sprache selbst).")
@@ -296,11 +312,15 @@ private struct EngineRow: View {
 
 private struct AISmoothingContent: View {
     var body: some View {
-        Text(
-            "Die KI glättet deinen Diktat-Text: entfernt Füllwörter, korrigiert Satzbau und macht den Text schreibfertig.")
-            .font(.callout)
-            .foregroundStyle(.secondary)
-            .padding(.bottom, 8)
+        HStack(spacing: 8) {
+            Text(
+                "Die KI glättet deinen Diktat-Text: entfernt Füllwörter, korrigiert Satzbau und macht den Text schreibfertig.")
+                .font(.callout)
+                .foregroundStyle(.secondary)
+            Spacer()
+            ProBadge()
+        }
+        .padding(.bottom, 8)
 
         InfoBox(
             icon: "bolt.fill",
@@ -397,7 +417,11 @@ private struct StylesContent: View {
         }
         .padding(.bottom, 8)
 
-        SectionTitle(text: "Eigene Stile")
+        HStack(spacing: 8) {
+            SectionTitle(text: "Eigene Stile")
+            ProBadge()
+            Spacer()
+        }
         Text(
             "Unter Einstellungen → KI → Eigene Stile kannst du beliebig viele eigene Stile mit eigenem System-Prompt erstellen (z.B. Arztbrief, Protokoll, Twitterpost).")
             .font(.callout)
@@ -524,6 +548,11 @@ private struct PreviewContent: View {
             .padding(.bottom, 4)
 
         InfoBox(
+            icon: "exclamationmark.circle",
+            text: "Das automatische Wörterbuch-Lernen erfolgt nur im Preview-Modus. Ohne aktivierte Vorschau (Einstellungen → Allgemein → Vorschau vor dem Einfügen) wird der Text direkt eingefügt – Korrekturen werden dabei nicht übernommen.",
+            color: .orange)
+
+        InfoBox(
             icon: "book.fill",
             text: "Das Wörterbuch kann unter Einstellungen → Wörterbuch eingesehen, bearbeitet und exportiert werden.",
             color: .blue)
@@ -541,53 +570,60 @@ private struct SettingsContent: View {
 
         SectionTitle(text: "Allgemein")
         SettingsList(items: [
-            ("Spracherkennung", "Apple Speech (live) oder Whisper (präziser)"),
-            ("Whisper-Modell", "Base (~150 MB), Large v3 Turbo (~800 MB, empfohlen) oder Large v3 (~3 GB)"),
-            ("Sprache", "Deutsch, Englisch oder Automatisch"),
-            ("Vorschau", "Text vor dem Einfügen im Panel anzeigen"),
-            ("Sound-Feedback", "Tink/Pop bei Aufnahme-Start und -Stopp"),
-            ("Diktat-Shortcut", "Taste für Push-to-Talk (Standard: Fn)"),
-            ("Transform-Shortcut", "Taste für Transform-Modus (Standard: ⌥ Fn)"),
-            ("Launch at Login", "Dicto automatisch beim Mac-Start öffnen")
+            ("Spracherkennung", "Apple Speech (live) oder Whisper (präziser)", false),
+            ("Whisper-Modell", "Base (~150 MB) kostenlos · Large v3 Turbo & Large v3 erfordern Pro", true),
+            ("Sprache", "Deutsch, Englisch oder Automatisch", false),
+            ("Vorschau", "Text vor dem Einfügen im Panel anzeigen", false),
+            ("Sound-Feedback", "Tink/Pop bei Aufnahme-Start und -Stopp", false),
+            ("Diktat-Shortcut", "Taste für Push-to-Talk (Standard: Fn)", false),
+            ("Transform-Shortcut", "Taste für Transform-Modus (Standard: ⌥ Fn)", false),
+            ("Launch at Login", "Dicto automatisch beim Mac-Start öffnen", false)
         ])
 
-        SectionTitle(text: "KI")
+        HStack(spacing: 8) {
+            SectionTitle(text: "KI")
+            ProBadge()
+            Spacer()
+        }
         SettingsList(items: [
-            ("Textglättung", "KI-Verarbeitung ein- oder ausschalten"),
-            ("Anbieter", "Ollama (lokal) oder OpenAI API"),
-            ("Ollama-Modell", "Aus installierten Modellen wählen (empfohlen: qwen2.5:32b)"),
-            ("Ollama-Endpoint", "URL des lokalen Ollama-Servers (Standard: localhost:11434)"),
-            ("OpenAI API-Key", "Wird sicher im macOS Keychain gespeichert"),
-            ("OpenAI-Modell", "z.B. gpt-4o-mini (schnell/günstig) oder gpt-4o (beste Qualität)"),
-            ("OpenAI Basis-URL", "Für OpenAI-kompatible APIs (Groq, LM Studio etc.)"),
-            ("System-Prompt", "Anweisungen für die KI beim Neutralstil"),
-            ("Eigene Stile", "Stile mit eigenem Prompt erstellen und verwalten")
+            ("Textglättung", "KI-Verarbeitung ein- oder ausschalten", true),
+            ("Anbieter", "Ollama (lokal) oder OpenAI API", true),
+            ("Ollama-Modell", "Aus installierten Modellen wählen (empfohlen: qwen2.5:32b)", true),
+            ("Ollama-Endpoint", "URL des lokalen Ollama-Servers (Standard: localhost:11434)", true),
+            ("OpenAI API-Key", "Wird sicher im macOS Keychain gespeichert", true),
+            ("OpenAI-Modell", "z.B. gpt-4o-mini (schnell/günstig) oder gpt-4o (beste Qualität)", true),
+            ("OpenAI Basis-URL", "Für OpenAI-kompatible APIs (Groq, LM Studio etc.)", true),
+            ("System-Prompt", "Anweisungen für die KI beim Neutralstil", true),
+            ("Eigene Stile", "Stile mit eigenem Prompt erstellen und verwalten", true)
         ])
 
         SectionTitle(text: "Wörterbuch")
         SettingsList(items: [
-            ("Einträge", "Manuell Korrekturpaare hinzufügen (z.B. Dikto → Dicto)"),
-            ("Export / Import", "Wörterbuch als JSON-Datei sichern oder übertragen")
+            ("Einträge", "Manuell Korrekturpaare hinzufügen (z.B. Dikto → Dicto)", false),
+            ("Export / Import", "Wörterbuch als JSON-Datei sichern oder übertragen", false)
         ])
 
         SectionTitle(text: "Statistiken")
         SettingsList(items: [
-            ("Diktat-Verlauf", "Die letzten 20 Diktate mit Text und Zeitstempel"),
-            ("Nutzungsstatistik", "Anzahl Diktate, Wörter und meistgenutzter Stil")
+            ("Diktat-Verlauf", "Die letzten 20 Diktate mit Text und Zeitstempel · Free: 10 Einträge · Pro: 20", false),
+            ("Nutzungsstatistik", "Anzahl Diktate, Wörter und meistgenutzter Stil", false)
         ])
     }
 }
 
 private struct SettingsList: View {
-    let items: [(String, String)]
+    let items: [(String, String, Bool)]
     var body: some View {
         VStack(spacing: 0) {
             ForEach(Array(items.enumerated()), id: \.offset) { i, item in
                 HStack(alignment: .top, spacing: 8) {
-                    Text(item.0)
-                        .font(.callout)
-                        .fontWeight(.medium)
-                        .frame(width: 160, alignment: .leading)
+                    HStack(spacing: 6) {
+                        Text(item.0)
+                            .font(.callout)
+                            .fontWeight(.medium)
+                        if item.2 { ProBadge() }
+                    }
+                    .frame(width: 180, alignment: .leading)
                     Text(item.1)
                         .font(.callout)
                         .foregroundStyle(.secondary)

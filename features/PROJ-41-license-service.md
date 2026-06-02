@@ -78,7 +78,7 @@ App-Start:
 
 - **Produkt:** Dicto Pro
 - **Preis:** €19 (Einmalkauf, steuerinklusiv)
-- **Variant-ID:** 1708450
+- **Variant-ID:** 1733412
 - **Aktivierungslimit:** 3 Geräte pro Key
 - **Lizenzdauer:** Unbegrenzt
 - **Store:** dicto.lemonsqueezy.com (Aktivierung ausstehend)

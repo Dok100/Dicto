@@ -52,12 +52,12 @@ final class SettingsWindowController: NSWindowController, NSToolbarDelegate {
         self.appState = appState
 
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 500, height: 520),
+            contentRect: NSRect(x: 0, y: 0, width: 700, height: 560),
             styleMask: [.titled, .closable, .resizable, .unifiedTitleAndToolbar],
             backing: .buffered,
             defer: false)
         window.title = "Dicto – Einstellungen"
-        window.minSize = NSSize(width: 440, height: 400)
+        window.minSize = NSSize(width: 600, height: 440)
         window.isReleasedWhenClosed = false
         window.setFrameAutosaveName("DictoSettings")
         window.center()
@@ -86,7 +86,7 @@ final class SettingsWindowController: NSWindowController, NSToolbarDelegate {
         if let w = window, !w.isVisible,
            UserDefaults.standard.object(forKey: "NSWindow Frame DictoSettings") == nil
         {
-            w.setContentSize(NSSize(width: 500, height: 520))
+            w.setContentSize(NSSize(width: 700, height: 560))
             w.center()
         }
         showWindow(nil)

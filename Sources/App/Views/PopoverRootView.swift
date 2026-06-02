@@ -48,7 +48,7 @@ struct PopoverRootView: View {
                 .padding(.horizontal, 10)
                 .padding(.vertical, 8)
         }
-        .frame(minWidth: 280, minHeight: 260)
+        .frame(minWidth: 380, minHeight: 300)
         .background(.regularMaterial)
         .animation(.spring(response: 0.28, dampingFraction: 0.82), value: stateTag)
         .animation(.spring(response: 0.28, dampingFraction: 0.82), value: showHistory)
@@ -221,6 +221,8 @@ struct PopoverRootView: View {
 
     // MARK: – Verlauf
 
+    @State private var showClearConfirm = false
+
     @ViewBuilder
     private var historyView: some View {
         let entries = appState.historyService.entries
@@ -228,26 +230,56 @@ struct PopoverRootView: View {
             ContentUnavailableView("Noch kein Verlauf", systemImage: "clock")
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 6) {
-                    ForEach(entries) { entry in
-                        VStack(alignment: .leading, spacing: 3) {
-                            Text(entry.date, formatter: Self.relativeDateFormatter)
-                                .font(.caption2)
-                                .foregroundStyle(.tertiary)
-                            Text(entry.text)
-                                .font(.callout)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .textSelection(.enabled)
+            VStack(spacing: 6) {
+                HStack {
+                    Text("Verlauf")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Button {
+                        showClearConfirm = true
+                    } label: {
+                        Image(systemName: "trash")
+                            .font(.system(size: 11))
+                            .foregroundStyle(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Verlauf löschen")
+                    .confirmationDialog(
+                        "Verlauf löschen?",
+                        isPresented: $showClearConfirm,
+                        titleVisibility: .visible
+                    ) {
+                        Button("Löschen", role: .destructive) {
+                            appState.historyService.clear()
                         }
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 8)
-                        .background(.quaternary.opacity(0.6), in: RoundedRectangle(cornerRadius: 8))
+                        Button("Abbrechen", role: .cancel) {}
+                    } message: {
+                        Text("Alle Einträge werden unwiderruflich gelöscht.")
                     }
                 }
-                .padding(.horizontal, 1)
+
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 6) {
+                        ForEach(entries) { entry in
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(entry.date, formatter: Self.relativeDateFormatter)
+                                    .font(.caption2)
+                                    .foregroundStyle(.tertiary)
+                                Text(entry.text)
+                                    .font(.callout)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .textSelection(.enabled)
+                            }
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 8)
+                            .background(.quaternary.opacity(0.6), in: RoundedRectangle(cornerRadius: 8))
+                        }
+                    }
+                    .padding(.horizontal, 1)
+                }
+                .frame(minHeight: 80, maxHeight: 200)
             }
-            .frame(minHeight: 80, maxHeight: 200)
         }
     }
 

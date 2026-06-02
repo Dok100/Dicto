@@ -3,6 +3,7 @@ import SwiftUI
 
 struct GeneralSettingsView: View {
     @ObservedObject var settings: AppSettings
+    @ObservedObject private var license = LicenseService.shared
 
     private var launchAtLoginBinding: Binding<Bool> {
         Binding(
@@ -63,13 +64,25 @@ struct GeneralSettingsView: View {
                         ForEach(WhisperModel.allCases, id: \.self) { m in
                             HStack {
                                 Text(m.label)
-                                if m.isProFeature && !LicenseService.shared.isPro {
+                                    .foregroundStyle(m.isProFeature && !license.isPro ? .secondary : .primary)
+                                if m.isProFeature && !license.isPro {
                                     Image(systemName: "lock.fill")
+                                        .foregroundStyle(.secondary)
                                 }
                             }.tag(m)
                         }
                     }
                     .pickerStyle(.radioGroup)
+                    .onChange(of: settings.whisperModel) { _, new in
+                        if new.isProFeature && !license.isPro {
+                            settings.whisperModel = .base
+                        }
+                    }
+                    .onChange(of: license.isPro) { _, isPro in
+                        if !isPro && settings.whisperModel.isProFeature {
+                            settings.whisperModel = .base
+                        }
+                    }
 
                     Text("Modellwechsel wird beim nächsten Diktat angewendet.")
                         .font(.caption)
@@ -115,5 +128,10 @@ struct GeneralSettingsView: View {
         }
         .formStyle(.grouped)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onAppear {
+            if !license.isPro && settings.whisperModel.isProFeature {
+                settings.whisperModel = .base
+            }
+        }
     }
 }
