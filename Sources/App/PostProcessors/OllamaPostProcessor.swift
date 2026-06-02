@@ -51,7 +51,7 @@ final class OllamaPostProcessor {
             "stream": true,
             "messages": [
                 ["role": "system", "content": systemPrompt],
-                ["role": "user", "content": "<diktat>\(text)</diktat>"]
+                ["role": "user", "content": "<diktat>\(text)</diktat>\n/no_think"]
             ]
         ]
         request.httpBody = try? JSONSerialization.data(withJSONObject: body)

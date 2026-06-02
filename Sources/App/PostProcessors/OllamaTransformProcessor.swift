@@ -57,7 +57,7 @@ final class OllamaTransformProcessor {
             "stream": true,
             "messages": [
                 ["role": "system", "content": Self.systemPrompt],
-                ["role": "user", "content": "<original>\(original)</original>\n<befehl>\(command)</befehl>"]
+                ["role": "user", "content": "<original>\(original)</original>\n<befehl>\(command)</befehl>\n/no_think"]
             ]
         ]
         request.httpBody = try? JSONSerialization.data(withJSONObject: body)
