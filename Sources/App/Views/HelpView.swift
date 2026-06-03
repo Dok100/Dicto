@@ -255,7 +255,7 @@ private struct DictationContent: View {
                 name: "Whisper (präziser, offline)",
                 icon: "waveform",
                 pros: ["Sehr hohe Genauigkeit", "Fachvokabular, Eigennamen, Umlaute"],
-                cons: ["Einmaliger Download (800 MB – 3 GB)", "Text erscheint erst nach Aufnahme"])
+                cons: ["Einmaliger Download (~3 GB)", "Text erscheint erst nach Aufnahme"])
         }
         .padding(.bottom, 4)
 
@@ -266,7 +266,7 @@ private struct DictationContent: View {
 
         InfoBox(
             icon: "seal.fill",
-            text: "Large v3 Turbo und Large v3 erfordern Dicto Pro. Das Base-Modell ist in der Free-Version verfügbar.",
+            text: "Large v3 erfordert Dicto Pro. Das Base-Modell ist in der Free-Version verfügbar.",
             color: .orange)
 
         SectionTitle(text: "Sprachauswahl")
@@ -571,7 +571,7 @@ private struct SettingsContent: View {
         SectionTitle(text: "Allgemein")
         SettingsList(items: [
             ("Spracherkennung", "Apple Speech (live) oder Whisper (präziser)", false),
-            ("Whisper-Modell", "Base (~150 MB) kostenlos · Large v3 Turbo & Large v3 erfordern Pro", true),
+            ("Whisper-Modell", "Base (~150 MB) kostenlos · Large v3 erfordert Pro", true),
             ("Sprache", "Deutsch, Englisch oder Automatisch", false),
             ("Vorschau", "Text vor dem Einfügen im Panel anzeigen", false),
             ("Sound-Feedback", "Tink/Pop bei Aufnahme-Start und -Stopp", false),

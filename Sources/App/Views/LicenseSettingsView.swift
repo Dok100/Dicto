@@ -107,7 +107,7 @@ struct LicenseSettingsView: View {
 
             // ── Sektion 3: Pro-Features ───────────────────────────────────────
             Section {
-                proFeatureRow(icon: "waveform", label: "WhisperKit Large v3 Turbo & Large v3",
+                proFeatureRow(icon: "waveform", label: "WhisperKit Large v3",
                               subtitle: "Höchste Präzision, vollständig offline")
                 proFeatureRow(icon: "brain",    label: "KI-Textverarbeitung",
                               subtitle: "Ollama (lokal) und OpenAI API")
